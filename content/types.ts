@@ -125,3 +125,12 @@ export interface Helpline {
   hours: string
   sources: { title: string; url: string }[] // official pages that state this number
 }
+
+// People (and Mitthu) who appear in scenes and dialogue (content/npcs.json).
+// A hotspot's `npc` and a node's `speaker` refer to these ids; "player" means the child.
+export interface NpcDef {
+  name: string
+  kind?: 'person' | 'parrot' // default person
+  adult?: boolean // adults are drawn taller, with adult head proportions
+  look?: Record<string, string | boolean> // a CharacterSpec; missing parts use defaults
+}
