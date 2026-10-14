@@ -208,7 +208,7 @@ Done when: CI is green and the app shows an empty shell.
 - [x] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
 - [x] Portrait renderer (head and shoulders with a mood) for dialogue and results.
 
-🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14.
+🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14. ⚠️ **Reopened 2026-10-15:** the owner no longer likes the character design (see "Owner feedback rework" below).
 
 #### Scene engine and look development
 
@@ -219,7 +219,17 @@ Done when: CI is green and the app shows an empty shell.
 - [x] **Sandbox scene** (`/dev/scene`): one test scene with placeholder art that exercises every engine feature. Add engine unit tests for walking bounds, hotspot proximity, flag logic and retry.
 - [x] **Look development:** build the first real School backdrop (4 to 5 parallax layers, golden-hour light, light shafts, grain, depth blur, ambient life such as birds and drifting dust) and put the finished character in it.
 
-🛑 **Gate:** owner approves the visual style on this one scene. If it does not look good enough, change the approach here, before more scenes exist.
+🛑 **Gate:** owner approves the visual style on this one scene. If it does not look good enough, change the approach here, before more scenes exist. ⏳ **Not approved yet** (presented 2026-10-14).
+
+#### Owner feedback rework (added 2026-10-15, must be done before Phase 3)
+
+The owner said they do **not like the cover page or the character design**. Both must change, and be approved, before Phase 3 starts.
+
+- [ ] **Clarify the feedback first.** Ask the owner (a) what "cover page" means. It is most likely the first screen a child sees (`/#/onboarding` "Hello!", or the profile picker), but it could also be the School look-dev scene at `/#/dev/look`. (b) What exactly they dislike about each, and what they would like instead (references or examples help). Do not redesign before this is answered.
+- [ ] **Redesign the cover page** to the owner's direction. All text through `t()`, Help button still present, calm mode respected. Show screenshots and get approval.
+- [ ] **Redesign the character** to the owner's direction (`src/character/Character.tsx`, `spec.ts`, `character.css`). Keep the `CharacterSpec` shape, or migrate saved profiles in `store.ts` (bump the persist `version`). Keep every option the plan requires. Check every combination on `/#/dev/characters`. 🛑 Re-run the character gate.
+- [ ] 🛑 **Re-run the look-development gate** on `/#/dev/look` with the new character, and get the owner's approval of the scene style.
+- [ ] **Open the Phase 2 pull request** from `p2-character-scene` to `main`, wait for green CI, merge with a merge commit (owner preference), then start Phase 3 on a new branch.
 
 ### Phase 3: School end to end (MILESTONE A)
 
@@ -382,3 +392,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: every P2 task. Scene engine (pure `sceneReducer` + `Scene` player): parallax, camera, walking with blockers, keyboard/walk pad/tap-to-walk, hotspots with prompts, "Things to do here", dialogue (portraits, typewriter, choices, aria-live, read aloud, retry), objectives, Mitthu (follow, perch, 20 s hint). `/dev/scene` sandbox. School look-dev at `/dev/look`. 155 unit and 34 e2e tests green.
 - Hacky / watch: the look-dev page reuses the sandbox story and placeholder props (the box and notice). The real School story and props come in P3. Phone walk pad is only checked through `pointer: coarse`, not on a real device yet. No per-frame performance profiling yet (P7).
 - Waiting for: owner approval of the visual style at `/dev/look`. Then the next task is P3 › author `content/scenes/school.json`.
+
+**Handoff (2026-10-15): start of the next session**
+- State: P0 and P1 are merged to `main` (PRs #1, #2). All of P2 is built and pushed on branch `p2-character-scene` (no PR yet). 155 unit and 34 e2e tests green locally.
+- Owner feedback: they do **not like the cover page or the character design**. The character gate is reopened, and the look-dev gate is not approved. Phase 3 must not start until both are redesigned and approved.
+- Exact next task: P2 › Owner feedback rework › "Clarify the feedback first". Ask the owner before changing any art.

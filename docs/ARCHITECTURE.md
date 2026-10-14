@@ -13,11 +13,12 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 
 | Folder | Holds | Status |
 | --- | --- | --- |
-| `content/` | Typed JSON: UI strings, scenes, help copy; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1) |
+| `content/` | Typed JSON: UI strings, scenes, help copy, people; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1); `npcs.json`, `scenes/sandbox.json` (P2) |
 | `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, later `sync.ts`, `supabase.ts` | all but sync/supabase (P1) |
-| `src/engine/` | Scene, dialogue and game engines | P2 |
-| `src/character/` | Paper-doll character rig and portraits | P2 |
-| `src/screens/` | One component per route: Onboarding, Profiles, HelpCentre, guards, Placeholder | P1 |
+| `src/engine/` | Pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts`) and the scene player (`Scene.tsx`, `Dialogue.tsx`, `WalkPad.tsx`, `hooks.ts`, `people.ts`, `speech.ts`) | P2 |
+| `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (design under rework) |
+| `src/art/` | Scene art registry by key (`index.ts`), `sandbox.tsx`, `school.tsx` (look-dev) | P2 |
+| `src/screens/` | One component per route: Onboarding, Profiles, HelpCentre, Me (+ character), guards, Placeholder; dev pages DevCharacters, DevScene, DevLook | P1, P2 |
 | `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
 | `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |
@@ -58,18 +59,46 @@ flowchart TD
     Play["/play/:id"]
     Teacher[/teacher/]
     Reviewer[/reviewer/]
+    Dev["/dev/characters · /dev/scene · /dev/look"]
   end
   subgraph "Shell nav (adds Town · Book · Community · Me)"
     Town
     Book[/book/]
     Community[/community/]
-    Me[/me/]
+    Me["/me · /me/character"]
     Credits[/credits/]
   end
   Help["/help (no shell: calm, silent)"]
 ```
 
 `RequireProfile` guards `/town`, `/play/:id`, `/book`, `/community` and `/me`. Without an active player they go back to `/`.
+
+## Scene engine (P2)
+
+A scene is played by one pure reducer. React only sends actions and draws the state.
+
+```mermaid
+flowchart LR
+  Loop["requestAnimationFrame
+(tick: now, dt, dir)"] --> R
+  Keys["Keys: arrows/A/D, E, Enter"] --> R
+  Pad["Walk pad / tap-to-walk"] --> R
+  List["Things to do here"] --> R
+  DialogueUI["Dialogue: Next / choices"] --> R
+  R["sceneReducer(scene)
+state + action → new state"] --> S[(SceneState:
+x, camera, Mitthu,
+flags, dialogue, retries,
+hint, exit, completed)]
+  S --> Draw["Scene.tsx draws layers (src/art),
+stage, people (npcs.json), prompts"]
+  S -->|completed / exit| Parent["onComplete(retries) / onExit(hotspot)"]
+```
+
+- Layers with `speed < 1` (or `front` not set) are drawn behind the stage, and layers with `speed > 1` or `front: true` in front. Speed 0 is fixed to the screen (the light layer). Film grain sits over every scene.
+- The scene is 1000 design units tall, with the ground at `GROUND_Y` = 900. A child is 330 units tall and an adult 395.
+- Calm mode turns off parallax, camera smoothing, the typewriter and all ambient motion. `gentle` scenes play sound at half volume and never nudge the screen.
+- The engine never names a building. It reads only the SceneDef, the art registry by key, and `npcs.json`.
 
 ## Build and run
 
