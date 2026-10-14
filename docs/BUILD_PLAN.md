@@ -366,3 +366,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: ESLint pinned to 9 (past end-of-support) because jsx-a11y doesn't support 10 yet (D-007). Calm mode only follows the system setting until the P1 settings store. The deploy job is untested until the owner sets up Vercel (SETUP.md §3).
 - Owner: check the two font licences in ASSET_LICENSES.md. Optionally install `gh` and protect `main`.
 - Next task: P1 › Rules and content contract › `content/types.ts` from §6 plus the validation script.
+
+**P1 Core (2026-10-14)**
+- Done: all 9 P1 tasks. 100 unit, 10 e2e and 16 safety tests, all green locally. The validator runs in CI.
+- Hacky / watch: Help Centre numbers are sourced from PIB pages but **not yet owner-verified** (`help.json` → `review.status: "unverified"`, SETUP.md §5). Language picker shows English only until P6. `t()` doesn't re-render on a language change yet (P6). Names with hyphens or apostrophes are rejected per §4 (D-014). Sounds are synthesised placeholders.
+- Owner: fact-check `content/help.json` (SETUP.md §5) and the font licences.
+- Next task: P2 › Character › paper-doll SVG character rig and options.
