@@ -2,7 +2,9 @@ import { Navigate, Route, Routes } from 'react-router'
 import { Shell } from '@/components/Shell'
 import { RequireProfile, StartRedirect } from '@/screens/guards'
 import { HelpCentre } from '@/screens/HelpCentre'
+import { Onboarding } from '@/screens/Onboarding'
 import { Placeholder } from '@/screens/Placeholder'
+import { Profiles } from '@/screens/Profiles'
 
 // Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
 export default function App() {
@@ -14,8 +16,8 @@ export default function App() {
 
       {/* Screens with the top bar only. */}
       <Route element={<Shell />}>
-        <Route path="/profiles" element={<Placeholder title="profiles.title" />} />
-        <Route path="/onboarding" element={<Placeholder title="onboarding.title" />} />
+        <Route path="/profiles" element={<Profiles />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/teacher" element={<Placeholder title="teacher.title" />} />
         <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
         <Route element={<RequireProfile />}>
