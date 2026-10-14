@@ -1,25 +1,31 @@
-import { Route, Routes } from 'react-router'
-import { t } from '@/lib/i18n'
+import { Navigate, Outlet, Route, Routes } from 'react-router'
+import { RequireProfile, StartRedirect } from '@/screens/guards'
+import { Placeholder } from '@/screens/Placeholder'
 
-// The empty shell. Real screens and routes arrive in Phase 1.
-function Home() {
-  return (
-    <main className="grid min-h-dvh place-items-center p-4">
-      <div className="max-w-md rounded-card bg-plaster-deep p-8 text-center shadow-soft">
-        <h1 className="text-3xl font-semibold text-terracotta-deep">{t('app.name')}</h1>
-        <p lang="hi" className="mt-1 text-xl text-brass">
-          {t('app.nameHindi')}
-        </p>
-        <p className="mt-4 text-ink-soft">{t('app.tagline')}</p>
-      </div>
-    </main>
-  )
-}
-
+// Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<StartRedirect />} />
+      <Route path="/help" element={<Placeholder title="help.title" />} />
+
+      <Route element={<Outlet />}>
+        <Route path="/profiles" element={<Placeholder title="profiles.title" />} />
+        <Route path="/onboarding" element={<Placeholder title="onboarding.title" />} />
+        <Route path="/credits" element={<Placeholder title="credits.title" />} />
+        <Route path="/teacher" element={<Placeholder title="teacher.title" />} />
+        <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
+
+        <Route element={<RequireProfile />}>
+          <Route path="/town" element={<Placeholder title="town.title" />} />
+          <Route path="/play/:id" element={<Placeholder title="play.title" />} />
+          <Route path="/book" element={<Placeholder title="book.title" />} />
+          <Route path="/community" element={<Placeholder title="community.title" />} />
+          <Route path="/me" element={<Placeholder title="me.title" />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

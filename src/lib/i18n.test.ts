@@ -8,13 +8,11 @@ describe('t()', () => {
   })
 
   it('fills in {placeholders}', () => {
-    expect(t('shell.comingSoon', { name: 'Asha' })).toBe(
-      'The town is being built. Come back soon, Asha!',
-    )
+    expect(t('profiles.playAs', { name: 'Asha' })).toBe('Play as Asha')
   })
 
   it('leaves unknown placeholders untouched', () => {
-    expect(t('shell.comingSoon', {})).toContain('{name}')
+    expect(t('profiles.playAs', {})).toContain('{name}')
   })
 
   it('returns the key itself when a string is missing', () => {

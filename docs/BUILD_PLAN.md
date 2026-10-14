@@ -192,7 +192,7 @@ Done when: CI is green and the app shows an empty shell.
 
 #### App shell and safety basics
 
-- [ ] Routes: `/` redirect, `/profiles`, `/onboarding`, `/town`, `/play/:id`, `/book`, `/help`, `/community`, `/me`, `/credits`, `/teacher`, `/reviewer`.
+- [x] Routes: `/` redirect, `/profiles`, `/onboarding`, `/town`, `/play/:id`, `/book`, `/help`, `/community`, `/me`, `/credits`, `/teacher`, `/reviewer`.
 - [ ] Shell: top bar and mobile bottom nav, a **Help button on every screen except `/help`**, settings (sound, music, narration, calm motion, language). `data-calm` syncs with settings and `prefers-reduced-motion`.
 - [ ] **Help Centre** (calm): helplines, "how to tell a trusted adult" steps, rights list, disclaimer, all from `content/help.json` exactly as written. Source every number from an official page and put the source in the file.
 - [ ] Profile picker and onboarding (hello, first name with validation, age band). The avatar step is added in Phase 2.

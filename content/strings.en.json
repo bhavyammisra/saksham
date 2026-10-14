@@ -2,5 +2,19 @@
   "app.name": "Saksham",
   "app.nameHindi": "सक्षम",
   "app.tagline": "Know your rights. Help a friend.",
-  "shell.comingSoon": "The town is being built. Come back soon, {name}!"
+
+  "placeholder.body": "This part of Saksham is still being built.",
+
+  "help.title": "Need help?",
+  "profiles.title": "Who is playing?",
+  "profiles.playAs": "Play as {name}",
+  "onboarding.title": "Hello!",
+  "town.title": "Town",
+  "play.title": "Play",
+  "book.title": "My Book",
+  "community.title": "Community",
+  "me.title": "Me",
+  "credits.title": "Credits",
+  "teacher.title": "For teachers",
+  "reviewer.title": "Content review"
 }

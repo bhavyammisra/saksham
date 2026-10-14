@@ -24,7 +24,7 @@ export function getLang(): Lang {
 
 /**
  * Look up a UI string and fill in {placeholders}.
- *   t('shell.comingSoon', { name: 'Asha' })
+ *   t('profiles.playAs', { name: 'Asha' })
  * A missing key returns the key itself (and warns in development),
  * so a gap is visible on screen instead of crashing the app.
  */
