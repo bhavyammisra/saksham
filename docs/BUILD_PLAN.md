@@ -372,3 +372,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: Help Centre numbers are sourced from PIB pages but **not yet owner-verified** (`help.json` → `review.status: "unverified"`, SETUP.md §5). Language picker shows English only until P6. `t()` doesn't re-render on a language change yet (P6). Names with hyphens or apostrophes are rejected per §4 (D-014). Sounds are synthesised placeholders.
 - Owner: fact-check `content/help.json` (SETUP.md §5) and the font licences.
 - Next task: P2 › Character › paper-doll SVG character rig and options.
+
+**P2 Character and scene engine: paused at 🛑 character gate (2026-10-14)**
+- Done: the four Character tasks (SVG rig with 10 skin tones, 8 hairstyles, 6 hair colours, 5 outfits, patka/hijab/dupatta, glasses, bag; idle/walk/talk/wave/gasp/cheer; builder in onboarding and `/me/character`; portraits; `/dev/characters`). The profile store moved to v2 with `avatar`.
+- Hacky / watch: front-facing body with a walk-in-place stride (no true side view). The school bag shows mostly as straps. The shoulders are a little boxy.
+- Waiting for: owner approval of the character look. Then the next task is P2 › Scene engine › engine core.
