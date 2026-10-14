@@ -177,7 +177,7 @@ RLS summary: a child reads and writes only their own rows; a teacher reads rows 
 - [x] Add scripts `dev`, `build`, `lint`, `typecheck`, `test`, `e2e`. Set up Vitest and Playwright with one trivial passing test each.
 - [x] CI workflow: jobs `lint`, `unit` (typecheck + vitest), `build`, `e2e`, then `deploy` on `main` only. Add `.env.example` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
 - [x] `src/lib/i18n.ts` with `t(key, vars)` and `content/strings.en.json`. From now on **no hard-coded UI text**.
-- [ ] Design tokens in the stylesheet (palette, type scale, spacing, radii, shadows) following the art direction in §2, plus the calm rules and a visible focus ring. Set the owner-approved font (an open-licence font that supports Devanagari).
+- [x] Design tokens in the stylesheet (palette, type scale, spacing, radii, shadows) following the art direction in §2, plus the calm rules and a visible focus ring. Set the owner-approved font (an open-licence font that supports Devanagari).
 - [ ] Create `docs/` skeleton: `DECISIONS.md`, `ARCHITECTURE.md`, `SETUP.md`, `ASSET_LICENSES.md`, `TEST_REPORT.md`.
 
 Done when: CI is green and the app shows an empty shell.
