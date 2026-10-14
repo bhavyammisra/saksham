@@ -44,12 +44,23 @@ interface Props {
   mood?: Mood
   facing?: Facing
   view?: View
+  /** Adults (teachers, shopkeepers) keep adult head proportions. */
+  adult?: boolean
   /** Accessible description. Without it the drawing is hidden from screen readers (decorative). */
   label?: string
   className?: string
 }
 
-export function Character({ spec, pose = 'idle', mood = 'neutral', facing = 'right', view = 'full', label, className }: Props) {
+export function Character({
+  spec,
+  pose = 'idle',
+  mood = 'neutral',
+  facing = 'right',
+  view = 'full',
+  adult = false,
+  label,
+  className,
+}: Props) {
   // Gradient ids must be unique on the page, because many characters can be shown at once.
   const uid = 'ch' + useId().replace(/[^a-zA-Z0-9]/g, '')
   const face: Mood = pose === 'gasp' ? 'surprised' : pose === 'cheer' ? 'happy' : mood
@@ -127,7 +138,7 @@ export function Character({ spec, pose = 'idle', mood = 'neutral', facing = 'rig
 
         <g className="ch-part ch-head">
           {/* Children's heads are larger relative to the body: scale the head up around the neck. */}
-          <g transform="translate(60 80) scale(1.12) translate(-60 -80)">
+          <g transform={`translate(60 80) scale(${adult ? 1 : 1.12}) translate(-60 -80)`}>
             <Head spec={spec} mood={face} pose={pose} paint={paint} skin={skin} hair={hair} scarf={scarf} />
           </g>
         </g>

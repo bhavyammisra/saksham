@@ -208,15 +208,15 @@ Done when: CI is green and the app shows an empty shell.
 - [x] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
 - [x] Portrait renderer (head and shoulders with a mood) for dialogue and results.
 
-🛑 **Gate:** owner approves the character look before scene art starts.
+🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14.
 
 #### Scene engine and look development
 
-- [ ] Engine core: scene renderer with parallax layers, camera follow, walking with bounds and blockers, collision, facing, input (keyboard, joystick, tap-to-walk).
-- [ ] Hotspots: proximity prompts, "Things to do here" list, interaction, flags.
-- [ ] Dialogue overlay: portraits, typewriter, choices, `aria-live`, read-aloud, retry-to-last-choice, `gentle` handling.
-- [ ] Objectives panel and Mitthu (follow, perch, idle hint).
-- [ ] **Sandbox scene** (`/dev/scene`): one test scene with placeholder art that exercises every engine feature. Add engine unit tests for walking bounds, hotspot proximity, flag logic and retry.
+- [x] Engine core: scene renderer with parallax layers, camera follow, walking with bounds and blockers, collision, facing, input (keyboard, joystick, tap-to-walk).
+- [x] Hotspots: proximity prompts, "Things to do here" list, interaction, flags.
+- [x] Dialogue overlay: portraits, typewriter, choices, `aria-live`, read-aloud, retry-to-last-choice, `gentle` handling.
+- [x] Objectives panel and Mitthu (follow, perch, idle hint).
+- [x] **Sandbox scene** (`/dev/scene`): one test scene with placeholder art that exercises every engine feature. Add engine unit tests for walking bounds, hotspot proximity, flag logic and retry.
 - [ ] **Look development:** build the first real School backdrop (4 to 5 parallax layers, golden-hour light, light shafts, grain, depth blur, ambient life such as birds and drifting dust) and put the finished character in it.
 
 🛑 **Gate:** owner approves the visual style on this one scene. If it does not look good enough, change the approach here, before more scenes exist.
@@ -376,4 +376,4 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P2 Character and scene engine: paused at 🛑 character gate (2026-10-14)**
 - Done: the four Character tasks (SVG rig with 10 skin tones, 8 hairstyles, 6 hair colours, 5 outfits, patka/hijab/dupatta, glasses, bag; idle/walk/talk/wave/gasp/cheer; builder in onboarding and `/me/character`; portraits; `/dev/characters`). The profile store moved to v2 with `avatar`.
 - Hacky / watch: front-facing body with a walk-in-place stride (no true side view). The school bag shows mostly as straps. The shoulders are a little boxy.
-- Waiting for: owner approval of the character look. Then the next task is P2 › Scene engine › engine core.
+- ✅ Owner approved the character look on 2026-10-14. Next: P2 › Scene engine › engine core.

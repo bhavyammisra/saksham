@@ -114,5 +114,22 @@
   "dev.moods": "Moods (portrait)",
   "dev.skinTones": "Skin tones",
   "dev.hairStyles": "Hairstyles",
-  "me.changeCharacter": "Change my character"
+  "me.changeCharacter": "Change my character",
+  "scene.region": "Scene: {title}. Walk with the arrow keys or A and D. Press E to talk or look.",
+  "scene.you": "You",
+  "scene.conversation": "Conversation",
+  "scene.next": "Next",
+  "scene.readAloud": "Read aloud",
+  "scene.objectives": "What to do",
+  "scene.done": "done",
+  "scene.notDone": "not done yet",
+  "scene.thingsToDo": "Things to do here",
+  "scene.thingsToDoHint": "Choose one to go straight there.",
+  "scene.walkLeft": "Walk left",
+  "scene.walkRight": "Walk right",
+  "mitthu.hint": "Mitthu: How about this? {objective}",
+  "dev.scene": "Engine sandbox",
+  "dev.sceneComplete": "Scene complete! Retries: {retries}.",
+  "dev.sceneExit": "You left the scene through: {label}.",
+  "dev.sceneRestart": "Play again"
 }
