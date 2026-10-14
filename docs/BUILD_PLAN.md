@@ -178,7 +178,7 @@ RLS summary: a child reads and writes only their own rows; a teacher reads rows 
 - [x] CI workflow: jobs `lint`, `unit` (typecheck + vitest), `build`, `e2e`, then `deploy` on `main` only. Add `.env.example` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
 - [x] `src/lib/i18n.ts` with `t(key, vars)` and `content/strings.en.json`. From now on **no hard-coded UI text**.
 - [x] Design tokens in the stylesheet (palette, type scale, spacing, radii, shadows) following the art direction in §2, plus the calm rules and a visible focus ring. Set the owner-approved font (an open-licence font that supports Devanagari).
-- [ ] Create `docs/` skeleton: `DECISIONS.md`, `ARCHITECTURE.md`, `SETUP.md`, `ASSET_LICENSES.md`, `TEST_REPORT.md`.
+- [x] Create `docs/` skeleton: `DECISIONS.md`, `ARCHITECTURE.md`, `SETUP.md`, `ASSET_LICENSES.md`, `TEST_REPORT.md`.
 
 Done when: CI is green and the app shows an empty shell.
 
@@ -360,3 +360,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 ## Session notes
 
 (Append at the end of every phase and before stopping: three to six lines on what's done, what's hacky, and the exact next task.)
+
+**P0 Foundation (2026-10-14)**
+- Done: all six P0 tasks. CI green on GitHub (lint, unit, build, e2e; deploy skipped until Vercel vars exist). Plan regrouped into 8 phases (D-001).
+- Hacky / watch: ESLint pinned to 9 (past end-of-support) because jsx-a11y doesn't support 10 yet (D-007). Calm mode only follows the system setting until the P1 settings store. The deploy job is untested until the owner sets up Vercel (SETUP.md §3).
+- Owner: check the two font licences in ASSET_LICENSES.md. Optionally install `gh` and protect `main`.
+- Next task: P1 › Rules and content contract › `content/types.ts` from §6 plus the validation script.
