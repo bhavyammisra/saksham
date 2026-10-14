@@ -4,6 +4,7 @@ import { HashRouter } from 'react-router'
 import App from './App.tsx'
 import { followSystemCalm, setCalmSetting } from './lib/calm.ts'
 import { setLang, t } from './lib/i18n.ts'
+import { sound } from './lib/sound.ts'
 import { useStore } from './lib/store.ts'
 import './index.css'
 
@@ -17,10 +18,12 @@ const applySettings = () => {
   const { settings } = useStore.getState()
   setCalmSetting(settings.calmMotion)
   setLang(settings.lang)
+  sound.setEnabled(settings.sound)
   document.documentElement.lang = settings.lang
 }
 applySettings()
 useStore.subscribe(applySettings)
+sound.unlockOnFirstGesture()
 document.title = t('app.name')
 
 // HashRouter keeps routes after "#", so any static host can serve the app
