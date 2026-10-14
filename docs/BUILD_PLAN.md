@@ -175,7 +175,7 @@ RLS summary: a child reads and writes only their own rows; a teacher reads rows 
 
 - [x] Create the Vite React TypeScript project in the empty repo. Add Tailwind v4, react-router (HashRouter), zustand, `motion`. Set path aliases `@` (src) and `@content`.
 - [x] Add scripts `dev`, `build`, `lint`, `typecheck`, `test`, `e2e`. Set up Vitest and Playwright with one trivial passing test each.
-- [ ] CI workflow: jobs `lint`, `unit` (typecheck + vitest), `build`, `e2e`, then `deploy` on `main` only. Add `.env.example` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+- [x] CI workflow: jobs `lint`, `unit` (typecheck + vitest), `build`, `e2e`, then `deploy` on `main` only. Add `.env.example` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
 - [ ] `src/lib/i18n.ts` with `t(key, vars)` and `content/strings.en.json`. From now on **no hard-coded UI text**.
 - [ ] Design tokens in the stylesheet (palette, type scale, spacing, radii, shadows) following the art direction in §2, plus the calm rules and a visible focus ring. Set the owner-approved font (an open-licence font that supports Devanagari).
 - [ ] Create `docs/` skeleton: `DECISIONS.md`, `ARCHITECTURE.md`, `SETUP.md`, `ASSET_LICENSES.md`, `TEST_REPORT.md`.
