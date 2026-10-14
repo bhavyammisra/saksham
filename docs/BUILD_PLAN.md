@@ -41,7 +41,7 @@ Two age bands: `young` (8 to 11) and `teen` (12 to 16). The band changes the car
 
 Grounded and warm, **not cartoonish**: semi-realistic proportions, painterly layered vector scenes, soft golden light, subtle grain, light shafts, depth blur on far layers, real Indian materials and colours (painted plaster, tiles, wood, brass, marigold garlands). No thick outlines, no big-head mascots. Mitthu is the only slightly stylised character. The visual style must be consistent across every scene: one palette family, one lighting logic.
 
-Honest constraint: the look depends on art quality. So there is a **look-development gate** (Phase 4) where the owner approves the style on one scene before any other scene is built.
+Honest constraint: the look depends on art quality. So there is a **look-development gate** (Phase 2) where the owner approves the style on one scene before any other scene is built.
 
 ## 3. Scope
 
@@ -56,7 +56,7 @@ Honest constraint: the look depends on art quality. So there is a **look-develop
 7. English first, then Hindi with the same content structure.
 8. Experience upgrade: splash, layered sound, dialogue voice pass, living scenery.
 
-**Optional** (only after Phase 14 is green): spot-the-danger mini-game, text-size and dyslexia-friendly font settings, printable parent sheet, unlockable character items earned with stars.
+**Optional** (only after Phase 7 is green): spot-the-danger mini-game, text-size and dyslexia-friendly font settings, printable parent sheet, unlockable character items earned with stars.
 
 **Stretch, not committed** (documented as future work in the report, do not start): a real 3D town and 3D characters (Three.js or React Three Fiber).
 
@@ -182,22 +182,26 @@ RLS summary: a child reads and writes only their own rows; a teacher reads rows 
 
 Done when: CI is green and the app shows an empty shell.
 
-### Phase 1: Rules and content contract
+### Phase 1: Core
+
+#### Rules and content contract
 
 - [ ] `content/types.ts` from §6. A validation script that checks every scene JSON (all node targets exist, a `good` end exists, flags used in `showIf` are set somewhere, every UI key exists in the strings file).
 - [ ] `src/lib/rules.ts` from §7 with unit tests for every rule (stars thresholds, retries, best-of replay, unlocks, band filtering, hint round does not change the score, recommended building, merge rule). Name tests with the requirement IDs from §11.
 - [ ] `src/lib/store.ts`: persisted zustand store (profiles, active profile, settings, per-profile progress). The store only calls `rules.ts`.
 
-### Phase 2: App shell and safety basics
+#### App shell and safety basics
 
 - [ ] Routes: `/` redirect, `/profiles`, `/onboarding`, `/town`, `/play/:id`, `/book`, `/help`, `/community`, `/me`, `/credits`, `/teacher`, `/reviewer`.
 - [ ] Shell: top bar and mobile bottom nav, a **Help button on every screen except `/help`**, settings (sound, music, narration, calm motion, language). `data-calm` syncs with settings and `prefers-reduced-motion`.
 - [ ] **Help Centre** (calm): helplines, "how to tell a trusted adult" steps, rights list, disclaimer, all from `content/help.json` exactly as written. Source every number from an official page and put the source in the file.
-- [ ] Profile picker and onboarding (hello, first name with validation, age band). The avatar step is added in Phase 3.
+- [ ] Profile picker and onboarding (hello, first name with validation, age band). The avatar step is added in Phase 2.
 - [ ] Sound manager (`src/lib/sound.ts`): a WebAudio context created on the first user gesture, one `sound.play(name)` API, respects settings, plays nothing on `/help`, half gain in `gentle` scenes.
 - [ ] Safety-invariant e2e tests: Help button on every route except `/help`; `/help` is calm and silent; the name field rejects digits and symbols; no screen shows free text from another child.
 
-### Phase 3: Character
+### Phase 2: Character and scene engine
+
+#### Character
 
 - [ ] Paper-doll SVG character: shared rig (head, hair, body, outfit, headwear) with realistic proportions. Options: 8 to 10 skin tones, 6 to 8 hairstyles, 5 or more hair colours, a few outfits (school uniform, kurta, salwar kameez, casual), headwear (patka, hijab, dupatta), glasses, school bag. Spec is a small JSON object.
 - [ ] Animations on the shared rig (CSS or `motion`): idle, walk, talk, wave, react (gasp, cheer). Facing left or right.
@@ -206,7 +210,7 @@ Done when: CI is green and the app shows an empty shell.
 
 🛑 **Gate:** owner approves the character look before scene art starts.
 
-### Phase 4: Scene engine and look development
+#### Scene engine and look development
 
 - [ ] Engine core: scene renderer with parallax layers, camera follow, walking with bounds and blockers, collision, facing, input (keyboard, joystick, tap-to-walk).
 - [ ] Hotspots: proximity prompts, "Things to do here" list, interaction, flags.
@@ -217,7 +221,7 @@ Done when: CI is green and the app shows an empty shell.
 
 🛑 **Gate:** owner approves the visual style on this one scene. If it does not look good enough, change the approach here, before more scenes exist.
 
-### Phase 5: School end to end (MILESTONE A)
+### Phase 3: School end to end (MILESTONE A)
 
 - [ ] Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
 - [ ] Card reveal (flippable, band-aware), quiz game (band filtering, hint round, explanations), results (stars rule, badges, saving progress).
@@ -226,20 +230,33 @@ Done when: CI is green and the app shows an empty shell.
 
 Done when: School plays from start to results, progress survives a reload, and the demo-path test passes. Write session notes.
 
-### Phase 6: Town hub and progression
+### Phase 4: Town and all buildings
+
+#### Town hub and progression
 
 - [ ] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door.
 - [ ] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers).
 - [ ] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode.
 
-### Phase 7: Backend core
+#### Remaining buildings
+
+- [ ] Dhaba, Home and Panchayat as scenes. This should be content and art only. If one needs engine changes, fix the engine, not the content. Home and any heavy story use `gentle` tone and are handled through conversation and witnessing, never by showing harm.
+- [ ] Sort game (drag plus a tap alternative) and add one to at least two buildings.
+
+#### Community
+
+- [ ] Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help. Labelled "Sample" where the data is not live.
+
+### Phase 5: Backend
+
+#### Backend core
 
 - [ ] `docs/SETUP.md` with the owner's manual steps: create the Supabase project, enable anonymous sign-ins, enable email auth, set the site URL, add the two GitHub repository variables. 🛑 **Stop and ask the owner to do these.**
 - [ ] Migrations for §8: tables, constraints (stars 0..3, name length, code format), views, RPC, RLS policies.
 - [ ] `supabase/tests/`: RLS tests (a child cannot read another child, a teacher cannot read another teacher's class, a child cannot call reviewer RPCs, `join_class` rejects bad codes and names).
 - [ ] `src/lib/supabase.ts` returns `null` when env vars are missing; generated types.
 
-### Phase 8: Teacher, class and sync
+#### Teacher, class and sync
 
 - [ ] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it.
 - [ ] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file.
@@ -247,22 +264,15 @@ Done when: School plays from start to results, progress survives a reload, and t
 - [ ] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty.
 - [ ] Verify the whole demo path works with env vars unset and with the network off.
 
-### Phase 9: Content review workflow
+#### Content review workflow
 
 - [ ] Hash-and-seed script for reviewable items (English now, Hindi later).
 - [ ] `/reviewer` screen (reviewer role only): list by status and language, bundled text next to its hash, approve, reject with a note, send back. Writes `content_events`.
 - [ ] "Reviewed ✓" with date on the card back when the hash matches a published row. Never block the card if offline or unmatched.
 
-### Phase 10: Remaining buildings
+### Phase 6: Experience and Hindi
 
-- [ ] Dhaba, Home and Panchayat as scenes. This should be content and art only. If one needs engine changes, fix the engine, not the content. Home and any heavy story use `gentle` tone and are handled through conversation and witnessing, never by showing harm.
-- [ ] Sort game (drag plus a tap alternative) and add one to at least two buildings.
-
-### Phase 11: Community
-
-- [ ] Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help. Labelled "Sample" where the data is not live.
-
-### Phase 12: Experience upgrade
+#### Experience upgrade
 
 - [ ] **Splash v2**: a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
 - [ ] **Sound v2**: layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
@@ -270,12 +280,12 @@ Done when: School plays from start to results, progress survives a reload, and t
 - [ ] **Living world**: ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
 - [ ] Re-check calm mode, gentle tone and Help Centre silence after each item.
 
-### Phase 13: Hindi
+#### Hindi
 
 - [ ] `strings.hi.json` and Hindi overlays for scenes, cards, quizzes and help, laid over the English by a `localize()` function. Only text changes: ids, wiring, answers, `law`, `source` and helpline numbers always come from English. Read-aloud picks a `hi-IN` voice in Hindi. The typewriter types by grapheme (`Intl.Segmenter`).
 - [ ] The Hindi is machine-authored and **unreviewed**. Flag it that way in the session notes and in the app credits until a fluent speaker has reviewed it.
 
-### Phase 14: Hardening and documentation
+### Phase 7: Hardening and documentation
 
 - [ ] Walk the demo path at 1366×768, 1920×1080 and 390×844; fix every rough edge. Offline check and a "backend down" check.
 - [ ] Accessibility pass: keyboard-only path, 48 px targets, `aria-live`, reduced motion, axe checks in Playwright.
@@ -339,8 +349,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 
 ## 13. Owner-only tasks
 
-- Create the Supabase project, enable anonymous sign-ins and email auth, set the GitHub repository variables (Phase 7).
-- Approve the character look (Phase 3 gate) and the scene style (Phase 4 gate).
+- Create the Supabase project, enable anonymous sign-ins and email auth, set the GitHub repository variables (Phase 5).
+- Approve the character look (Phase 2 character gate) and the scene style (Phase 2 look-development gate).
 - Fact-check every legal statement, age, penalty and helpline number against official sources.
 - Grant the `reviewer` role to a real faculty reviewer; arrange real play-testing.
 - Have a fluent Hindi speaker review the Hindi content.
