@@ -1,4 +1,4 @@
-// Tiny colour helpers for shading: mix a colour toward white (light) or black (shadow).
+// Tiny colour helpers for shading: mix a colour toward white (light) or a dark tone (shadow).
 
 function toRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.replace('#', ''), 16)
@@ -14,5 +14,9 @@ export function mix(a: string, b: string, amount: number): string {
 }
 
 export const lighten = (hex: string, amount: number) => mix(hex, '#ffffff', amount)
-// Shadows are mixed toward a warm dark brown, not black, to keep the golden-light look.
+// Warm brown shadow, used by the scene art.
 export const darken = (hex: string, amount: number) => mix(hex, '#2a160c', amount)
+// Character shadows lean cool (a dark plum), like painted game art: warm light, cool shade.
+export const shade = (hex: string, amount: number) => mix(hex, '#2b1d33', amount)
+/** Outline colour for a shape: a very dark version of its own colour (never pure black). */
+export const ink = (hex: string) => mix(hex, '#160d12', 0.72)

@@ -22,9 +22,13 @@ export default function App() {
         <Route path="/help" element={<HelpCentre />} />
 
         {/* Screens with the top bar only. */}
-        <Route element={<Shell />}>
+        {/* The cover screens before the game: full-screen art under a see-through top bar. */}
+        <Route element={<Shell immersive />}>
           <Route path="/profiles" element={<Profiles />} />
           <Route path="/onboarding" element={<Onboarding />} />
+        </Route>
+
+        <Route element={<Shell />}>
           <Route path="/teacher" element={<Placeholder title="teacher.title" />} />
           <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
           <Route path="/dev/characters" element={<DevCharacters />} />

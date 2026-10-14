@@ -132,5 +132,21 @@
   "dev.sceneComplete": "Scene complete! Retries: {retries}.",
   "dev.sceneExit": "You left the scene through: {label}.",
   "dev.sceneRestart": "Play again",
-  "dev.look": "School look development"
+  "dev.look": "School look development",
+  "cover.tagline": "Explore the town. Help a friend. Learn your rights.",
+  "cover.mitthu": "Mitthu the parrot",
+  "onboarding.step": "Step {n} of 3",
+  "onboarding.bandHint": "This picks stories that suit your age.",
+  "onboarding.bandYoungNote": "Younger explorers",
+  "onboarding.bandTeenNote": "Older explorers",
+  "builder.parts": "What to change",
+  "builder.extras": "Extras",
+  "builder.face": "Face",
+  "builder.style": "Style",
+  "builder.colour": "Colour",
+  "builder.poses": "Try a pose",
+  "builder.poseWave": "Wave",
+  "builder.poseCheer": "Cheer",
+  "builder.poseWalk": "Walk",
+  "profiles.hint": "Pick your player to keep exploring."
 }

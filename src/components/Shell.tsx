@@ -15,9 +15,9 @@ const navItems: { to: string; label: StringKey }[] = [
  * a top bar with the logo, "Need help?" and Settings, and (with `nav`)
  * the main navigation: in the top bar on wide screens, at the bottom on phones.
  */
-export function Shell({ nav = false }: { nav?: boolean }) {
+export function Shell({ nav = false, immersive = false }: { nav?: boolean; immersive?: boolean }) {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="relative flex min-h-dvh flex-col">
       <a
         href="#main"
         onClick={(event) => {
@@ -30,12 +30,19 @@ export function Shell({ nav = false }: { nav?: boolean }) {
         {t('shell.skip')}
       </a>
 
-      <header className="sticky top-0 z-10 border-b border-sand bg-plaster/95 backdrop-blur">
+      {/* Immersive screens (the cover) draw their art under a see-through top bar. */}
+      <header
+        className={
+          immersive
+            ? 'absolute inset-x-0 top-0 z-20 bg-gradient-to-b from-black/45 to-transparent'
+            : 'sticky top-0 z-10 border-b border-sand bg-plaster/95 backdrop-blur'
+        }
+      >
         <div className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-2">
           <Link
             to="/"
             aria-label={t('shell.home')}
-            className="inline-flex min-h-tap items-center text-xl font-semibold text-terracotta-deep"
+            className={`inline-flex min-h-tap items-center text-xl font-semibold ${immersive ? 'text-white/90' : 'text-terracotta-deep'}`}
           >
             {t('app.name')}
           </Link>

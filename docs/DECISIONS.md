@@ -175,3 +175,17 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Choice:** Phase 2 gets an "Owner feedback rework" section in BUILD_PLAN: clarify the feedback, redesign the cover page, redesign the character, then re-run both 🛑 gates. Phase 3 does not start until both are approved.
 - **Why:** The plan's rule is to change the look before more scenes depend on it. Every later scene, portrait and result screen reuses the character.
 - **Still open:** what "cover page" refers to (most likely the first screen, `/#/onboarding`). The next session asks the owner first. The engine (D-021) is unaffected; only art and the first screen change.
+
+## D-024 Character redesign: painted game-character look
+
+- **Context:** The owner found the first character (D-019) fake-looking and asked for the feel of *Attack on Titan* or *GTA V* characters: realistic body proportions, colour, shadows and depth, without copying either.
+- **Choice:** The same single SVG rig, `CharacterSpec` and options (so saved profiles and the scene engine are unchanged), redrawn: about 6.5 heads tall with real anatomy (shoulder caps, tapering arms and legs, knees, hands with thumbs, a defined jaw and chin, almond eyes with irises, lash lines and lid shadows, a shaped nose and lips). Shading is "cel" style: a thin ink outline in a dark version of each colour, a hard edge between the lit side and a cool plum shadow (`shade()` in `color.ts`), a bright rim on the lit edge, and painted cast shadows (hair on the forehead, chin on the neck, arms on the body, sleeves on arms). Trousers are joined by a still hip piece so the legs can swing. The SVG may draw outside its box, so a raised arm isn't cut off.
+- **Why:** Anime and game characters read as "real" mostly through proportions, hard-edged light and shadow, and outlines, all of which SVG does cheaply. Keeping the rig means no migration and every pose, portrait and scene keeps working.
+- **Alternatives:** 3D models or raster art (needs an artist, licences, much heavier downloads); a full 3/4 view (twice the drawing work for every option; may come later).
+
+## D-025 Cover screens and a game-style character customiser
+
+- **Context:** The owner said the screens before the game (welcome, name, then age and the player picker) were blank plain text, and asked for the customiser to feel like a game's (e.g. BGMI).
+- **Choice:** A painted cover backdrop (`src/art/cover.tsx`): a golden-hour rooftop view over an Indian town with a skyline, kites, birds, marigold lights and dust, all SVG and CSS. The welcome screen shows a gold game title, Mitthu's greeting in a glass panel, a glowing start button and three explorers on the roof. The name and age steps use glass cards over a dimmed backdrop with a "Step n of 3" bar; the player picker uses portrait cards. These screens use `Shell immersive` (a see-through top bar; "Need help?" stays). The customiser is a dark studio: the character large on a lit platform with "Try a pose" buttons, part tabs (Face, Hair, Clothes, Head covering, Extras; a proper ARIA tab list with arrow keys), and item tiles with a gold frame and a tick for the chosen one.
+- **Why:** The first screens set the tone for the whole game. No new dependencies; every string goes through `t()`; calm mode stops all of the motion.
+- **Alternatives:** A video or raster title screen (heavy, needs licences); keeping one long scrolling list in the customiser (simple, but did not feel like a game).

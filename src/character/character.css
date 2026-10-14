@@ -4,17 +4,20 @@
    so a wave is still a raised arm and a cheer is still raised arms. */
 
 /* Pivots, in the character's 120 x 360 design units. */
+.ch {
+  overflow: visible; /* raised arms may reach above the drawing's box */
+}
 .ch .ch-part {
   transform-box: view-box;
 }
 .ch .ch-body { transform-origin: 60px 350px; }
-.ch .ch-head { transform-origin: 60px 84px; }
-.ch .ch-arm-l { transform-origin: 35px 100px; }
-.ch .ch-arm-r { transform-origin: 85px 100px; }
-.ch .ch-leg-l { transform-origin: 51px 188px; }
-.ch .ch-leg-r { transform-origin: 69px 188px; }
-.ch .ch-eyes { transform-origin: 60px 49px; }
-.ch .ch-mouth-talk { transform-origin: 60px 66.5px; }
+.ch .ch-head { transform-origin: 60px 70px; }
+.ch .ch-arm-l { transform-origin: 33px 101px; }
+.ch .ch-arm-r { transform-origin: 87px 101px; }
+.ch .ch-leg-l { transform-origin: 50px 190px; }
+.ch .ch-leg-r { transform-origin: 70px 190px; }
+.ch .ch-eyes { transform-origin: 60px 46px; }
+.ch .ch-mouth-talk { transform-origin: 60px 62.8px; }
 
 /* Blink, in every pose. */
 .ch .ch-eyes { animation: ch-blink 4.6s infinite; }

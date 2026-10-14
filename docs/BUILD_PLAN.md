@@ -225,9 +225,9 @@ Done when: CI is green and the app shows an empty shell.
 
 The owner said they do **not like the cover page or the character design**. Both must change, and be approved, before Phase 3 starts.
 
-- [ ] **Clarify the feedback first.** Ask the owner (a) what "cover page" means. It is most likely the first screen a child sees (`/#/onboarding` "Hello!", or the profile picker), but it could also be the School look-dev scene at `/#/dev/look`. (b) What exactly they dislike about each, and what they would like instead (references or examples help). Do not redesign before this is answered.
-- [ ] **Redesign the cover page** to the owner's direction. All text through `t()`, Help button still present, calm mode respected. Show screenshots and get approval.
-- [ ] **Redesign the character** to the owner's direction (`src/character/Character.tsx`, `spec.ts`, `character.css`). Keep the `CharacterSpec` shape, or migrate saved profiles in `store.ts` (bump the persist `version`). Keep every option the plan requires. Check every combination on `/#/dev/characters`. 🛑 Re-run the character gate.
+- [x] **Clarify the feedback first.** ✅ 2026-10-15: "cover page" = the screens before the game (welcome and name, also age and the player picker), too blank and plain. Character: wanted realistic proportions, colour, shadows and depth like *Attack on Titan* / *GTA V*; customiser like a game's (BGMI). Ask the owner (a) what "cover page" means. It is most likely the first screen a child sees (`/#/onboarding` "Hello!", or the profile picker), but it could also be the School look-dev scene at `/#/dev/look`. (b) What exactly they dislike about each, and what they would like instead (references or examples help). Do not redesign before this is answered.
+- [x] **Redesign the cover page** to the owner's direction (D-025). ⏳ Waiting for owner approval. All text through `t()`, Help button still present, calm mode respected. Show screenshots and get approval.
+- [x] **Redesign the character** (and the customiser) to the owner's direction (D-024, D-025). ⏳ 🛑 Character gate waiting for owner approval. Was: Redesign the character to the owner's direction (`src/character/Character.tsx`, `spec.ts`, `character.css`). Keep the `CharacterSpec` shape, or migrate saved profiles in `store.ts` (bump the persist `version`). Keep every option the plan requires. Check every combination on `/#/dev/characters`. 🛑 Re-run the character gate.
 - [ ] 🛑 **Re-run the look-development gate** on `/#/dev/look` with the new character, and get the owner's approval of the scene style.
 - [ ] **Open the Phase 2 pull request** from `p2-character-scene` to `main`, wait for green CI, merge with a merge commit (owner preference), then start Phase 3 on a new branch.
 
@@ -397,3 +397,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - State: P0 and P1 are merged to `main` (PRs #1, #2). All of P2 is built and pushed on branch `p2-character-scene` (no PR yet). 155 unit and 34 e2e tests green locally.
 - Owner feedback: they do **not like the cover page or the character design**. The character gate is reopened, and the look-dev gate is not approved. Phase 3 must not start until both are redesigned and approved.
 - Exact next task: P2 › Owner feedback rework › "Clarify the feedback first". Ask the owner before changing any art.
+
+**P2 rework: paused at 🛑 character gate and cover approval (2026-10-15)**
+- Done: owner feedback clarified. New painted cover backdrop and immersive welcome, name, age and player-picker screens (D-025). Character rig redrawn with realistic proportions, ink outlines and cel shading (D-024); same `CharacterSpec`, no store migration. Customiser rebuilt as a dark game-style studio with part tabs. 155 unit and 35 e2e tests green.
+- Hacky / watch: still a front view (no true side view for walking). The raised-arm wave is a straight arm (no elbow bend). The welcome-screen explorers are hidden behind the text on very short phone screens.
+- Waiting for: owner approval of the cover screens and the character (🛑). Then re-run the look-dev gate on `/#/dev/look`, then open the P2 pull request.
