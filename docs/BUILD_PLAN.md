@@ -186,7 +186,7 @@ Done when: CI is green and the app shows an empty shell.
 
 #### Rules and content contract
 
-- [ ] `content/types.ts` from §6. A validation script that checks every scene JSON (all node targets exist, a `good` end exists, flags used in `showIf` are set somewhere, every UI key exists in the strings file).
+- [x] `content/types.ts` from §6. A validation script that checks every scene JSON (all node targets exist, a `good` end exists, flags used in `showIf` are set somewhere, every UI key exists in the strings file).
 - [ ] `src/lib/rules.ts` from §7 with unit tests for every rule (stars thresholds, retries, best-of replay, unlocks, band filtering, hint round does not change the score, recommended building, merge rule). Name tests with the requirement IDs from §11.
 - [ ] `src/lib/store.ts`: persisted zustand store (profiles, active profile, settings, per-profile progress). The store only calls `rules.ts`.
 

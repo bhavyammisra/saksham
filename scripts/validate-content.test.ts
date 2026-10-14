@@ -1,0 +1,195 @@
+import { describe, expect, it } from 'vitest'
+import type { SceneDef } from '../content/types.ts'
+import { findStringKeys, validateScene, validateStrings } from './validate-content.ts'
+
+// A tiny but complete scene. Each test breaks one thing.
+function validScene(): SceneDef {
+  return {
+    id: 'test',
+    title: 'Test place',
+    right: 'Right to test',
+    tagline: 'A place for tests.',
+    tone: 'normal',
+    width: 2000,
+    layers: [{ id: 'sky', art: 'sky.svg', speed: 0.2 }],
+    walkable: { minX: 100, maxX: 1900 },
+    spawn: { x: 200 },
+    hotspots: [
+      { id: 'friend', x: 600, label: 'Talk to Ravi', kind: 'npc', npc: 'ravi', node: 'hello' },
+      { id: 'note', x: 900, label: 'Look at the note', kind: 'object', node: 'note', showIf: ['met-ravi'] },
+      { id: 'door', x: 1800, label: 'Leave', kind: 'exit' },
+    ],
+    objectives: [{ id: 'talk', text: 'Talk to Ravi', requires: ['met-ravi'] }],
+    startNode: 'hello',
+    nodes: {
+      hello: {
+        id: 'hello',
+        speaker: 'ravi',
+        text: 'Hi!',
+        set: ['met-ravi'],
+        choices: [
+          { label: 'Tell a teacher', to: 'good', kind: 'good' },
+          { label: 'Do nothing', to: 'weak', kind: 'weak' },
+        ],
+      },
+      weak: { id: 'weak', speaker: 'mitthu', text: "Let's try that again.", end: 'retry' },
+      good: { id: 'good', speaker: 'ravi', text: 'Thank you!', mood: 'happy', end: 'good' },
+      note: { id: 'note', speaker: 'mitthu', text: 'A note.', next: 'hello' },
+    },
+    card: {
+      id: 'test-card',
+      title: 'Test right',
+      kid: 'Kid text',
+      teen: 'Teen text',
+      ifItHappens: 'Tell an adult.',
+      law: 'Law text',
+      source: 'Source',
+    },
+    games: [
+      {
+        kind: 'quiz',
+        id: 'test-quiz',
+        questions: [
+          { id: 'q1', text: 'Q1?', options: ['A', 'B'], answer: 0, explanation: 'Because.' },
+          { id: 'q2', text: 'Q2?', options: ['A', 'B', 'C'], answer: 2, explanation: 'Because.', band: 'teen' },
+        ],
+      },
+    ],
+  }
+}
+
+// Builds a broken copy of the valid scene. Typed loosely on purpose:
+// these tests exist to put wrong shapes into the scene.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Loose = Record<string, any>
+
+function broken(change: (scene: Loose) => void): unknown {
+  const scene = structuredClone(validScene()) as Loose
+  change(scene)
+  return scene
+}
+
+describe('NFR-07 content validation: scenes', () => {
+  it('accepts a valid scene', () => {
+    expect(validateScene(validScene())).toEqual([])
+  })
+
+  it('rejects something that is not an object', () => {
+    expect(validateScene(null)).toEqual(['scene is not a JSON object'])
+  })
+
+  it('rejects a missing title and an unknown tone', () => {
+    const errors = validateScene(broken((s) => ((s.title = ''), (s.tone = 'loud'))))
+    expect(errors).toContain('"title" must be non-empty text')
+    expect(errors.some((e) => e.startsWith('"tone"'))).toBe(true)
+  })
+
+  it('rejects a startNode that does not exist', () => {
+    expect(validateScene(broken((s) => (s.startNode = 'nowhere')))).toContain(
+      '"startNode" points to missing node "nowhere"',
+    )
+  })
+
+  it('rejects next and choice targets that do not exist', () => {
+    const errors = validateScene(
+      broken((s) => {
+        s.nodes.note.next = 'ghost'
+        s.nodes.hello.choices[1].to = 'phantom'
+      }),
+    )
+    expect(errors).toContain('node "note".next points to missing node "ghost"')
+    expect(errors).toContain('node "hello".choices[1] points to missing node "phantom"')
+  })
+
+  it('rejects a scene with no good ending', () => {
+    expect(validateScene(broken((s) => (s.nodes.good.end = 'retry')))).toContain('no node has end: "good"')
+  })
+
+  it('rejects a good ending that cannot be reached', () => {
+    const errors = validateScene(broken((s) => (s.nodes.hello.choices = [{ label: 'Only', to: 'weak' }])))
+    expect(errors).toContain('no good ending can be reached from "startNode"')
+  })
+
+  it('rejects dead ends and nodes with two ways out', () => {
+    const errors = validateScene(
+      broken((s) => {
+        delete s.nodes.note.next
+        s.nodes.good.next = 'hello'
+      }),
+    )
+    expect(errors).toContain('node "note" is a dead end (needs "next", "choices" or "end")')
+    expect(errors).toContain('node "good" must have only one of "next", "choices" or "end"')
+  })
+
+  it('rejects a node whose id does not match its key', () => {
+    expect(validateScene(broken((s) => (s.nodes.note.id = 'other')))).toContain(
+      'node "note" has id "other" (must match its key)',
+    )
+  })
+
+  it('rejects showIf flags that no node sets', () => {
+    expect(validateScene(broken((s) => (s.hotspots[1].showIf = ['never-set'])))).toContain(
+      'hotspot "note".showIf uses flag "never-set" that no node sets',
+    )
+  })
+
+  it('rejects objectives that need flags no node sets', () => {
+    expect(validateScene(broken((s) => (s.objectives[0].requires = ['nope'])))).toContain(
+      'objective "talk" requires flag "nope" that no node sets',
+    )
+  })
+
+  it('rejects hotspots outside the walkable area, duplicates and missing nodes', () => {
+    const errors = validateScene(
+      broken((s) => {
+        s.hotspots[0].x = 5000
+        s.hotspots[2].id = 'friend'
+        s.hotspots[1].node = 'missing'
+      }),
+    )
+    expect(errors).toContain('hotspot "friend".x must be inside "walkable"')
+    expect(errors).toContain('hotspot "friend" is duplicated')
+    expect(errors).toContain('hotspot "note".node points to missing node "missing"')
+  })
+
+  it('rejects a spawn point outside the walkable area', () => {
+    expect(validateScene(broken((s) => (s.spawn.x = 50)))).toContain('"spawn.x" must be inside "walkable"')
+  })
+
+  it('rejects an incomplete card', () => {
+    expect(validateScene(broken((s) => (s.card.law = '')))).toContain('card.law must be non-empty text')
+  })
+
+  it('rejects a quiz answer outside the options', () => {
+    expect(validateScene(broken((s) => (s.games[0].questions[0].answer = 2)))).toContain(
+      'quiz "test-quiz" question "q1".answer must be an index into options',
+    )
+  })
+
+  it('rejects a quiz with only teen questions', () => {
+    expect(validateScene(broken((s) => (s.games[0].questions[0].band = 'teen')))).toContain(
+      'quiz "test-quiz" has no questions for young players',
+    )
+  })
+
+  it('rejects a scene without a quiz', () => {
+    expect(validateScene(broken((s) => (s.games = [])))).toContain('"games" must list at least one game')
+  })
+})
+
+describe('NFR-09 content validation: UI strings', () => {
+  it('finds t() keys in source code', () => {
+    const code = `t('app.name'); t("nav.help", { a: 1 }); format('x'); t( 'menu.open' )`
+    expect(findStringKeys(code)).toEqual(['app.name', 'nav.help', 'menu.open'])
+  })
+
+  it('reports keys used in code but missing from the strings file', () => {
+    expect(validateStrings({ 'app.name': 'Saksham' }, ['app.name', 'nav.help'])).toEqual([
+      `t('nav.help') is used in code but missing from the strings file`,
+    ])
+  })
+
+  it('reports empty string values', () => {
+    expect(validateStrings({ 'app.name': ' ' }, [])).toEqual(['string "app.name" must be non-empty text'])
+  })
+})
