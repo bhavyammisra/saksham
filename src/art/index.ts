@@ -3,10 +3,12 @@
 // Each scene's art lives in its own file and is added below.
 
 import { sandboxLayers, sandboxProps } from './sandbox'
+import { schoolLayers } from './school'
 import type { LayerArt, PropArt } from './types'
 
 export const layerArt: Record<string, LayerArt> = {
   ...sandboxLayers,
+  ...schoolLayers,
 }
 
 export const propArt: Record<string, PropArt> = {

@@ -152,7 +152,7 @@ export function Scene({ scene, onComplete, onExit }: Props) {
       >
         <div className="absolute inset-0" style={{ transform: shake }}>
           {scale > 0 &&
-            scene.layers.filter((l) => l.speed <= 1).map((l) => <LayerView key={l.id} layer={l} {...layerProps} />)}
+            scene.layers.filter((l) => !isFront(l)).map((l) => <LayerView key={l.id} layer={l} {...layerProps} />)}
 
           {/* The stage: everything standing on the ground moves with the camera. */}
           <div
@@ -213,7 +213,9 @@ export function Scene({ scene, onComplete, onExit }: Props) {
           </div>
 
           {scale > 0 &&
-            scene.layers.filter((l) => l.speed > 1).map((l) => <LayerView key={l.id} layer={l} {...layerProps} />)}
+            scene.layers.filter(isFront).map((l) => <LayerView key={l.id} layer={l} {...layerProps} />)}
+          {/* Film grain on every scene: one shared painted texture. Static, so calm-safe. */}
+          <div aria-hidden="true" className="scene-grain pointer-events-none absolute inset-0" />
         </div>
 
         {/* Mitthu's hint after 20 quiet seconds. */}
@@ -294,6 +296,9 @@ export function Scene({ scene, onComplete, onExit }: Props) {
 }
 
 // ---------------------------------------------------------------- pieces
+
+/** Layers in front of the characters: marked front, or nearer than the stage (speed > 1). */
+const isFront = (l: Layer) => l.front ?? l.speed > 1
 
 function hotspotHeight(h: Hotspot): number {
   if (h.kind === 'npc') return getNpc(h.npc ?? '')?.adult ? ADULT_HEIGHT : PLAYER_HEIGHT

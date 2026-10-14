@@ -1,0 +1,35 @@
+/* School ambient life. All of it stops in calm mode. */
+
+/* A small flock crossing the evening sky, slowly. */
+.sch-birds {
+  animation: sch-fly 38s linear infinite;
+}
+@keyframes sch-fly {
+  from { transform: translate(-200px, 0); }
+  50% { transform: translate(900px, -40px); }
+  to { transform: translate(2000px, 10px); }
+}
+
+/* Dust motes drifting up through the light. */
+.sch-dust circle {
+  animation: sch-drift 12s ease-in-out infinite;
+}
+@keyframes sch-drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.2; }
+  50% { transform: translate(18px, -40px); opacity: 0.8; }
+}
+
+/* The light shafts breathe very slightly. */
+.sch-shafts {
+  animation: sch-glow 9s ease-in-out infinite;
+}
+@keyframes sch-glow {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+html[data-calm] .sch-birds,
+html[data-calm] .sch-dust circle,
+html[data-calm] .sch-shafts {
+  animation: none !important;
+}

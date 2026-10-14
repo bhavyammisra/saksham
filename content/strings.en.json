@@ -131,5 +131,6 @@
   "dev.scene": "Engine sandbox",
   "dev.sceneComplete": "Scene complete! Retries: {retries}.",
   "dev.sceneExit": "You left the scene through: {label}.",
-  "dev.sceneRestart": "Play again"
+  "dev.sceneRestart": "Play again",
+  "dev.look": "School look development"
 }

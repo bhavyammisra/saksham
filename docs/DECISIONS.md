@@ -157,3 +157,14 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
   - **Calm mode** turns off parallax, camera smoothing, the typewriter, bobbing and screen nudges. **Gentle** scenes play sounds at half volume and never nudge the screen.
 - **Why:** A pure reducer is the simplest way to make a game loop testable and explainable: 41 unit tests play the real sandbox JSON, including a full walkthrough with a retry. React only draws.
 - **Alternatives:** A canvas game engine such as Phaser or PixiJS (a big dependency, and canvas is invisible to screen readers), game state kept in refs and mutated (fast but hard to test).
+
+## D-022 Scene art: hand-drawn SVG layers with one lighting logic
+
+- **Context:** The art direction asks for grounded, warm, painterly scenes with golden-hour light, light shafts, grain, depth blur and ambient life, kept consistent across every building. The Phase 2 gate decides whether this approach is good enough.
+- **Choice:** Each scene's art is plain SVG components in `src/art/<scene>.tsx`, registered by key in `src/art/index.ts`. The School look-dev has seven layers: sky 0.05, far hills 0.15 (blurred), town 0.4 (lightly blurred), trees 0.65, school and courtyard 1 (the stage), a light layer fixed to the screen and drawn in front, and blurred foreground leaves at 1.35.
+  - **One lighting logic everywhere:** the sun is low on the right, warm light falls on right-facing surfaces, and the left side gets cool violet-grey shade. Shadows are cast long to the left, and colours fade into a warm haze with distance (`HAZE`).
+  - **The light layer** (warm colour grade, three soft shafts, dust, vignette) sits in front of the characters, so they share the same light. For that, layers gained an optional `front` flag in `content/types.ts`.
+  - **Film grain** is an engine-level overlay, so every scene has the same texture.
+  - **Ambient life** (birds, dust, a slow shaft glow) is CSS animation that stops in calm mode. Seeded random numbers keep each scene identical on every visit.
+- **Why:** No image files to licence, sharp at any screen size, small to download (the whole School backdrop is code), and it shares the character's style. The light layer is the cheapest way to make every element feel lit by the same sun.
+- **Alternatives:** Painted raster backdrops (would look richer, but need an artist and licences, are heavy on school connections, and blur when scaled), WebGL or 3D (out of scope; a stretch goal in §3).

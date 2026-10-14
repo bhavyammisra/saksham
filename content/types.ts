@@ -30,7 +30,8 @@ export interface SceneDef {
 export interface Layer {
   id: string
   art: string
-  speed: number // parallax factor, 1 = foreground
+  speed: number // parallax factor, 1 = foreground; 0 = fixed to the screen (light, haze)
+  front?: boolean // drawn in front of the characters (default: only layers faster than 1)
 }
 
 export interface Hotspot {

@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import { Shell } from '@/components/Shell'
 import { SoundRouteSync } from '@/components/SoundRouteSync'
 import { DevCharacters } from '@/screens/DevCharacters'
+import { DevLook } from '@/screens/DevLook'
 import { DevScene } from '@/screens/DevScene'
 import { RequireProfile, StartRedirect } from '@/screens/guards'
 import { HelpCentre } from '@/screens/HelpCentre'
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
           <Route path="/dev/characters" element={<DevCharacters />} />
           <Route path="/dev/scene" element={<DevScene />} />
+          <Route path="/dev/look" element={<DevLook />} />
           <Route element={<RequireProfile />}>
             <Route path="/play/:id" element={<Placeholder title="play.title" />} />
           </Route>
