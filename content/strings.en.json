@@ -113,5 +113,6 @@
   "dev.poses": "Poses",
   "dev.moods": "Moods (portrait)",
   "dev.skinTones": "Skin tones",
-  "dev.hairStyles": "Hairstyles"
+  "dev.hairStyles": "Hairstyles",
+  "me.changeCharacter": "Change my character"
 }

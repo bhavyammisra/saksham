@@ -4,6 +4,7 @@ import { SoundRouteSync } from '@/components/SoundRouteSync'
 import { DevCharacters } from '@/screens/DevCharacters'
 import { RequireProfile, StartRedirect } from '@/screens/guards'
 import { HelpCentre } from '@/screens/HelpCentre'
+import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
 import { Placeholder } from '@/screens/Placeholder'
 import { Profiles } from '@/screens/Profiles'
@@ -37,7 +38,8 @@ export default function App() {
             <Route path="/town" element={<Placeholder title="town.title" />} />
             <Route path="/book" element={<Placeholder title="book.title" />} />
             <Route path="/community" element={<Placeholder title="community.title" />} />
-            <Route path="/me" element={<Placeholder title="me.title" />} />
+            <Route path="/me" element={<Me />} />
+            <Route path="/me/character" element={<MeCharacter />} />
           </Route>
         </Route>
 

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { defaultSpec } from '@/character/spec'
 import { initialState, selectActiveData, selectActiveProfile, useStore } from './store'
 
 const store = () => useStore.getState()
@@ -78,5 +79,28 @@ describe('settings and demo mode', () => {
     expect(store().demo).toBe(true)
     store().setDemo(false)
     expect(store().demo).toBe(false)
+  })
+})
+
+describe('FR-01 the player character', () => {
+  it('a new profile gets the default character unless one is given', () => {
+    const asha = store().addProfile('Asha', 'young')!
+    expect(asha.avatar).toEqual(defaultSpec)
+    const ravi = store().addProfile('Ravi', 'teen', { ...defaultSpec, hair: 'curly' })!
+    expect(ravi.avatar.hair).toBe('curly')
+  })
+
+  it('changes only the active player’s character', () => {
+    const asha = store().addProfile('Asha', 'young')!
+    store().addProfile('Ravi', 'teen')
+    store().setAvatar({ ...defaultSpec, outfit: 'kurta' })
+    expect(selectActiveProfile(store())?.avatar.outfit).toBe('kurta')
+    expect(store().profiles.find((p) => p.id === asha.id)?.avatar.outfit).toBe(defaultSpec.outfit)
+  })
+
+  it('repairs an invalid character instead of saving it', () => {
+    store().addProfile('Asha', 'young')
+    store().setAvatar({ ...defaultSpec, skin: 'not-a-tone' })
+    expect(selectActiveProfile(store())?.avatar.skin).toBe(defaultSpec.skin)
   })
 })

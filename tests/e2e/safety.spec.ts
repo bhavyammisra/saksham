@@ -13,9 +13,11 @@ const ROUTES_WITH_HELP_BUTTON = [
   '/book',
   '/community',
   '/me',
+  '/me/character',
   '/credits',
   '/teacher',
   '/reviewer',
+  '/dev/characters',
 ]
 
 test.describe('FR-08 / NFR-06 "Need help?" is on every screen except the Help Centre', () => {

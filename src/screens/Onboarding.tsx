@@ -1,23 +1,27 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
 import type { Band } from '@content/types'
+import { CharacterBuilder } from '@/character/CharacterBuilder'
+import { randomSpec, type CharacterSpec } from '@/character/spec'
 import { Button } from '@/components/Button'
 import { Page } from '@/components/Page'
 import { t } from '@/lib/i18n'
 import { cleanFirstName, isValidFirstName } from '@/lib/rules'
 import { useStore } from '@/lib/store'
 
-type Step = 'hello' | 'name' | 'band'
+type Step = 'hello' | 'name' | 'band' | 'character'
 
 /**
- * New player (FR-01): hello -> first name -> age band.
+ * New player (FR-01): hello -> first name -> age band -> character.
  * The only personal data asked for is a first name (NFR-01). It stays on this device.
- * The character builder step is added in Phase 2.
  */
 export function Onboarding() {
   const [step, setStep] = useState<Step>('hello')
   const [name, setName] = useState('')
   const [showError, setShowError] = useState(false)
+  const [band, setBand] = useState<Band>('young')
+  // Start from a random character, so every new player looks a little different.
+  const [avatar, setAvatar] = useState<CharacterSpec>(() => randomSpec())
   const heading = useRef<HTMLHeadingElement>(null)
   const hasProfiles = useStore((s) => s.profiles.length > 0)
   const addProfile = useStore((s) => s.addProfile)
@@ -44,8 +48,24 @@ export function Onboarding() {
     setStep('band')
   }
 
-  const chooseBand = (band: Band) => {
-    if (addProfile(name, band)) navigate('/town')
+  const chooseBand = (chosen: Band) => {
+    setBand(chosen)
+    setStep('character')
+  }
+
+  const finish = () => {
+    if (addProfile(name, band, avatar)) navigate('/town')
+  }
+
+  if (step === 'character') {
+    return (
+      <Page title={t('builder.title')} headingRef={heading}>
+        <CharacterBuilder value={avatar} onChange={setAvatar} onDone={finish} />
+        <Button look="secondary" onClick={() => setStep('band')} className="mt-6">
+          {t('onboarding.back')}
+        </Button>
+      </Page>
+    )
   }
 
   if (step === 'hello') {

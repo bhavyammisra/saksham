@@ -203,10 +203,10 @@ Done when: CI is green and the app shows an empty shell.
 
 #### Character
 
-- [ ] Paper-doll SVG character: shared rig (head, hair, body, outfit, headwear) with realistic proportions. Options: 8 to 10 skin tones, 6 to 8 hairstyles, 5 or more hair colours, a few outfits (school uniform, kurta, salwar kameez, casual), headwear (patka, hijab, dupatta), glasses, school bag. Spec is a small JSON object.
-- [ ] Animations on the shared rig (CSS or `motion`): idle, walk, talk, wave, react (gasp, cheer). Facing left or right.
-- [ ] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
-- [ ] Portrait renderer (head and shoulders with a mood) for dialogue and results.
+- [x] Paper-doll SVG character: shared rig (head, hair, body, outfit, headwear) with realistic proportions. Options: 8 to 10 skin tones, 6 to 8 hairstyles, 5 or more hair colours, a few outfits (school uniform, kurta, salwar kameez, casual), headwear (patka, hijab, dupatta), glasses, school bag. Spec is a small JSON object.
+- [x] Animations on the shared rig (CSS or `motion`): idle, walk, talk, wave, react (gasp, cheer). Facing left or right.
+- [x] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
+- [x] Portrait renderer (head and shoulders with a mood) for dialogue and results.
 
 🛑 **Gate:** owner approves the character look before scene art starts.
 
