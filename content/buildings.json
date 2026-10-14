@@ -1,0 +1,8 @@
+[
+  { "id": "school" },
+  { "id": "dhaba" },
+  { "id": "home" },
+  { "id": "panchayat" },
+  { "id": "playground", "teaser": true },
+  { "id": "cyber-adda", "teaser": true }
+]

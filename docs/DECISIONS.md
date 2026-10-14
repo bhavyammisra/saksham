@@ -89,3 +89,46 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Choice:** All tokens live in `@theme` in `src/index.css`: warm palette, a separate cool Help palette with no reds, an enlarged type scale, `--spacing-tap` = 48px, radii and warm shadows. Calm mode is the `data-calm` attribute on `<html>`, set by `src/lib/calm.ts` from `prefers-reduced-motion` (the setting joins in Phase 1). Under it, a CSS rule cuts all animations and transitions to near zero.
 - **Why:** One file to change the look. Tailwind generates the utilities. An attribute on `<html>` is something both CSS and engine code can check. The focus ring is blue, so it contrasts with the warm palette, with a white halo for dark art.
 - **Alternatives:** A JS theme object (duplicates CSS), relying on `prefers-reduced-motion` alone (can't be switched on in-app).
+
+## D-013 Content contract and a hand-written validator
+
+- **Context:** Scenes are JSON written by hand. A typo in a node id or flag would only show up as a stuck game. JSON imports lose TypeScript's literal types, so the compiler can't check scene files.
+- **Choice:** `content/types.ts` is the contract (§6). `GameDef` is quiz-only until the sort game in Phase 4, and `BuildingInfo` lists the unlock order in `content/buildings.json`. `scripts/validate-content.ts` (`npm run validate`, in CI) checks every `content/scenes/*.json`: required fields, enum values, every `next`/`to`/`node`/`startNode` exists, no dead ends, a reachable `end: "good"`, every `showIf`/`hideIf`/`requires` flag is set by some node, hotspots and spawn inside `walkable`, card fields, quiz answers in range, and a non-teen question exists. It also checks that every `t('key')` in `src/` exists in `strings.en.json`.
+- **Why:** Plain functions, unit-tested with one broken scene per rule, and readable in the viva. Node 24 runs the TypeScript file directly (type stripping), so no build step or extra tool is needed.
+- **Alternatives:** JSON Schema with ajv, or zod (new dependencies; they can't express graph rules like "reachable good end" anyway).
+
+## D-014 Game rules as pure functions over whole-number scores
+
+- **Context:** Stars, unlocks, band filtering, hint rounds and the sync merge must be exact and testable (§7), and they're graded through the SRS and the tests.
+- **Choice:** `src/lib/rules.ts` holds pure functions only, with no React, storage or clock. A score is kept as `{ correct, total }`, and thresholds are checked as `correct × 100 ≥ total × percent`. Saved `bestScore` is a whole percentage, which matches the `best_score` column later. Only the first attempt per question counts, so the hint round can't change the score by construction. The first-name rule (letters, Hindi vowel signs, single spaces, ≤ 20 characters) lives here too, so the UI, store and later the database agree.
+- **Why:** Pure functions are the easiest code to test and explain. Whole numbers avoid `0.6 * 5 = 2.9999…` bugs at exactly 60% and 90%. Test names start with requirement IDs (FR-05, FR-06, FR-07, FR-12, FR-17, NFR-01) for the traceability matrix.
+- **Note:** Hyphens and apostrophes in names (Asha-Rani, D'Souza) are rejected because §4 says "letters and spaces". Change `isValidFirstName` if the owner wants them.
+- **Alternatives:** Fractions (rounding bugs), rules inside the store (harder to test).
+
+## D-015 One persisted zustand store; device-level settings
+
+- **Context:** Several children may share one device. Each needs separate progress, and everything must survive reloads offline.
+- **Choice:** `src/lib/store.ts` is a single zustand store saved to `localStorage` under the key `saksham` (version 1). It holds `profiles`, `activeProfileId`, `settings`, `data[profileId] = { progress, extras }` and `demo`. Settings and demo mode belong to the device, not to a profile. Every change to progress goes through `rules.ts` (`progressFromResult`, `bestProgress`), and names through `isValidFirstName`.
+- **Why:** One store is easy to reason about and to sync later (Phase 5). Device-level settings mean a teacher can turn on calm mode once for a shared tablet. If `localStorage` is unavailable (private window, blocked storage, tests), the store falls back to memory instead of crashing. A `merge` step fills in defaults for settings added later.
+- **Alternatives:** One store per profile (harder switching), IndexedDB (more code for small data).
+
+## D-016 App shell: one layout component, native `<dialog>` for settings
+
+- **Context:** Every screen except `/help` needs the Help button. Some screens also need the main navigation. Settings must be keyboard- and screen-reader-friendly.
+- **Choice:** `Shell` is a layout route: a top bar with logo, "Need help?" and Settings. `<Shell nav />` adds the navigation, in the top bar on wide screens and as a bottom bar on phones. `/help` sits outside every shell. Settings is a native `<dialog>` opened with `showModal()`. Toggles are `<button role="switch">` that also show "On"/"Off" as words, so state is never colour-only. On phones the Settings button shows only a gear icon, and its label stays readable by screen readers. `data-calm` is on when the system asks for reduced motion OR the "Calm motion" setting is on. `main.tsx` keeps it, and the page language, in sync with the store.
+- **Why:** Putting the Help button in the layout, not in each screen, means a new screen can't forget it. The native dialog gives focus trapping, Escape-to-close and focus return without a library.
+- **Alternatives:** A Help button in each screen (easy to miss one), a dialog library such as Radix (a dependency for something the browser already does).
+
+## D-017 Help Centre content in JSON, with official sources enforced by the validator
+
+- **Context:** The Help Centre is the most safety-critical screen. Its words must be exactly as authored, and every number must come from an official page.
+- **Choice:** `content/help.json` (typed as `HelpContent`) holds every sentence and number, with `sources` per helpline and a `review` block for the owner's sign-off. The screen only lays the content out. The words around it ("Back", "Call {number}") come from `t()`. The validator rejects a helpline whose number isn't digits only, or whose sources aren't `https` pages on `.gov.in` or `.nic.in`. Helplines included: 1098, 112, 14416, 1930.
+- **Why:** Copy and code stay separate, so the owner can fix wording without touching code, and a reviewer can check one file. Enforcing government domains means a blog or news page can't slip in as a "source". Styling uses only the `help-*` colours (teal and cool grey, never red) and no transitions.
+- **Alternatives:** Copy in the component (mixes code and safety text), a hand-kept list of sources in a document (drifts out of date).
+
+## D-018 Sound: one synthesised WebAudio manager
+
+- **Context:** §2 P1 asks for a sound manager that starts on the first gesture, respects settings, is silent on `/help`, and plays at half volume in `gentle` scenes.
+- **Choice:** `src/lib/sound.ts` exposes `sound.play(name)` with three short synthesised sounds (`tap`, `soft`, `success`) made from oscillators. The volume rule is the pure function `soundGain()`, which is unit-tested. `main.tsx` passes the "Sound effects" setting in. `SoundRouteSync` silences everything while the route is `/help`. The standard `Button` plays `tap`.
+- **Why:** Synthesised sound needs no audio files, so there is no licence to check and no download. The audio context is created only after a tap or key press, as browsers require. Recorded ambience and music come in Phase 6.
+- **Alternatives:** Howler.js (a dependency we don't need yet), `<audio>` tags (needs files, and is harder to mix).

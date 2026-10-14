@@ -1,0 +1,356 @@
+// Content validator: `npm run validate` (also runs in CI).
+//
+// Checks every content/scenes/*.json file against the contract in content/types.ts,
+// and checks that every t('key') used in src/ exists in content/strings.en.json.
+// Each check returns a list of human-readable problems; an empty list means valid.
+//
+// Runs directly with Node 24 (which strips TypeScript types), so this file only
+// uses type annotations, nothing that needs compiling.
+
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import type { SceneDef, StoryNode } from '../content/types.ts'
+
+const TONES = ['normal', 'gentle']
+const MOODS = ['neutral', 'happy', 'worried', 'surprised', 'sad']
+const HOTSPOT_KINDS = ['npc', 'object', 'exit']
+const CHOICE_KINDS = ['good', 'weak']
+const ENDS = ['good', 'retry']
+const CARD_FIELDS = ['id', 'title', 'kid', 'teen', 'ifItHappens', 'law', 'source'] as const
+
+// ---------------------------------------------------------------- helpers
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim() !== ''
+}
+
+function isNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
+function isStringList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every(isText)
+}
+
+// ---------------------------------------------------------------- scenes
+
+/** Returns every problem found in one scene. Empty list = valid. */
+export function validateScene(raw: unknown): string[] {
+  const errors: string[] = []
+  const fail = (message: string) => errors.push(message)
+
+  if (!isObject(raw)) return ['scene is not a JSON object']
+  // From here on we check each field before trusting it.
+  const scene = raw as Partial<SceneDef> & Record<string, unknown>
+
+  for (const field of ['id', 'title', 'right', 'tagline', 'startNode'] as const) {
+    if (!isText(scene[field])) fail(`"${field}" must be non-empty text`)
+  }
+  if (!TONES.includes(scene.tone as string)) fail(`"tone" must be one of ${TONES.join(', ')}`)
+  if (!isNumber(scene.width) || scene.width <= 0) fail('"width" must be a positive number')
+
+  // Layers
+  if (!Array.isArray(scene.layers) || scene.layers.length === 0) {
+    fail('"layers" must be a non-empty list')
+  } else {
+    scene.layers.forEach((layer, i) => {
+      if (!isText(layer?.id) || !isText(layer?.art)) fail(`layers[${i}] needs "id" and "art"`)
+      if (!isNumber(layer?.speed) || layer.speed < 0) fail(`layers[${i}].speed must be 0 or more`)
+    })
+  }
+
+  // Walking area
+  const walk = scene.walkable
+  const walkOk = isObject(walk) && isNumber(walk.minX) && isNumber(walk.maxX) && walk.minX < walk.maxX
+  if (!walkOk) {
+    fail('"walkable" needs minX < maxX')
+  } else if (isNumber(scene.width) && (walk.minX < 0 || walk.maxX > scene.width)) {
+    fail('"walkable" must stay inside the scene width')
+  }
+  const insideWalk = (x: unknown) => walkOk && isNumber(x) && x >= walk.minX && x <= walk.maxX
+
+  if (!isObject(scene.spawn) || !insideWalk(scene.spawn.x)) fail('"spawn.x" must be inside "walkable"')
+  ;(scene.blockers ?? []).forEach((b, i) => {
+    if (!isNumber(b?.x1) || !isNumber(b?.x2) || b.x1 >= b.x2) fail(`blockers[${i}] needs x1 < x2`)
+  })
+
+  // Story nodes
+  const nodes: Record<string, StoryNode> = isObject(scene.nodes) ? (scene.nodes as Record<string, StoryNode>) : {}
+  if (!isObject(scene.nodes) || Object.keys(nodes).length === 0) fail('"nodes" must be a non-empty object')
+  const nodeExists = (id: unknown) => typeof id === 'string' && id in nodes
+
+  if (isText(scene.startNode) && !nodeExists(scene.startNode)) {
+    fail(`"startNode" points to missing node "${scene.startNode}"`)
+  }
+
+  const flagsSet = new Set<string>()
+  for (const [key, node] of Object.entries(nodes)) {
+    const where = `node "${key}"`
+    if (!isObject(node)) {
+      fail(`${where} is not an object`)
+      continue
+    }
+    if (node.id !== key) fail(`${where} has id "${String(node.id)}" (must match its key)`)
+    if (!isText(node.speaker)) fail(`${where} needs a "speaker"`)
+    if (!isText(node.text)) fail(`${where} needs "text"`)
+    if (node.mood !== undefined && !MOODS.includes(node.mood)) fail(`${where} has unknown mood "${node.mood}"`)
+    if (node.end !== undefined && !ENDS.includes(node.end)) fail(`${where} has unknown end "${node.end}"`)
+    if (node.set !== undefined) {
+      if (!isStringList(node.set)) fail(`${where}.set must be a list of flags`)
+      else node.set.forEach((flag) => flagsSet.add(flag))
+    }
+    if (node.next !== undefined && !nodeExists(node.next)) {
+      fail(`${where}.next points to missing node "${node.next}"`)
+    }
+    if (node.choices !== undefined) {
+      if (!Array.isArray(node.choices) || node.choices.length === 0) {
+        fail(`${where}.choices must be a non-empty list`)
+      } else {
+        node.choices.forEach((choice, i) => {
+          if (!isText(choice?.label)) fail(`${where}.choices[${i}] needs a "label"`)
+          if (!nodeExists(choice?.to)) fail(`${where}.choices[${i}] points to missing node "${String(choice?.to)}"`)
+          if (choice?.kind !== undefined && !CHOICE_KINDS.includes(choice.kind)) {
+            fail(`${where}.choices[${i}] has unknown kind "${choice.kind}"`)
+          }
+        })
+      }
+    }
+    const ways = [node.next, node.choices, node.end].filter((w) => w !== undefined).length
+    if (ways === 0) fail(`${where} is a dead end (needs "next", "choices" or "end")`)
+    if (ways > 1) fail(`${where} must have only one of "next", "choices" or "end"`)
+  }
+
+  // A good ending must exist and be reachable from the start.
+  const goodEnds = Object.values(nodes).filter((n) => isObject(n) && n.end === 'good')
+  if (goodEnds.length === 0) fail('no node has end: "good"')
+  else if (nodeExists(scene.startNode) && !canReachGoodEnd(nodes, scene.startNode as string)) {
+    fail('no good ending can be reached from "startNode"')
+  }
+
+  // Hotspots
+  if (!Array.isArray(scene.hotspots)) {
+    fail('"hotspots" must be a list')
+  } else {
+    const ids = new Set<string>()
+    scene.hotspots.forEach((h, i) => {
+      const where = `hotspot "${h?.id ?? i}"`
+      if (!isText(h?.id)) fail(`hotspots[${i}] needs an "id"`)
+      else if (ids.has(h.id)) fail(`${where} is duplicated`)
+      else ids.add(h.id)
+      if (!isText(h?.label)) fail(`${where} needs a "label"`)
+      if (!HOTSPOT_KINDS.includes(h?.kind)) fail(`${where} has unknown kind "${String(h?.kind)}"`)
+      if (!insideWalk(h?.x)) fail(`${where}.x must be inside "walkable"`)
+      if (h?.kind === 'npc' && !isText(h.npc)) fail(`${where} is an npc and needs "npc"`)
+      if (h?.kind !== 'exit' && h?.node === undefined) fail(`${where} needs a "node" to open`)
+      if (h?.node !== undefined && !nodeExists(h.node)) fail(`${where}.node points to missing node "${h.node}"`)
+      for (const list of ['showIf', 'hideIf'] as const) {
+        const flags = h?.[list]
+        if (flags === undefined) continue
+        if (!isStringList(flags)) fail(`${where}.${list} must be a list of flags`)
+        else flags.forEach((f) => !flagsSet.has(f) && fail(`${where}.${list} uses flag "${f}" that no node sets`))
+      }
+    })
+  }
+
+  // Objectives
+  if (!Array.isArray(scene.objectives)) {
+    fail('"objectives" must be a list')
+  } else {
+    const ids = new Set<string>()
+    scene.objectives.forEach((o, i) => {
+      const where = `objective "${o?.id ?? i}"`
+      if (!isText(o?.id)) fail(`objectives[${i}] needs an "id"`)
+      else if (ids.has(o.id)) fail(`${where} is duplicated`)
+      else ids.add(o.id)
+      if (!isText(o?.text)) fail(`${where} needs "text"`)
+      if (!isStringList(o?.requires) || o.requires.length === 0) fail(`${where}.requires must list flags`)
+      else o.requires.forEach((f) => !flagsSet.has(f) && fail(`${where} requires flag "${f}" that no node sets`))
+    })
+  }
+
+  // Card
+  if (!isObject(scene.card)) fail('"card" is missing')
+  else for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
+
+  // Games
+  if (!Array.isArray(scene.games) || scene.games.length === 0) {
+    fail('"games" must list at least one game')
+  } else {
+    if (!scene.games.some((g) => g?.kind === 'quiz')) fail('"games" must include a quiz')
+    scene.games.forEach((game, gi) => {
+      if (game?.kind !== 'quiz') return fail(`games[${gi}] has unknown kind "${String(game?.kind)}"`)
+      if (!isText(game.id)) fail(`games[${gi}] needs an "id"`)
+      if (!Array.isArray(game.questions) || game.questions.length === 0) {
+        return fail(`quiz "${game.id}" needs questions`)
+      }
+      const ids = new Set<string>()
+      game.questions.forEach((q, qi) => {
+        const where = `quiz "${game.id}" question "${q?.id ?? qi}"`
+        if (!isText(q?.id)) fail(`quiz "${game.id}" questions[${qi}] needs an "id"`)
+        else if (ids.has(q.id)) fail(`${where} is duplicated`)
+        else ids.add(q.id)
+        if (!isText(q?.text)) fail(`${where} needs "text"`)
+        if (!isText(q?.explanation)) fail(`${where} needs an "explanation"`)
+        if (!isStringList(q?.options) || q.options.length < 2) fail(`${where} needs at least 2 options`)
+        else if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= q.options.length) {
+          fail(`${where}.answer must be an index into options`)
+        }
+        if (q?.band !== undefined && q.band !== 'teen') fail(`${where}.band can only be "teen"`)
+      })
+      // Every band must be left with at least one question.
+      if (game.questions.every((q) => q?.band === 'teen')) fail(`quiz "${game.id}" has no questions for young players`)
+    })
+  }
+
+  return errors
+}
+
+/** Follows next/choices from the start node and reports whether an end: "good" node is reachable. */
+function canReachGoodEnd(nodes: Record<string, StoryNode>, start: string): boolean {
+  const seen = new Set<string>()
+  const queue = [start]
+  while (queue.length > 0) {
+    const id = queue.shift() as string
+    if (seen.has(id)) continue
+    seen.add(id)
+    const node = nodes[id]
+    if (!node) continue
+    if (node.end === 'good') return true
+    if (node.next) queue.push(node.next)
+    for (const choice of node.choices ?? []) queue.push(choice.to)
+  }
+  return false
+}
+
+// ---------------------------------------------------------------- UI strings
+
+/** Finds t('key') calls in source text. */
+export function findStringKeys(source: string): string[] {
+  return [...source.matchAll(/\bt\(\s*['"]([\w.-]+)['"]/g)].map((m) => m[1] as string)
+}
+
+/** Every key used in code must exist in the English strings, and every value must be non-empty text. */
+export function validateStrings(strings: unknown, usedKeys: Iterable<string>): string[] {
+  if (!isObject(strings)) return ['strings file is not a JSON object']
+  const errors: string[] = []
+  for (const [key, value] of Object.entries(strings)) {
+    if (!isText(value)) errors.push(`string "${key}" must be non-empty text`)
+  }
+  for (const key of new Set(usedKeys)) {
+    if (!(key in strings)) errors.push(`t('${key}') is used in code but missing from the strings file`)
+  }
+  return errors
+}
+
+// ---------------------------------------------------------------- Help Centre
+
+/** Official sources only: Government of India sites end in .gov.in or .nic.in. */
+export function isOfficialSource(url: string): boolean {
+  try {
+    const { protocol, hostname } = new URL(url)
+    return protocol === 'https:' && (hostname.endsWith('.gov.in') || hostname.endsWith('.nic.in') || hostname === 'gov.in')
+  } catch {
+    return false
+  }
+}
+
+/** Every helpline needs a dialable number and at least one official source page. */
+export function validateHelp(raw: unknown): string[] {
+  if (!isObject(raw)) return ['help content is not a JSON object']
+  const errors: string[] = []
+  const help = raw as Record<string, unknown>
+  for (const field of ['title', 'intro', 'urgent', 'helplinesTitle', 'disclaimer']) {
+    if (!isText(help[field])) errors.push(`"${field}" must be non-empty text`)
+  }
+  if (!Array.isArray(help.helplines) || help.helplines.length === 0) {
+    errors.push('"helplines" must list at least one helpline')
+  } else {
+    help.helplines.forEach((line, i) => {
+      const where = `helpline "${isObject(line) ? String(line.id) : i}"`
+      if (!isObject(line)) return void errors.push(`${where} is not an object`)
+      for (const field of ['id', 'name', 'when', 'hours']) {
+        if (!isText(line[field])) errors.push(`${where} needs "${field}"`)
+      }
+      if (typeof line.number !== 'string' || !/^\d{3,12}$/.test(line.number)) {
+        errors.push(`${where}.number must be digits only`)
+      }
+      const sources = line.sources
+      if (!Array.isArray(sources) || sources.length === 0) {
+        errors.push(`${where} needs at least one source`)
+      } else {
+        sources.forEach((s, si) => {
+          if (!isObject(s) || !isText(s.title)) errors.push(`${where}.sources[${si}] needs a "title"`)
+          if (!isObject(s) || typeof s.url !== 'string' || !isOfficialSource(s.url)) {
+            errors.push(`${where}.sources[${si}] must be an https .gov.in or .nic.in page`)
+          }
+        })
+      }
+    })
+  }
+  for (const section of ['trustedAdult', 'rights'] as const) {
+    const value = help[section]
+    const list = section === 'trustedAdult' ? 'steps' : 'items'
+    if (!isObject(value) || !isText(value.title) || !isStringList(value[list]) || value[list].length === 0) {
+      errors.push(`"${section}" needs a "title" and a non-empty "${list}" list`)
+    }
+  }
+  return errors
+}
+
+// ---------------------------------------------------------------- command line
+
+function listFiles(dir: string, test: (name: string) => boolean): string[] {
+  let names: string[]
+  try {
+    names = readdirSync(dir)
+  } catch {
+    return [] // folder does not exist yet
+  }
+  return names.flatMap((name) => {
+    const path = join(dir, name)
+    if (statSync(path).isDirectory()) return listFiles(path, test)
+    return test(name) ? [path] : []
+  })
+}
+
+function main(): void {
+  const root = fileURLToPath(new URL('..', import.meta.url))
+  const problems: string[] = []
+  const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'))
+
+  const sceneFiles = listFiles(join(root, 'content', 'scenes'), (n) => n.endsWith('.json'))
+  for (const file of sceneFiles) {
+    let scene: unknown
+    try {
+      scene = readJson(file)
+    } catch (error) {
+      problems.push(`${relative(root, file)}: not valid JSON (${(error as Error).message})`)
+      continue
+    }
+    for (const p of validateScene(scene)) problems.push(`${relative(root, file)}: ${p}`)
+  }
+
+  const sourceFiles = listFiles(join(root, 'src'), (n) => /\.tsx?$/.test(n) && !n.includes('.test.'))
+  const usedKeys = sourceFiles.flatMap((file) => findStringKeys(readFileSync(file, 'utf8')))
+  for (const p of validateStrings(readJson(join(root, 'content', 'strings.en.json')), usedKeys)) {
+    problems.push(`content/strings.en.json: ${p}`)
+  }
+
+  for (const p of validateHelp(readJson(join(root, 'content', 'help.json')))) {
+    problems.push(`content/help.json: ${p}`)
+  }
+
+  if (problems.length > 0) {
+    console.error(`Content problems (${problems.length}):\n- ${problems.join('\n- ')}`)
+    process.exit(1)
+  }
+  console.log(`Content OK: ${sceneFiles.length} scene(s), ${new Set(usedKeys).size} UI string key(s) checked.`)
+}
+
+// Run only when called as a script, not when imported by tests.
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main()

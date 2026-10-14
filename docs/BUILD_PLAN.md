@@ -186,18 +186,18 @@ Done when: CI is green and the app shows an empty shell.
 
 #### Rules and content contract
 
-- [ ] `content/types.ts` from §6. A validation script that checks every scene JSON (all node targets exist, a `good` end exists, flags used in `showIf` are set somewhere, every UI key exists in the strings file).
-- [ ] `src/lib/rules.ts` from §7 with unit tests for every rule (stars thresholds, retries, best-of replay, unlocks, band filtering, hint round does not change the score, recommended building, merge rule). Name tests with the requirement IDs from §11.
-- [ ] `src/lib/store.ts`: persisted zustand store (profiles, active profile, settings, per-profile progress). The store only calls `rules.ts`.
+- [x] `content/types.ts` from §6. A validation script that checks every scene JSON (all node targets exist, a `good` end exists, flags used in `showIf` are set somewhere, every UI key exists in the strings file).
+- [x] `src/lib/rules.ts` from §7 with unit tests for every rule (stars thresholds, retries, best-of replay, unlocks, band filtering, hint round does not change the score, recommended building, merge rule). Name tests with the requirement IDs from §11.
+- [x] `src/lib/store.ts`: persisted zustand store (profiles, active profile, settings, per-profile progress). The store only calls `rules.ts`.
 
 #### App shell and safety basics
 
-- [ ] Routes: `/` redirect, `/profiles`, `/onboarding`, `/town`, `/play/:id`, `/book`, `/help`, `/community`, `/me`, `/credits`, `/teacher`, `/reviewer`.
-- [ ] Shell: top bar and mobile bottom nav, a **Help button on every screen except `/help`**, settings (sound, music, narration, calm motion, language). `data-calm` syncs with settings and `prefers-reduced-motion`.
-- [ ] **Help Centre** (calm): helplines, "how to tell a trusted adult" steps, rights list, disclaimer, all from `content/help.json` exactly as written. Source every number from an official page and put the source in the file.
-- [ ] Profile picker and onboarding (hello, first name with validation, age band). The avatar step is added in Phase 2.
-- [ ] Sound manager (`src/lib/sound.ts`): a WebAudio context created on the first user gesture, one `sound.play(name)` API, respects settings, plays nothing on `/help`, half gain in `gentle` scenes.
-- [ ] Safety-invariant e2e tests: Help button on every route except `/help`; `/help` is calm and silent; the name field rejects digits and symbols; no screen shows free text from another child.
+- [x] Routes: `/` redirect, `/profiles`, `/onboarding`, `/town`, `/play/:id`, `/book`, `/help`, `/community`, `/me`, `/credits`, `/teacher`, `/reviewer`.
+- [x] Shell: top bar and mobile bottom nav, a **Help button on every screen except `/help`**, settings (sound, music, narration, calm motion, language). `data-calm` syncs with settings and `prefers-reduced-motion`.
+- [x] **Help Centre** (calm): helplines, "how to tell a trusted adult" steps, rights list, disclaimer, all from `content/help.json` exactly as written. Source every number from an official page and put the source in the file.
+- [x] Profile picker and onboarding (hello, first name with validation, age band). The avatar step is added in Phase 2.
+- [x] Sound manager (`src/lib/sound.ts`): a WebAudio context created on the first user gesture, one `sound.play(name)` API, respects settings, plays nothing on `/help`, half gain in `gentle` scenes.
+- [x] Safety-invariant e2e tests: Help button on every route except `/help`; `/help` is calm and silent; the name field rejects digits and symbols; no screen shows free text from another child.
 
 ### Phase 2: Character and scene engine
 
@@ -366,3 +366,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: ESLint pinned to 9 (past end-of-support) because jsx-a11y doesn't support 10 yet (D-007). Calm mode only follows the system setting until the P1 settings store. The deploy job is untested until the owner sets up Vercel (SETUP.md §3).
 - Owner: check the two font licences in ASSET_LICENSES.md. Optionally install `gh` and protect `main`.
 - Next task: P1 › Rules and content contract › `content/types.ts` from §6 plus the validation script.
+
+**P1 Core (2026-10-14)**
+- Done: all 9 P1 tasks. 100 unit, 10 e2e and 16 safety tests, all green locally. The validator runs in CI.
+- Hacky / watch: Help Centre numbers are sourced from PIB pages but **not yet owner-verified** (`help.json` → `review.status: "unverified"`, SETUP.md §5). Language picker shows English only until P6. `t()` doesn't re-render on a language change yet (P6). Names with hyphens or apostrophes are rejected per §4 (D-014). Sounds are synthesised placeholders.
+- Owner: fact-check `content/help.json` (SETUP.md §5) and the font licences.
+- Next task: P2 › Character › paper-doll SVG character rig and options.

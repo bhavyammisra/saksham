@@ -1,0 +1,86 @@
+{
+  "title": "Need help?",
+  "intro": "You are not alone. These people help children every day. Calling is free.",
+  "urgent": "If someone is in danger right now, call 112.",
+  "helplinesTitle": "People you can call",
+  "helplines": [
+    {
+      "id": "child-helpline",
+      "name": "Child Helpline",
+      "number": "1098",
+      "when": "If you or another child needs help, care or protection. Adults can call for a child too.",
+      "hours": "Free. Day and night, every day.",
+      "sources": [
+        {
+          "title": "PIB, Ministry of Women and Child Development: integration of Child Helpline with ERSS-112 (2023)",
+          "url": "https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1933794"
+        }
+      ]
+    },
+    {
+      "id": "emergency",
+      "name": "Emergency",
+      "number": "112",
+      "when": "If someone is hurt or in danger right now. Police, fire and ambulance.",
+      "hours": "Free. Day and night, every day.",
+      "sources": [
+        { "title": "Emergency Response Support System (ERSS), Government of India", "url": "https://112.gov.in" }
+      ]
+    },
+    {
+      "id": "tele-manas",
+      "name": "Tele-MANAS",
+      "number": "14416",
+      "when": "If you feel very sad, scared or worried, and want to talk to someone kind.",
+      "hours": "Free. Day and night. You can choose your language.",
+      "sources": [
+        { "title": "Tele-MANAS, Ministry of Health and Family Welfare", "url": "https://telemanas.mohfw.gov.in/home" },
+        {
+          "title": "PIB, Ministry of Health and Family Welfare: Tele-MANAS launch (2022)",
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1866498"
+        }
+      ]
+    },
+    {
+      "id": "cyber",
+      "name": "Cyber Crime Helpline",
+      "number": "1930",
+      "when": "If someone tricks your family out of money online. Other online harm can be reported at cybercrime.gov.in.",
+      "hours": "Free.",
+      "sources": [
+        { "title": "National Cyber Crime Reporting Portal, Ministry of Home Affairs", "url": "https://cybercrime.gov.in" },
+        {
+          "title": "PIB, Ministry of Home Affairs: Curbing Cyber Frauds in Digital India",
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2176146"
+        }
+      ]
+    }
+  ],
+  "trustedAdult": {
+    "title": "How to tell a trusted adult",
+    "steps": [
+      "Think of an adult you trust. It could be a parent, grandparent, teacher, aunt, uncle or neighbour.",
+      "Find a quiet moment. You can say: \"I need to tell you something important.\"",
+      "Say what happened in your own words. You do not need to know every detail.",
+      "If they do not listen, or do not help, tell another adult you trust. Keep telling until someone helps.",
+      "Asking for help is brave. It is never your fault."
+    ]
+  },
+  "rights": {
+    "title": "Your rights",
+    "items": [
+      "You have the right to go to school and learn.",
+      "You have the right to be safe at home, at school, outside and online.",
+      "You have the right to rest and play, and not to do work that keeps you from school.",
+      "You have the right to finish growing up before anyone can marry you.",
+      "You have the right to be listened to and to ask for help."
+    ]
+  },
+  "disclaimer": "Saksham is a game for learning. It cannot call anyone or read any messages. This page gives general information, not legal advice.",
+  "review": {
+    "status": "unverified",
+    "checkedBy": null,
+    "checkedOn": null,
+    "note": "Numbers come from official pages listed under each helpline but have not yet been checked by the owner. Tele-MANAS also has a long-form toll-free number that PIB pages print in two different ways (1-800-91-4416 and 1-800-891-4416), so only 14416 is shown. Check each number and each rights sentence (BUILD_PLAN §13), then set status to verified with your name and date."
+  }
+}

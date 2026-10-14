@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "validate": "node scripts/validate-content.ts"
   },
   "dependencies": {
     "@fontsource-variable/noto-serif": "^5.3.0",

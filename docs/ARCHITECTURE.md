@@ -13,14 +13,15 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 
 | Folder | Holds | Status |
 | --- | --- | --- |
-| `content/` | Typed JSON: UI strings, scenes, help copy; `types.ts` | `strings.en.json` (P0) |
-| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, later `rules.ts`, `store.ts`, `sound.ts`, `sync.ts`, `supabase.ts` | `i18n`, `calm` (P0) |
+| `content/` | Typed JSON: UI strings, scenes, help copy; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1) |
+| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, later `sync.ts`, `supabase.ts` | all but sync/supabase (P1) |
 | `src/engine/` | Scene, dialogue and game engines | P2 |
 | `src/character/` | Paper-doll character rig and portraits | P2 |
-| `src/screens/` | One component per route | P1 |
-| `src/components/` | Shared UI pieces (buttons, top bar, Help button) | P1 |
+| `src/screens/` | One component per route: Onboarding, Profiles, HelpCentre, guards, Placeholder | P1 |
+| `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
-| `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0 |
+| `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |
+| `scripts/` | `validate-content.ts` (content and strings checks, run in CI) | P1 |
 | `docs/` | Plan, decisions, setup, licences, test report | P0 |
 
 Path aliases: `@/…` → `src/…`, `@content/…` → `content/…`.
@@ -43,6 +44,32 @@ flowchart LR
 ```
 
 The Phase 5 sync sequence and join-class sequence will be added here as Mermaid sequence diagrams.
+
+## Routes
+
+```mermaid
+flowchart TD
+  Root["/ (StartRedirect)"] -->|no players| Onb[/onboarding/]
+  Root -->|players, none active| Prof[/profiles/]
+  Root -->|active player| Town[/town/]
+  subgraph "Shell (top bar + Need help? + Settings)"
+    Onb
+    Prof
+    Play["/play/:id"]
+    Teacher[/teacher/]
+    Reviewer[/reviewer/]
+  end
+  subgraph "Shell nav (adds Town · Book · Community · Me)"
+    Town
+    Book[/book/]
+    Community[/community/]
+    Me[/me/]
+    Credits[/credits/]
+  end
+  Help["/help (no shell: calm, silent)"]
+```
+
+`RequireProfile` guards `/town`, `/play/:id`, `/book`, `/community` and `/me`. Without an active player they go back to `/`.
 
 ## Build and run
 
