@@ -15,9 +15,14 @@ This project is being built from scratch and must end up **fully understood by i
 
 ## Commands
 
-(Fill these in during Phase 0 and keep them accurate.)
+(Filled in during Phase 0. Keep them accurate.) Node 24+. First run: `npm ci` and `npx playwright install chromium`.
 
-- `npm run dev`, `npm run build`, `npm run lint`, `npm run typecheck`, `npm run test`, `npm run e2e`
+- `npm run dev`: Vite dev server
+- `npm run build`: `tsc -b && vite build` into `dist/`
+- `npm run lint`: ESLint (typescript-eslint, react-hooks, jsx-a11y)
+- `npm run typecheck`: `tsc -b` (app, configs and e2e tests)
+- `npm run test`: Vitest unit tests (`src/**/*.test.ts`)
+- `npm run e2e`: Playwright against the built app (`tests/e2e/`). It builds and serves on port 4173 itself.
 
 Before saying a task is done: lint, typecheck, test and build must all pass.
 

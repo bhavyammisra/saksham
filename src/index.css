@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+
+/* Fonts are bundled from npm (SIL OFL 1.1, see docs/ASSET_LICENSES.md).
+   Nothing is loaded from a CDN. The browser picks the Devanagari face
+   automatically for Hindi characters because it is next in the font stack. */
+@import '@fontsource-variable/noto-serif';
+@import '@fontsource-variable/noto-serif-devanagari';
+
+/* ------------------------------------------------------------------
+   Design tokens (art direction: BUILD_PLAN §2)
+   Warm, grounded Indian materials: painted plaster, terracotta tiles,
+   marigold, brass, carved wood, under soft golden light.
+   Each token becomes a Tailwind utility: --color-plaster -> bg-plaster.
+   ------------------------------------------------------------------ */
+@theme {
+  /* Palette: town and game screens */
+  --color-plaster: #f6ecd9;        /* page background, limewashed wall */
+  --color-plaster-deep: #ecdcbf;   /* panels, cards */
+  --color-sand: #d9bc8c;           /* borders, dividers */
+  --color-marigold: #e8a33d;       /* highlights, stars */
+  --color-marigold-soft: #f6d79a;  /* light shafts, hover fills */
+  --color-brass: #a9822f;          /* trims, badges */
+  --color-terracotta: #b5532f;     /* primary buttons (never on Help screens) */
+  --color-terracotta-deep: #8a3b20;
+  --color-wood: #6b4528;           /* doors, frames */
+  --color-leaf: #5f7a4a;           /* foliage, success */
+  --color-peacock: #2f6f73;        /* links, secondary actions */
+  --color-ink: #2b2118;            /* body text */
+  --color-ink-soft: #5c4a3a;       /* secondary text */
+  --color-focus: #1d4ed8;          /* focus ring: blue stands out on warm colours */
+
+  /* Palette: Help Centre only. Calm, cool, quiet. Never red. */
+  --color-help-bg: #eef3f1;
+  --color-help-surface: #ffffff;
+  --color-help-ink: #1f3a3d;
+  --color-help-accent: #2f6f73;
+  --color-help-border: #c9d9d5;
+
+  /* Type: one serif family covering Latin and Devanagari */
+  --font-serif: 'Noto Serif Variable', 'Noto Serif Devanagari Variable', Georgia, serif;
+  --font-sans: var(--font-serif);
+
+  /* Type scale: a little larger than usual, for young readers */
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.375rem;
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 1.35;
+  --text-2xl: 2.25rem;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 3rem;
+  --text-3xl--line-height: 1.15;
+
+  /* Spacing: Tailwind's 0.25rem step, plus the minimum tap target */
+  --spacing: 0.25rem;
+  --spacing-tap: 3rem; /* 48px: min-h-tap, min-w-tap */
+
+  /* Radii */
+  --radius-button: 0.75rem;
+  --radius-card: 1.25rem;
+  --radius-pill: 9999px;
+
+  /* Shadows: warm-tinted, soft, like late-afternoon light */
+  --shadow-soft: 0 1px 2px rgb(74 48 24 / 0.08), 0 4px 12px rgb(74 48 24 / 0.1);
+  --shadow-lifted: 0 2px 4px rgb(74 48 24 / 0.1), 0 12px 28px rgb(74 48 24 / 0.16);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+@layer base {
+  html {
+    color-scheme: light;
+    font-family: var(--font-serif);
+    background-color: var(--color-plaster);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  /* Visible focus ring for keyboard users, on every interactive element.
+     The white halo keeps it visible on dark art too. */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px #ffffff;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Calm mode
+   <html data-calm> is set when the system asks for reduced motion
+   (and, from Phase 1, by the "Calm motion" setting).
+   Calm mode stops all CSS animation and transitions. Scene code also
+   checks it to turn off parallax, ambient loops, screen movement and
+   confetti.
+   ------------------------------------------------------------------ */
+html[data-calm] *,
+html[data-calm] *::before,
+html[data-calm] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
