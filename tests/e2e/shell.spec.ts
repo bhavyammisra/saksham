@@ -26,3 +26,26 @@ test('calm mode follows the system "reduce motion" setting', async ({ page }) =>
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await expect(page.locator('html')).not.toHaveAttribute('data-calm')
 })
+
+test('the "Calm motion" setting turns calm mode on and is remembered after a reload', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await page.goto('/')
+  await expect(page.locator('html')).not.toHaveAttribute('data-calm')
+
+  await page.getByRole('button', { name: strings['settings.open'] }).click()
+  const calm = page.getByRole('switch', { name: new RegExp(strings['settings.calmMotion']) })
+  await expect(calm).toHaveAttribute('aria-checked', 'false')
+  await calm.click()
+  await expect(calm).toHaveAttribute('aria-checked', 'true')
+  await expect(page.locator('html')).toHaveAttribute('data-calm', '')
+
+  await page.reload()
+  await expect(page.locator('html')).toHaveAttribute('data-calm', '')
+})
+
+test('the top bar fits a phone screen without sideways scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 })
+  await page.goto('/')
+  const width = await page.evaluate(() => document.documentElement.scrollWidth)
+  expect(width).toBeLessThanOrEqual(360)
+})

@@ -1,4 +1,5 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
+import { Shell } from '@/components/Shell'
 import { RequireProfile, StartRedirect } from '@/screens/guards'
 import { Placeholder } from '@/screens/Placeholder'
 
@@ -7,18 +8,25 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<StartRedirect />} />
+      {/* The Help Centre has no shell: no Help button, nothing that moves or makes sound. */}
       <Route path="/help" element={<Placeholder title="help.title" />} />
 
-      <Route element={<Outlet />}>
+      {/* Screens with the top bar only. */}
+      <Route element={<Shell />}>
         <Route path="/profiles" element={<Placeholder title="profiles.title" />} />
         <Route path="/onboarding" element={<Placeholder title="onboarding.title" />} />
-        <Route path="/credits" element={<Placeholder title="credits.title" />} />
         <Route path="/teacher" element={<Placeholder title="teacher.title" />} />
         <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
+        <Route element={<RequireProfile />}>
+          <Route path="/play/:id" element={<Placeholder title="play.title" />} />
+        </Route>
+      </Route>
 
+      {/* Screens with the top bar and the main navigation. */}
+      <Route element={<Shell nav />}>
+        <Route path="/credits" element={<Placeholder title="credits.title" />} />
         <Route element={<RequireProfile />}>
           <Route path="/town" element={<Placeholder title="town.title" />} />
-          <Route path="/play/:id" element={<Placeholder title="play.title" />} />
           <Route path="/book" element={<Placeholder title="book.title" />} />
           <Route path="/community" element={<Placeholder title="community.title" />} />
           <Route path="/me" element={<Placeholder title="me.title" />} />

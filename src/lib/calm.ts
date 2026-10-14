@@ -1,18 +1,33 @@
 // Calm mode: <html data-calm> turns off motion everywhere (see src/index.css).
-//
-// Phase 0: follows the system "reduce motion" preference only.
-// Phase 1: the "Calm motion" setting will also switch it on.
+// It is on when EITHER the system asks for reduced motion OR the child turns on
+// the "Calm motion" setting.
 
-const query = '(prefers-reduced-motion: reduce)'
+let systemCalm = false
+let settingCalm = false
 
-export function setCalm(on: boolean): void {
-  if (on) document.documentElement.dataset.calm = ''
+function apply(): void {
+  if (systemCalm || settingCalm) document.documentElement.dataset.calm = ''
   else delete document.documentElement.dataset.calm
 }
 
-/** Sets data-calm from the system preference and keeps it in sync if it changes. */
+/** Reads the system "reduce motion" preference now and whenever it changes. Call once at start-up. */
 export function followSystemCalm(): void {
-  const media = window.matchMedia(query)
-  setCalm(media.matches)
-  media.addEventListener('change', (event) => setCalm(event.matches))
+  const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+  systemCalm = media.matches
+  media.addEventListener('change', (event) => {
+    systemCalm = event.matches
+    apply()
+  })
+  apply()
+}
+
+/** Called whenever the "Calm motion" setting changes. */
+export function setCalmSetting(on: boolean): void {
+  settingCalm = on
+  apply()
+}
+
+/** True when calm mode is on. Engine code checks this before any movement. */
+export function isCalm(): boolean {
+  return document.documentElement.hasAttribute('data-calm')
 }
