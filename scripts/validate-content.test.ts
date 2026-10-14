@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateHelp, validateScene, validateStrings } from './validate-content.ts'
+import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
 function validScene(): SceneDef {
@@ -191,5 +192,30 @@ describe('NFR-09 content validation: UI strings', () => {
 
   it('reports empty string values', () => {
     expect(validateStrings({ 'app.name': ' ' }, [])).toEqual(['string "app.name" must be non-empty text'])
+  })
+})
+
+describe('NFR-06 Help Centre content', () => {
+  it('the real help.json is valid', () => {
+    expect(validateHelp(help)).toEqual([])
+  })
+
+  it('accepts only https Government of India pages as sources', () => {
+    expect(isOfficialSource('https://112.gov.in')).toBe(true)
+    expect(isOfficialSource('https://telemanas.mohfw.gov.in/home')).toBe(true)
+    expect(isOfficialSource('https://rsdebate.nic.in/x.pdf')).toBe(true)
+    expect(isOfficialSource('http://112.gov.in')).toBe(false)
+    expect(isOfficialSource('https://en.wikipedia.org/wiki/112')).toBe(false)
+    expect(isOfficialSource('https://fakegov.in')).toBe(false)
+    expect(isOfficialSource('not a url')).toBe(false)
+  })
+
+  it('rejects a helpline without an official source or with a non-digit number', () => {
+    const bad = structuredClone(help) as Loose
+    bad.helplines[0].sources = [{ title: 'Blog', url: 'https://example.com' }]
+    bad.helplines[1].number = '11-2'
+    const errors = validateHelp(bad)
+    expect(errors).toContain('helpline "child-helpline".sources[0] must be an https .gov.in or .nic.in page')
+    expect(errors).toContain('helpline "emergency".number must be digits only')
   })
 })

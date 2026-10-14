@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { Shell } from '@/components/Shell'
 import { RequireProfile, StartRedirect } from '@/screens/guards'
+import { HelpCentre } from '@/screens/HelpCentre'
 import { Placeholder } from '@/screens/Placeholder'
 
 // Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
@@ -9,7 +10,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<StartRedirect />} />
       {/* The Help Centre has no shell: no Help button, nothing that moves or makes sound. */}
-      <Route path="/help" element={<Placeholder title="help.title" />} />
+      <Route path="/help" element={<HelpCentre />} />
 
       {/* Screens with the top bar only. */}
       <Route element={<Shell />}>

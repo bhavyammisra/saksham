@@ -102,3 +102,26 @@ export interface BuildingInfo {
   id: string
   teaser?: boolean // locked "Coming soon" building, never playable
 }
+
+// The Help Centre (content/help.json). Every word shown comes from this file, exactly as written.
+export interface HelpContent {
+  title: string
+  intro: string
+  urgent: string // shown first: what to do if someone is in danger now
+  helplinesTitle: string
+  helplines: Helpline[]
+  trustedAdult: { title: string; steps: string[] }
+  rights: { title: string; items: string[] }
+  disclaimer: string
+  // Not shown in the app. Tracks the owner's fact-check of numbers and wording.
+  review: { status: 'unverified' | 'verified'; checkedBy: string | null; checkedOn: string | null; note: string }
+}
+
+export interface Helpline {
+  id: string
+  name: string
+  number: string // digits only, used for the tel: link
+  when: string // when to call, in a child's words
+  hours: string
+  sources: { title: string; url: string }[] // official pages that state this number
+}

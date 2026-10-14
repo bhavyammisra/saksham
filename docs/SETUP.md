@@ -41,3 +41,14 @@ The CI `deploy` job is **skipped** until these are set, so CI stays green withou
 ## 4. Supabase ⬜ (Phase 5, Claude will stop and ask)
 
 Filled in during Phase 5: create the project, enable anonymous sign-ins and email auth, set the site URL, and add the repository variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. The anon key is public by design. **The service-role key must never be put in this repository, in GitHub, or in Vercel for this project.**
+
+## 5. Fact-check the Help Centre ⬜ (owner, before any child uses the app)
+
+`content/help.json` holds every helpline number and sentence shown in the Help Centre. Each number lists the official page it came from under `sources`.
+
+1. Open each source link and confirm the number, who runs it, and the hours: 1098 (Child Helpline), 112 (ERSS), 14416 (Tele-MANAS), 1930 (Cyber Crime).
+2. Read the "Your rights" and "How to tell a trusted adult" sentences. Change any wording you want **in the JSON only**. The app shows it exactly as written.
+3. Tele-MANAS: PIB pages print its long-form number in two different ways, so only `14416` is shown. Add the long number only if the official site confirms it.
+4. When done, set `review.status` to `"verified"`, and fill in `checkedBy` and `checkedOn` (YYYY-MM-DD).
+
+Claude could not open 112.gov.in, cybercrime.gov.in or telemanas.mohfw.gov.in from its tools (connection refused or JavaScript-only pages). The numbers were cross-checked against PIB press releases instead.

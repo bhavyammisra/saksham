@@ -247,6 +247,61 @@ export function validateStrings(strings: unknown, usedKeys: Iterable<string>): s
   return errors
 }
 
+// ---------------------------------------------------------------- Help Centre
+
+/** Official sources only: Government of India sites end in .gov.in or .nic.in. */
+export function isOfficialSource(url: string): boolean {
+  try {
+    const { protocol, hostname } = new URL(url)
+    return protocol === 'https:' && (hostname.endsWith('.gov.in') || hostname.endsWith('.nic.in') || hostname === 'gov.in')
+  } catch {
+    return false
+  }
+}
+
+/** Every helpline needs a dialable number and at least one official source page. */
+export function validateHelp(raw: unknown): string[] {
+  if (!isObject(raw)) return ['help content is not a JSON object']
+  const errors: string[] = []
+  const help = raw as Record<string, unknown>
+  for (const field of ['title', 'intro', 'urgent', 'helplinesTitle', 'disclaimer']) {
+    if (!isText(help[field])) errors.push(`"${field}" must be non-empty text`)
+  }
+  if (!Array.isArray(help.helplines) || help.helplines.length === 0) {
+    errors.push('"helplines" must list at least one helpline')
+  } else {
+    help.helplines.forEach((line, i) => {
+      const where = `helpline "${isObject(line) ? String(line.id) : i}"`
+      if (!isObject(line)) return void errors.push(`${where} is not an object`)
+      for (const field of ['id', 'name', 'when', 'hours']) {
+        if (!isText(line[field])) errors.push(`${where} needs "${field}"`)
+      }
+      if (typeof line.number !== 'string' || !/^\d{3,12}$/.test(line.number)) {
+        errors.push(`${where}.number must be digits only`)
+      }
+      const sources = line.sources
+      if (!Array.isArray(sources) || sources.length === 0) {
+        errors.push(`${where} needs at least one source`)
+      } else {
+        sources.forEach((s, si) => {
+          if (!isObject(s) || !isText(s.title)) errors.push(`${where}.sources[${si}] needs a "title"`)
+          if (!isObject(s) || typeof s.url !== 'string' || !isOfficialSource(s.url)) {
+            errors.push(`${where}.sources[${si}] must be an https .gov.in or .nic.in page`)
+          }
+        })
+      }
+    })
+  }
+  for (const section of ['trustedAdult', 'rights'] as const) {
+    const value = help[section]
+    const list = section === 'trustedAdult' ? 'steps' : 'items'
+    if (!isObject(value) || !isText(value.title) || !isStringList(value[list]) || value[list].length === 0) {
+      errors.push(`"${section}" needs a "title" and a non-empty "${list}" list`)
+    }
+  }
+  return errors
+}
+
 // ---------------------------------------------------------------- command line
 
 function listFiles(dir: string, test: (name: string) => boolean): string[] {
@@ -284,6 +339,10 @@ function main(): void {
   const usedKeys = sourceFiles.flatMap((file) => findStringKeys(readFileSync(file, 'utf8')))
   for (const p of validateStrings(readJson(join(root, 'content', 'strings.en.json')), usedKeys)) {
     problems.push(`content/strings.en.json: ${p}`)
+  }
+
+  for (const p of validateHelp(readJson(join(root, 'content', 'help.json')))) {
+    problems.push(`content/help.json: ${p}`)
   }
 
   if (problems.length > 0) {
