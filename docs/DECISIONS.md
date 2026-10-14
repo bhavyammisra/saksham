@@ -45,3 +45,18 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Choice:** `motion` (formerly Framer Motion).
 - **Why:** Declarative animations in React, gesture support for drag, and built-in reduced-motion handling.
 - **Alternatives:** Only CSS animations (harder for sequenced scene motion), GSAP (licence and imperative style).
+
+## D-007 Linting: ESLint 9 flat config + typescript-eslint + react-hooks + jsx-a11y
+
+- **Context:** Code quality and accessibility mistakes should be caught before review.
+- **Choice:** ESLint 9 with `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks` and `eslint-plugin-jsx-a11y`. `globals` supplies the browser and node global names.
+- **Why:** Owner's choice. ESLint is familiar and easy to explain. jsx-a11y flags missing labels, bad roles and non-interactive click handlers, which supports the accessibility rules in CLAUDE.md. The hooks plugin catches broken effect dependencies.
+- **Trade-off:** jsx-a11y 6.10 only supports ESLint up to 9, so ESLint is pinned to 9 even though ESLint 10 exists and 9 is past end-of-support. Revisit when jsx-a11y supports 10. Forcing past the peer-dependency conflict was rejected.
+- **Alternatives:** oxlint (faster, but weaker accessibility rules), ESLint 10 without jsx-a11y.
+
+## D-008 Testing: Vitest for units, Playwright for end-to-end
+
+- **Context:** Rules, safety invariants and the demo path all need automated tests that CI runs.
+- **Choice:** `vitest` for unit tests (files `*.test.ts` next to the code) and `@playwright/test` for end-to-end tests in `tests/e2e`, against the production build (`vite preview`), Chromium only.
+- **Why:** Vitest reuses the Vite config, so aliases work in tests with no extra setup. Playwright drives a real browser, and axe accessibility checks plug into it later. Testing the built app proves what users actually get.
+- **Alternatives:** Jest (separate transform config), Cypress (slower, heavier in CI).
