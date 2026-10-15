@@ -427,4 +427,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P3 School end to end: done (MILESTONE A, 2026-10-15)**
 - Done: every P3 task. "Done when" is met: School plays from start to results, progress survives a reload, and the demo-path test passes (`tests/e2e/demo-path.spec.ts`; shared School steps now live in `tests/e2e/helpers.ts`). 171 unit and 41 e2e tests, lint, typecheck, validate and build all green. Sprint log, test report and architecture map updated.
 - Hacky / watch: the School card's legal text is still `unverified` (SETUP.md §6). The hub is temporary (Phase 4 makes the town walkable). Demo mode exists in the store but has no on-screen switch yet (Phase 4). One badge icon for every badge.
-- Next task: open the P3 pull request (`p3-school` → `main`), merge with a merge commit after green CI, then P4 › walkable town scene on a new branch.
+- Next task: open the P3 pull request (`p3-school` → `main`), merge with a merge commit after green CI, then P4 › walkable town scene on a new branch. ✅ PR #4 merged 2026-10-15.
+
+**P3 merged, P4 started (2026-10-15)**
+- Done: PR #4 (all of Phase 3) merged to `main` with a merge commit after green CI (lint, unit, build and e2e in both the push and pull-request runs; deploy skipped until Vercel is set up). Branch `p4-town` created from `main`; lint, typecheck, validate, 171 unit and 41 e2e tests green.
+- Next task: P4 › walkable town scene (buildings as `exit` hotspots, locked buildings stay shut with a gentle reply, teasers say "Coming soon", Help has its own door). It replaces the temporary list at `/town`.

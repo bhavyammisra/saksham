@@ -80,4 +80,4 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-14 | `p0-foundation` (PR #1) | ✅ lint, unit, build, e2e; deploy skipped | [run 38567125652](https://github.com/bhavyammisra/saksham/actions/runs/38567125652) |
 | 2026-10-14 | `p1-core` (PR #2) | ✅ green, merged | |
 | 2026-10-15 | `p2-character-scene` (PR #3) | ✅ green, merged | |
-| 2026-10-15 | `p3-school` | pushed, PR not opened yet (local: all green) | |
+| 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |

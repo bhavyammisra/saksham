@@ -37,4 +37,5 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
   - Temporary town hub from `buildings.json` (D-029).
   - 171 unit and 41 e2e tests (including the demo path), all green. Found and fixed the real cause of a flaky walking test.
 - **Waiting on the owner:** fact-check the School card (SETUP.md §6).
-- **Next:** open and merge the P3 PR, then P4 Town and all buildings.
+- **Merged:** PR #4, 2026-10-15.
+- **Next:** P4 Town and all buildings, on branch `p4-town`.
