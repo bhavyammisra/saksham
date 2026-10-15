@@ -6,7 +6,7 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 3 of 0–7 (School end to end, MILESTONE A), on branch `p3-school`. Next task: the demo-path e2e test, the last P3 task. School plays from `/#/town` to results; its legal text waits for the owner's fact check (SETUP.md §6).
+- **Phase:** 3 of 0–7 (School end to end, MILESTONE A) is **done** on branch `p3-school` (pushed, PR not opened yet). Next: open the P3 PR, merge after green CI, then Phase 4 on a new branch. The School card's legal text waits for the owner's fact check (SETUP.md §6).
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2) and P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026).
 - **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-029).
 
@@ -19,12 +19,13 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Map of the code (details in docs/ARCHITECTURE.md)
 
-- `content/`: typed JSON. `types.ts` is the contract, plus `strings.en.json`, `help.json`, `npcs.json`, `buildings.json` and `scenes/*.json` (only the `sandbox` scene so far).
+- `content/`: typed JSON. `types.ts` is the contract, plus `strings.en.json`, `help.json`, `npcs.json`, `buildings.json` and `scenes/*.json` (`sandbox` and `school`).
 - `src/lib/`: `rules.ts` (pure game rules), `store.ts` (persisted zustand, version 2), `i18n.ts`, `calm.ts`, `sound.ts`.
 - `src/character/`: the SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu`.
 - `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`), plus `Scene.tsx` (draws it), `Dialogue.tsx` and `WalkPad.tsx`.
-- `src/art/`: scene art by key (`index.ts` registry, `sandbox.tsx`, `school.tsx`).
-- `src/screens/`, `src/components/` (Shell, HelpButton, SettingsDialog, Button, Page).
+- `src/art/`: scene art by key (`index.ts` registry, `sandbox.tsx`, `school.tsx`, `cover.tsx`).
+- `src/play/`: `CardReveal`, `Quiz`, `Results` (the end of a building). `src/lib/scenes.ts`: building id → scene.
+- `src/screens/` (Onboarding, Profiles, Town, Play, Me, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog, Button, Page, CoverScreen).
 - `scripts/validate-content.ts`: `npm run validate`, also run in CI.
 - Dev pages: `/#/dev/characters` (every character combination), `/#/dev/scene` (engine sandbox), `/#/dev/look` (School look-dev).
 

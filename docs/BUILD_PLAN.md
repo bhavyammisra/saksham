@@ -236,7 +236,7 @@ The owner said they do **not like the cover page or the character design**. Both
 - [x] Author `content/scenes/school.json`: ✅ 2026-10-15 (D-027). Lata's story, rights card and a 6-question quiz. Legal text is marked `unverified` for the owner's fact check (SETUP.md §6). Was: Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
 - [x] Card reveal (flippable, band-aware), quiz game (band filtering, hint round, explanations), results (stars rule, badges, saving progress). ✅ 2026-10-15 (D-028): `/play/:id` runs scene → card → quiz → results; Mitthu's arrival line (`intro`).
 - [x] Temporary simple hub (a list of buildings with lock states) so School can start and finish, with unlock saved across reloads. ✅ 2026-10-15 (D-029): `/town`.
-- [ ] Demo-path e2e test: profile, character, School, card flip, quiz, results, Help Centre.
+- [x] Demo-path e2e test: profile, character, School, card flip, quiz, results, Help Centre. ✅ 2026-10-15: `tests/e2e/demo-path.spec.ts`.
 
 Done when: School plays from start to results, progress survives a reload, and the demo-path test passes. Write session notes.
 
@@ -423,3 +423,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: `/town` (`src/screens/Town.tsx`) lists every building from `content/buildings.json` (which gained `name` and `right`, checked by the validator). Each card shows its state: playable, stars once finished, "Locked. Finish X first.", "Being built" (unlocked but no scene yet), or "Coming soon" (teasers). Mitthu suggests the recommended building. Unlocks come from saved progress, so they survive a reload. The rules now take `BuildingRef` (just id and teaser). 171 unit and 40 e2e tests green.
 - Fixed a flaky test: the keyboard-walking e2e held the arrow key while waiting for Ravi's prompt. On a busy machine it walked past the 240-unit prompt zone before releasing, so E did nothing. It now walks in short taps (`tests/e2e/scene.spec.ts`). It wasn't an app bug.
 - Next task: P3 › demo-path e2e test (profile, character, School, card flip, quiz, results, Help Centre).
+
+**P3 School end to end: done (MILESTONE A, 2026-10-15)**
+- Done: every P3 task. "Done when" is met: School plays from start to results, progress survives a reload, and the demo-path test passes (`tests/e2e/demo-path.spec.ts`; shared School steps now live in `tests/e2e/helpers.ts`). 171 unit and 41 e2e tests, lint, typecheck, validate and build all green. Sprint log, test report and architecture map updated.
+- Hacky / watch: the School card's legal text is still `unverified` (SETUP.md §6). The hub is temporary (Phase 4 makes the town walkable). Demo mode exists in the store but has no on-screen switch yet (Phase 4). One badge icon for every badge.
+- Next task: open the P3 pull request (`p3-school` → `main`), merge with a merge commit after green CI, then P4 › walkable town scene on a new branch.
