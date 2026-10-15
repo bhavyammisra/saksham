@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { BuildingInfo, Card, QuizQuestion } from '@content/types'
 import {
+  BADGES,
+  badgesFor,
   bestProgress,
   cardTextForBand,
   cleanFirstName,
@@ -330,5 +332,32 @@ describe('FR-01 / NFR-01 first name', () => {
 
   it('cleans extra spaces', () => {
     expect(cleanFirstName('  Asha   Rani ')).toBe('Asha Rani')
+  })
+})
+
+// ---------------------------------------------------------------- badges
+
+describe('FR-07 badges', () => {
+  const order = [{ id: 'school' }, { id: 'dhaba' }, { id: 'home' }, { id: 'teaser', teaser: true }]
+  const done = (...ids: string[]) => Object.fromEntries(ids.map((id) => [id, { stars: 1, bestScore: 50, completed: true }]))
+  const result = (retries: number, correct: number, total = 4) => ({ completed: true, retries, score: { correct, total } })
+
+  it('gives nothing for an unfinished building', () => {
+    expect(badgesFor({ completed: false, retries: 0, score: { correct: 4, total: 4 } }, {}, order)).toEqual([])
+  })
+
+  it('gives first steps for finishing, plus right-first-time and quiz-whiz when earned', () => {
+    expect(badgesFor(result(1, 2), done('school'), order)).toEqual(['first-steps'])
+    expect(badgesFor(result(0, 4), done('school'), order)).toEqual(['first-steps', 'right-first-time', 'quiz-whiz'])
+  })
+
+  it('gives kind-helper after two buildings and all-buildings after every playable one (teasers do not count)', () => {
+    expect(badgesFor(result(1, 2), done('school', 'dhaba'), order)).toContain('kind-helper')
+    expect(badgesFor(result(1, 2), done('school', 'dhaba'), order)).not.toContain('all-buildings')
+    expect(badgesFor(result(1, 2), done('school', 'dhaba', 'home'), order)).toContain('all-buildings')
+  })
+
+  it('every badge id is known', () => {
+    expect(badgesFor(result(0, 4), done('school', 'dhaba', 'home'), order).every((b) => BADGES.includes(b))).toBe(true)
   })
 })

@@ -33,7 +33,16 @@
     { "id": "ask-didi", "text": "Ask Meena Didi how to help Lata", "requires": ["asked-didi"] }
   ],
   "startNode": "ravi-hello",
+  "intro": "intro",
   "nodes": {
+    "intro": {
+      "id": "intro",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Here's the town school! The morning bell is about to ring. Ravi is waving at you. Let's go and see him.",
+      "end": "good"
+    },
+
     "ravi-hello": {
       "id": "ravi-hello",
       "speaker": "ravi",

@@ -22,6 +22,7 @@ export interface SceneDef {
   hotspots: Hotspot[]
   objectives: Objective[]
   startNode: string
+  intro?: string // node opened when the player arrives (Mitthu introduces the place)
   nodes: Record<string, StoryNode>
   card: Card
   games: GameDef[] // quiz first, sort later

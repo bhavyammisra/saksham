@@ -128,6 +128,32 @@ export function bestProgress(a: BuildingProgress | undefined, b: BuildingProgres
   }
 }
 
+// ---------------------------------------------------------------- badges
+
+/**
+ * Badges celebrate what a child did themselves, never how they compare to others
+ * (no streaks, no leaderboards). Each id has a label and a description in the strings file.
+ */
+export const BADGES = ['first-steps', 'kind-helper', 'quiz-whiz', 'right-first-time', 'all-buildings'] as const
+export type BadgeId = (typeof BADGES)[number]
+
+/**
+ * Badges earned by a finished play-through. `progress` is the saved progress *after*
+ * this result was recorded; `order` is the buildings list. Badges already held are
+ * returned too: the store keeps a union, so adding one twice changes nothing.
+ */
+export function badgesFor(result: BuildingResult, progress: ProgressMap, order: BuildingInfo[]): BadgeId[] {
+  if (!result.completed) return []
+  const earned: BadgeId[] = ['first-steps'] // finished a building
+  if (result.retries === 0) earned.push('right-first-time') // best choice every time
+  if (result.score.total > 0 && result.score.correct === result.score.total) earned.push('quiz-whiz') // full marks on the first try
+  const playable = order.filter((b) => !b.teaser)
+  const done = playable.filter((b) => progress[b.id]?.completed).length
+  if (done >= 2) earned.push('kind-helper') // helped in two places
+  if (playable.length > 0 && done === playable.length) earned.push('all-buildings')
+  return earned
+}
+
 // ---------------------------------------------------------------- unlocks
 
 /**

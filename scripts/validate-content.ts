@@ -87,6 +87,7 @@ export function validateScene(raw: unknown): string[] {
   if (isText(scene.startNode) && !nodeExists(scene.startNode)) {
     fail(`"startNode" points to missing node "${scene.startNode}"`)
   }
+  if (scene.intro !== undefined && !nodeExists(scene.intro)) fail(`"intro" points to missing node "${String(scene.intro)}"`)
 
   const flagsSet = new Set<string>()
   for (const [key, node] of Object.entries(nodes)) {

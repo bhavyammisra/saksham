@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import schoolJson from '@content/scenes/school.json'
 import type { SceneDef } from '@content/types'
+import { initialSceneState } from './sceneState'
 import { advance, choose, isSceneComplete, startDialogue, visibleHotspots, type DialogueState, type StoryState } from './story'
 
 const school = schoolJson as SceneDef
@@ -74,6 +75,10 @@ describe('School scene story', () => {
     expect(isSceneComplete(school, state.story)).toBe(false)
     // Reading the notice afterwards completes it.
     expect(isSceneComplete(school, talk(state.story, 'notice').story)).toBe(true)
+  })
+
+  it("opens Mitthu's intro line on arrival", () => {
+    expect(initialSceneState(school).dialogue?.nodeId).toBe('intro')
   })
 
   it('has quiz questions for both age bands', () => {

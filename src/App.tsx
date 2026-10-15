@@ -9,6 +9,7 @@ import { HelpCentre } from '@/screens/HelpCentre'
 import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
 import { Placeholder } from '@/screens/Placeholder'
+import { Play } from '@/screens/Play'
 import { Profiles } from '@/screens/Profiles'
 
 // Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
@@ -35,7 +36,7 @@ export default function App() {
           <Route path="/dev/scene" element={<DevScene />} />
           <Route path="/dev/look" element={<DevLook />} />
           <Route element={<RequireProfile />}>
-            <Route path="/play/:id" element={<Placeholder title="play.title" />} />
+            <Route path="/play/:id" element={<Play />} />
           </Route>
         </Route>
 

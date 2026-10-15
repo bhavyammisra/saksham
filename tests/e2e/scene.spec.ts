@@ -30,7 +30,7 @@ test('FR-02 / FR-03 keyboard: walk with the arrow keys, see the prompt, press E 
   await page.getByRole('region', { name: /Scene:/ }).focus()
   await page.keyboard.down('ArrowRight')
   const prompt = page.locator('.scene-prompt', { hasText: 'Talk to Ravi' })
-  await expect(prompt).toBeVisible({ timeout: 5000 })
+  await expect(prompt).toBeVisible({ timeout: 10_000 }) // generous: walking is slower when CI is busy
   await page.keyboard.up('ArrowRight')
   await page.keyboard.press('e')
   // The line is announced through the aria-live region.
