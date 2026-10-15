@@ -5,6 +5,9 @@ import type { Band, BuildingInfo, Card, QuizQuestion } from '@content/types'
 
 // ---------------------------------------------------------------- types
 
+/** All the rules need to know about a building: its id and whether it is a teaser. */
+export type BuildingRef = Pick<BuildingInfo, 'id' | 'teaser'>
+
 /** What is saved per building. bestScore is a whole percentage, 0 to 100. */
 export interface BuildingProgress {
   stars: number // 0 to 3
@@ -142,7 +145,7 @@ export type BadgeId = (typeof BADGES)[number]
  * this result was recorded; `order` is the buildings list. Badges already held are
  * returned too: the store keeps a union, so adding one twice changes nothing.
  */
-export function badgesFor(result: BuildingResult, progress: ProgressMap, order: BuildingInfo[]): BadgeId[] {
+export function badgesFor(result: BuildingResult, progress: ProgressMap, order: BuildingRef[]): BadgeId[] {
   if (!result.completed) return []
   const earned: BadgeId[] = ['first-steps'] // finished a building
   if (result.retries === 0) earned.push('right-first-time') // best choice every time
@@ -160,7 +163,7 @@ export function badgesFor(result: BuildingResult, progress: ProgressMap, order: 
  * The first playable building is always unlocked. Completing building N unlocks N+1.
  * Teasers are never playable. Demo mode unlocks every playable building.
  */
-export function isUnlocked(id: string, order: BuildingInfo[], progress: ProgressMap, demo = false): boolean {
+export function isUnlocked(id: string, order: BuildingRef[], progress: ProgressMap, demo = false): boolean {
   const playable = order.filter((b) => !b.teaser)
   const index = playable.findIndex((b) => b.id === id)
   if (index === -1) return false // unknown building or teaser
@@ -170,7 +173,7 @@ export function isUnlocked(id: string, order: BuildingInfo[], progress: Progress
 }
 
 /** The first unlocked building with fewer than 3 stars, or null when everything is done. */
-export function recommendedBuilding(order: BuildingInfo[], progress: ProgressMap, demo = false): string | null {
+export function recommendedBuilding(order: BuildingRef[], progress: ProgressMap, demo = false): string | null {
   const next = order.find((b) => isUnlocked(b.id, order, progress, demo) && (progress[b.id]?.stars ?? 0) < 3)
   return next?.id ?? null
 }

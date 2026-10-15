@@ -6,9 +6,9 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 3 of 0–7 (School end to end, MILESTONE A), on branch `p3-school`. Next task: the temporary hub (list of buildings with lock states). School plays start to results at `/#/play/school`; its legal text waits for the owner's fact check (SETUP.md §6).
+- **Phase:** 3 of 0–7 (School end to end, MILESTONE A), on branch `p3-school`. Next task: the demo-path e2e test, the last P3 task. School plays from `/#/town` to results; its legal text waits for the owner's fact check (SETUP.md §6).
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2) and P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-028).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-029).
 
 ## Start of every session
 

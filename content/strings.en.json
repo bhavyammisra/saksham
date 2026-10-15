@@ -194,5 +194,17 @@
   "badge.rightFirstTime": "Right first time",
   "badge.rightFirstTimeAbout": "You made the best choice every time.",
   "badge.allBuildings": "Town hero",
-  "badge.allBuildingsAbout": "You finished every place in the town."
+  "badge.allBuildingsAbout": "You finished every place in the town.",
+  "town.intro": "Pick a place to visit. Each one teaches a right.",
+  "town.visit": "Visit {name}",
+  "town.playAgain": "Play {name} again",
+  "town.lockedAfter": "Locked. Finish {name} first.",
+  "town.comingSoon": "Coming soon",
+  "town.beingBuilt": "Being built. Check back soon!",
+  "town.suggest": "Mitthu suggests this one",
+  "town.mitthuNext": "Let's go to {name}!",
+  "town.mitthuAllDone": "You've done every place so far. Amazing work!",
+  "town.stars": "{n} of 3 stars",
+  "town.notStarted": "Not visited yet",
+  "town.demo": "Demo mode: every place is open"
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -252,5 +252,23 @@ describe('NFR-07 content validation: people', () => {
       'hotspot "friend" uses unknown npc "ghost"',
       'node "good" has unknown speaker "stranger"',
     ])
+  })
+})
+
+describe('buildings list', () => {
+  const good = [
+    { id: 'school', name: 'The School', right: 'Education' },
+    { id: 'park', name: 'Park', right: 'Play', teaser: true },
+  ]
+
+  it('accepts a valid list', () => {
+    expect(validateBuildings(good)).toEqual([])
+  })
+
+  it('rejects duplicates, missing names and a teaser first', () => {
+    const errors = validateBuildings([{ id: 'park', name: 'Park', right: 'Play', teaser: true }, { id: 'park', right: 'x' }])
+    expect(errors).toContain('building "park" is duplicated')
+    expect(errors).toContain('building "park" needs a "name" and a "right"')
+    expect(errors).toContain('the first building must be playable (it is always unlocked)')
   })
 })

@@ -11,6 +11,7 @@ import { Onboarding } from '@/screens/Onboarding'
 import { Placeholder } from '@/screens/Placeholder'
 import { Play } from '@/screens/Play'
 import { Profiles } from '@/screens/Profiles'
+import { Town } from '@/screens/Town'
 
 // Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
 export default function App() {
@@ -44,7 +45,7 @@ export default function App() {
         <Route element={<Shell nav />}>
           <Route path="/credits" element={<Placeholder title="credits.title" />} />
           <Route element={<RequireProfile />}>
-            <Route path="/town" element={<Placeholder title="town.title" />} />
+            <Route path="/town" element={<Town />} />
             <Route path="/book" element={<Placeholder title="book.title" />} />
             <Route path="/community" element={<Placeholder title="community.title" />} />
             <Route path="/me" element={<Me />} />

@@ -235,7 +235,7 @@ The owner said they do **not like the cover page or the character design**. Both
 
 - [x] Author `content/scenes/school.json`: ✅ 2026-10-15 (D-027). Lata's story, rights card and a 6-question quiz. Legal text is marked `unverified` for the owner's fact check (SETUP.md §6). Was: Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
 - [x] Card reveal (flippable, band-aware), quiz game (band filtering, hint round, explanations), results (stars rule, badges, saving progress). ✅ 2026-10-15 (D-028): `/play/:id` runs scene → card → quiz → results; Mitthu's arrival line (`intro`).
-- [ ] Temporary simple hub (a list of buildings with lock states) so School can start and finish, with unlock saved across reloads.
+- [x] Temporary simple hub (a list of buildings with lock states) so School can start and finish, with unlock saved across reloads. ✅ 2026-10-15 (D-029): `/town`.
 - [ ] Demo-path e2e test: profile, character, School, card flip, quiz, results, Help Centre.
 
 Done when: School plays from start to results, progress survives a reload, and the demo-path test passes. Write session notes.
@@ -416,5 +416,10 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 
 **P3: card, quiz and results (2026-10-15)**
 - Done: `/play/:id` (`src/screens/Play.tsx`) plays a building's whole loop: scene, rights card (flips; young band gets "Tell me more"; law shown exactly as written), quiz (band-filtered, an explanation after each answer, Mitthu's hint round under 60% that never changes the score), and results (stars with the reason for each, score, card saved to the Book, new badges, "a new place is open"). Results are saved and survive a reload. Badges are a pure rule (`badgesFor`, D-028). Scenes can have an `intro` node that opens on arrival (School has Mitthu's line). Locked buildings can't be played. 169 unit and 39 e2e tests green.
-- Hacky / watch: the "Back to the town" button goes to the placeholder `/town` until the temporary hub (next task). The badge icon is one generic shape for now. One older e2e test (keyboard walking) was flaky under load, so its wait went from 5 to 10 seconds.
+- Hacky / watch: the "Back to the town" button goes to the placeholder `/town` until the temporary hub (next task). The badge icon is one generic shape for now. One older e2e test (keyboard walking) was flaky under load; the real cause and fix are in the next note.
 - Next task: P3 › temporary simple hub (a list of buildings with lock states).
+
+**P3: temporary town hub (2026-10-15)**
+- Done: `/town` (`src/screens/Town.tsx`) lists every building from `content/buildings.json` (which gained `name` and `right`, checked by the validator). Each card shows its state: playable, stars once finished, "Locked. Finish X first.", "Being built" (unlocked but no scene yet), or "Coming soon" (teasers). Mitthu suggests the recommended building. Unlocks come from saved progress, so they survive a reload. The rules now take `BuildingRef` (just id and teaser). 171 unit and 40 e2e tests green.
+- Fixed a flaky test: the keyboard-walking e2e held the arrow key while waiting for Ravi's prompt. On a busy machine it walked past the 240-unit prompt zone before releasing, so E did nothing. It now walks in short taps (`tests/e2e/scene.spec.ts`). It wasn't an app bug.
+- Next task: P3 › demo-path e2e test (profile, character, School, card flip, quiz, results, Help Centre).

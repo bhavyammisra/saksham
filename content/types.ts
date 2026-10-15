@@ -115,6 +115,8 @@ export interface QuizQuestion {
 // The town's buildings, in unlock order (content/buildings.json).
 export interface BuildingInfo {
   id: string
+  name: string // shown in the town
+  right: string // the right it teaches, shown in the town
   teaser?: boolean // locked "Coming soon" building, never playable
 }
 

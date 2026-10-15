@@ -67,7 +67,16 @@ test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results th
   await expect(page.getByText(strings['badge.firstSteps'])).toBeVisible()
   await expect(page.getByText(strings['results.unlocked'])).toBeVisible()
 
+  // Back in the town: School shows its stars, the Dhaba is now open, Home is still locked.
+  await page.getByRole('link', { name: strings['play.backToTown'] }).click()
+  await expect(page).toHaveURL(/#\/town$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['town.title'])
+  await expect(page.getByText(strings['town.stars'].replace('{n}', '2'))).toBeAttached()
+  await expect(page.getByText(strings['town.beingBuilt'])).toBeVisible()
+  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))).toBeVisible()
+
   await page.reload()
+  await expect(page.getByRole('link', { name: strings['town.playAgain'].replace('{name}', 'The School') })).toBeVisible()
   const saved = await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('saksham') ?? '{}').state
     return s.data[s.activeProfileId]
@@ -110,4 +119,13 @@ test('FR-07 a locked building cannot be played', async ({ page }) => {
   await createPlayer(page, 'Asha')
   await page.goto('/#/play/dhaba')
   await expect(page.getByText(strings['play.locked'])).toBeVisible()
+})
+
+test('FR-07 the town starts with only the School open, and links to it', async ({ page }) => {
+  await createPlayer(page, 'Asha')
+  await expect(page.getByText(strings['town.suggest'])).toBeVisible()
+  await expect(page.getByText(strings['town.comingSoon'])).toHaveCount(2)
+  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The School'))).toBeVisible()
+  await page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The School') }).click()
+  await expect(page).toHaveURL(/#\/play\/school$/)
 })

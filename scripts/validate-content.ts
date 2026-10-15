@@ -231,6 +231,24 @@ function canReachGoodEnd(nodes: Record<string, StoryNode>, start: string): boole
   return false
 }
 
+// ---------------------------------------------------------------- buildings
+
+/** The town's buildings: unique ids, a name and a right each, and a playable first building. */
+export function validateBuildings(raw: unknown): string[] {
+  if (!Array.isArray(raw) || raw.length === 0) return ['buildings must be a non-empty list']
+  const errors: string[] = []
+  const ids = new Set<string>()
+  raw.forEach((b, i) => {
+    if (!isObject(b) || !isText(b.id)) return void errors.push(`buildings[${i}] needs an "id"`)
+    if (ids.has(b.id)) errors.push(`building "${b.id}" is duplicated`)
+    ids.add(b.id)
+    if (!isText(b.name) || !isText(b.right)) errors.push(`building "${b.id}" needs a "name" and a "right"`)
+    if (b.teaser !== undefined && typeof b.teaser !== 'boolean') errors.push(`building "${b.id}".teaser must be true or false`)
+  })
+  if (isObject(raw[0]) && raw[0].teaser === true) errors.push('the first building must be playable (it is always unlocked)')
+  return errors
+}
+
 // ---------------------------------------------------------------- people
 
 /** Every hotspot npc and every node speaker must be a known person ("player" is the child). */
@@ -379,6 +397,10 @@ function main(): void {
   const usedKeys = sourceFiles.flatMap((file) => findStringKeys(readFileSync(file, 'utf8')))
   for (const p of validateStrings(readJson(join(root, 'content', 'strings.en.json')), usedKeys)) {
     problems.push(`content/strings.en.json: ${p}`)
+  }
+
+  for (const p of validateBuildings(readJson(join(root, 'content', 'buildings.json')))) {
+    problems.push(`content/buildings.json: ${p}`)
   }
 
   for (const p of validateHelp(readJson(join(root, 'content', 'help.json')))) {

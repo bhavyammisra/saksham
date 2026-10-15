@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { BuildingInfo, Card, QuizQuestion } from '@content/types'
+import type { Card, QuizQuestion } from '@content/types'
 import {
   BADGES,
+  type BuildingRef,
   badgesFor,
   bestProgress,
   cardTextForBand,
@@ -26,7 +27,7 @@ import {
 
 // ---------------------------------------------------------------- fixtures
 
-const order: BuildingInfo[] = [
+const order: BuildingRef[] = [
   { id: 'school' },
   { id: 'dhaba' },
   { id: 'home' },
