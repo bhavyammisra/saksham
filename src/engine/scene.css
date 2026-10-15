@@ -1,0 +1,46 @@
+/* Scene engine styles. Every movement here stops in calm mode. */
+
+/* Mitthu rises to fly beside the player while walking, and lands when they stop. */
+.scene .scene-mitthu {
+  transition: bottom 0.5s ease-out;
+}
+
+/* The "Talk to..." prompt bobs gently so it catches the eye. */
+.scene .scene-prompt {
+  animation: scene-prompt-bob 1.6s ease-in-out infinite;
+}
+@keyframes scene-prompt-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
+}
+
+/* Objects without art: a soft glow on the ground. */
+.scene .scene-sparkle {
+  background: radial-gradient(circle, rgb(246 215 154 / 0.95), rgb(246 215 154 / 0));
+}
+
+/* Hotspot pictures are buttons: show a soft lift on hover and focus. */
+.scene .scene-hotspot {
+  border-radius: 1rem;
+}
+.scene .scene-hotspot:hover {
+  filter: drop-shadow(0 0 6px rgb(246 215 154 / 0.95));
+}
+
+/* Film grain: a tiny static noise texture, made in SVG (no image file). */
+.scene .scene-grain {
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27160%27 height=%27160%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%272%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27160%27 height=%27160%27 filter=%27url(%23n)%27/%3E%3C/svg%3E");
+}
+
+/* Gentle scenes: no bobbing. */
+.scene[data-tone='gentle'] .scene-prompt {
+  animation: none;
+}
+
+html[data-calm] .scene *,
+html[data-calm] .scene *::before {
+  animation: none !important;
+  transition: none !important;
+}

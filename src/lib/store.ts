@@ -6,6 +6,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 import type { Band } from '@content/types'
+import { defaultSpec, normalizeSpec, type CharacterSpec } from '@/character/spec'
 import type { Lang } from './i18n'
 import {
   bestProgress,
@@ -23,6 +24,7 @@ export interface Profile {
   id: string
   firstName: string // the only personal data we keep (NFR-01)
   band: Band
+  avatar: CharacterSpec // the player's character (no photo, ever)
   createdAt: number
 }
 
@@ -50,9 +52,11 @@ export interface SakshamState {
   demo: boolean // demo mode: every playable building unlocked (FR-17)
 
   /** Adds a profile and makes it active. Returns null if the name is not valid. */
-  addProfile: (firstName: string, band: Band) => Profile | null
+  addProfile: (firstName: string, band: Band, avatar?: CharacterSpec) => Profile | null
   removeProfile: (id: string) => void
   setActiveProfile: (id: string | null) => void
+  /** Changes the active player's character. */
+  setAvatar: (avatar: CharacterSpec) => void
   updateSettings: (changes: Partial<Settings>) => void
   /** Saves a finished play-through for the active profile, keeping the best result. */
   recordResult: (buildingId: string, result: BuildingResult) => void
@@ -120,9 +124,15 @@ export const useStore = create<SakshamState>()(
     (set, get) => ({
       ...initialState(),
 
-      addProfile: (firstName, band) => {
+      addProfile: (firstName, band, avatar = defaultSpec) => {
         if (!isValidFirstName(firstName)) return null
-        const profile: Profile = { id: newId(), firstName: cleanFirstName(firstName), band, createdAt: Date.now() }
+        const profile: Profile = {
+          id: newId(),
+          firstName: cleanFirstName(firstName),
+          band,
+          avatar: normalizeSpec(avatar),
+          createdAt: Date.now(),
+        }
         set((s) => ({
           profiles: [...s.profiles, profile],
           activeProfileId: profile.id,
@@ -146,6 +156,11 @@ export const useStore = create<SakshamState>()(
         if (id !== null && !get().profiles.some((p) => p.id === id)) return
         set({ activeProfileId: id })
       },
+
+      setAvatar: (avatar) =>
+        set((s) => ({
+          profiles: s.profiles.map((p) => (p.id === s.activeProfileId ? { ...p, avatar: normalizeSpec(avatar) } : p)),
+        })),
 
       updateSettings: (changes) => set((s) => ({ settings: { ...s.settings, ...changes } })),
 
@@ -174,7 +189,13 @@ export const useStore = create<SakshamState>()(
     }),
     {
       name: 'saksham',
-      version: 1,
+      // Version 2 added the character (avatar) to each profile.
+      version: 2,
+      migrate: (saved, version) => {
+        const s = (saved ?? {}) as { profiles?: Partial<Profile>[] }
+        if (version < 2) s.profiles = (s.profiles ?? []).map((p) => ({ ...p, avatar: { ...defaultSpec } }))
+        return s
+      },
       storage: createJSONStorage(pickStorage),
       // Save data only; functions are rebuilt on load.
       partialize: (s) => ({
@@ -187,7 +208,13 @@ export const useStore = create<SakshamState>()(
       // Settings added in later versions get their defaults.
       merge: (saved, current) => {
         const s = (saved ?? {}) as Partial<SakshamState>
-        return { ...current, ...s, settings: { ...defaultSettings, ...s.settings } }
+        return {
+          ...current,
+          ...s,
+          settings: { ...defaultSettings, ...s.settings },
+          // A damaged or older character falls back to sensible defaults.
+          profiles: (s.profiles ?? []).map((p) => ({ ...p, avatar: normalizeSpec(p.avatar) })),
+        }
       },
     },
   ),

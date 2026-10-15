@@ -1,0 +1,129 @@
+{
+  "id": "sandbox",
+  "title": "Engine sandbox",
+  "right": "Test right",
+  "tagline": "A test scene that uses every engine feature.",
+  "tone": "normal",
+  "width": 3200,
+  "layers": [
+    { "id": "sky", "art": "sandbox.sky", "speed": 0.1 },
+    { "id": "hills", "art": "sandbox.hills", "speed": 0.35 },
+    { "id": "ground", "art": "sandbox.ground", "speed": 1 },
+    { "id": "front", "art": "sandbox.front", "speed": 1.25 }
+  ],
+  "walkable": { "minX": 150, "maxX": 3050 },
+  "blockers": [{ "x1": 1900, "x2": 2000 }],
+  "spawn": { "x": 300 },
+  "ambience": "sandbox",
+  "hotspots": [
+    { "id": "ravi", "x": 800, "label": "Talk to Ravi", "kind": "npc", "npc": "ravi", "node": "ravi-hello" },
+    { "id": "box", "x": 1300, "label": "Look at the box", "kind": "object", "art": "sandbox.box", "node": "box" },
+    {
+      "id": "notice",
+      "x": 1600,
+      "label": "Read the notice",
+      "kind": "object",
+      "art": "sandbox.notice",
+      "node": "notice",
+      "showIf": ["saw-box"]
+    },
+    { "id": "didi", "x": 2400, "label": "Talk to Meena Didi", "kind": "npc", "npc": "meena-didi", "node": "didi-hello" },
+    { "id": "door", "x": 2950, "label": "Leave the sandbox", "kind": "exit", "art": "sandbox.door" }
+  ],
+  "objectives": [
+    { "id": "meet-ravi", "text": "Find out what is worrying Ravi", "requires": ["ravi-worried"] },
+    { "id": "find-clue", "text": "Look at the box and the notice", "requires": ["saw-box", "read-notice"] },
+    { "id": "ask-help", "text": "Ask Meena Didi for help", "requires": ["asked-didi"] }
+  ],
+  "startNode": "ravi-hello",
+  "nodes": {
+    "ravi-hello": {
+      "id": "ravi-hello",
+      "speaker": "ravi",
+      "mood": "worried",
+      "text": "Hi. My library book is missing, and the notice says it is due today.",
+      "set": ["ravi-worried"],
+      "next": "player-reply"
+    },
+    "player-reply": {
+      "id": "player-reply",
+      "speaker": "player",
+      "text": "Let me look around. Maybe there is a clue.",
+      "next": "mitthu-tip"
+    },
+    "mitthu-tip": {
+      "id": "mitthu-tip",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Good idea! That box by the wall looks interesting.",
+      "end": "good"
+    },
+    "box": {
+      "id": "box",
+      "speaker": "mitthu",
+      "mood": "surprised",
+      "text": "A blue cover is poking out of the box. There is a notice nearby too.",
+      "set": ["saw-box"],
+      "fx": "gasp",
+      "end": "good"
+    },
+    "notice": {
+      "id": "notice",
+      "speaker": "mitthu",
+      "text": "The notice says: Lost books go to Meena Didi's desk.",
+      "set": ["read-notice"],
+      "end": "good"
+    },
+    "didi-hello": {
+      "id": "didi-hello",
+      "speaker": "meena-didi",
+      "mood": "happy",
+      "text": "Hello! You look like you have something to tell me.",
+      "choices": [
+        { "label": "Never mind, it is not important.", "to": "didi-weak", "kind": "weak" },
+        { "label": "Ravi's book is in the lost box. Can you help him?", "to": "didi-good", "kind": "good" }
+      ]
+    },
+    "didi-weak": {
+      "id": "didi-weak",
+      "speaker": "meena-didi",
+      "mood": "neutral",
+      "text": "All right. Come back if you change your mind.",
+      "next": "mitthu-retry"
+    },
+    "mitthu-retry": {
+      "id": "mitthu-retry",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "Hmm, Ravi still looks worried. Let's try that again.",
+      "end": "retry"
+    },
+    "didi-good": {
+      "id": "didi-good",
+      "speaker": "meena-didi",
+      "mood": "happy",
+      "text": "Thank you for telling me. I will give it back to Ravi myself.",
+      "set": ["asked-didi"],
+      "fx": "cheer",
+      "end": "good"
+    }
+  },
+  "card": {
+    "id": "sandbox-card",
+    "title": "Test card",
+    "kid": "Test text for young players.",
+    "teen": "Test text for teen players.",
+    "ifItHappens": "Tell a trusted adult.",
+    "law": "Test law text.",
+    "source": "Test source."
+  },
+  "games": [
+    {
+      "kind": "quiz",
+      "id": "sandbox-quiz",
+      "questions": [
+        { "id": "q1", "text": "Who can help with a lost book?", "options": ["A teacher", "Nobody"], "answer": 0, "explanation": "Teachers help." }
+      ]
+    }
+  ]
+}

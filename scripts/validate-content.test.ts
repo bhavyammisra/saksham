@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateHelp, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -217,5 +217,23 @@ describe('NFR-06 Help Centre content', () => {
     const errors = validateHelp(bad)
     expect(errors).toContain('helpline "child-helpline".sources[0] must be an https .gov.in or .nic.in page')
     expect(errors).toContain('helpline "emergency".number must be digits only')
+  })
+})
+
+describe('NFR-07 content validation: people', () => {
+  it('accepts known npcs, known speakers and the player', () => {
+    const scene = broken((s) => (s.nodes.hello.speaker = 'player'))
+    expect(validatePeople(scene, new Set(['ravi', 'mitthu']))).toEqual([])
+  })
+
+  it('rejects an unknown npc or speaker', () => {
+    const scene = broken((s) => {
+      s.hotspots[0].npc = 'ghost'
+      s.nodes.good.speaker = 'stranger'
+    })
+    expect(validatePeople(scene, new Set(['ravi', 'mitthu']))).toEqual([
+      'hotspot "friend" uses unknown npc "ghost"',
+      'node "good" has unknown speaker "stranger"',
+    ])
   })
 })

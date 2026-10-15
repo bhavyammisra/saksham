@@ -203,23 +203,33 @@ Done when: CI is green and the app shows an empty shell.
 
 #### Character
 
-- [ ] Paper-doll SVG character: shared rig (head, hair, body, outfit, headwear) with realistic proportions. Options: 8 to 10 skin tones, 6 to 8 hairstyles, 5 or more hair colours, a few outfits (school uniform, kurta, salwar kameez, casual), headwear (patka, hijab, dupatta), glasses, school bag. Spec is a small JSON object.
-- [ ] Animations on the shared rig (CSS or `motion`): idle, walk, talk, wave, react (gasp, cheer). Facing left or right.
-- [ ] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
-- [ ] Portrait renderer (head and shoulders with a mood) for dialogue and results.
+- [x] Paper-doll SVG character: shared rig (head, hair, body, outfit, headwear) with realistic proportions. Options: 8 to 10 skin tones, 6 to 8 hairstyles, 5 or more hair colours, a few outfits (school uniform, kurta, salwar kameez, casual), headwear (patka, hijab, dupatta), glasses, school bag. Spec is a small JSON object.
+- [x] Animations on the shared rig (CSS or `motion`): idle, walk, talk, wave, react (gasp, cheer). Facing left or right.
+- [x] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
+- [x] Portrait renderer (head and shoulders with a mood) for dialogue and results.
 
-🛑 **Gate:** owner approves the character look before scene art starts.
+🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14. ⚠️ **Reopened 2026-10-15:** the owner no longer likes the character design (see "Owner feedback rework" below).
 
 #### Scene engine and look development
 
-- [ ] Engine core: scene renderer with parallax layers, camera follow, walking with bounds and blockers, collision, facing, input (keyboard, joystick, tap-to-walk).
-- [ ] Hotspots: proximity prompts, "Things to do here" list, interaction, flags.
-- [ ] Dialogue overlay: portraits, typewriter, choices, `aria-live`, read-aloud, retry-to-last-choice, `gentle` handling.
-- [ ] Objectives panel and Mitthu (follow, perch, idle hint).
-- [ ] **Sandbox scene** (`/dev/scene`): one test scene with placeholder art that exercises every engine feature. Add engine unit tests for walking bounds, hotspot proximity, flag logic and retry.
-- [ ] **Look development:** build the first real School backdrop (4 to 5 parallax layers, golden-hour light, light shafts, grain, depth blur, ambient life such as birds and drifting dust) and put the finished character in it.
+- [x] Engine core: scene renderer with parallax layers, camera follow, walking with bounds and blockers, collision, facing, input (keyboard, joystick, tap-to-walk).
+- [x] Hotspots: proximity prompts, "Things to do here" list, interaction, flags.
+- [x] Dialogue overlay: portraits, typewriter, choices, `aria-live`, read-aloud, retry-to-last-choice, `gentle` handling.
+- [x] Objectives panel and Mitthu (follow, perch, idle hint).
+- [x] **Sandbox scene** (`/dev/scene`): one test scene with placeholder art that exercises every engine feature. Add engine unit tests for walking bounds, hotspot proximity, flag logic and retry.
+- [x] **Look development:** build the first real School backdrop (4 to 5 parallax layers, golden-hour light, light shafts, grain, depth blur, ambient life such as birds and drifting dust) and put the finished character in it.
 
-🛑 **Gate:** owner approves the visual style on this one scene. If it does not look good enough, change the approach here, before more scenes exist.
+🛑 **Gate:** owner approves the visual style on this one scene. If it does not look good enough, change the approach here, before more scenes exist. ✅ Approved 2026-10-15 after the restyle (D-026).
+
+#### Owner feedback rework (added 2026-10-15, must be done before Phase 3)
+
+The owner said they do **not like the cover page or the character design**. Both must change, and be approved, before Phase 3 starts.
+
+- [x] **Clarify the feedback first.** ✅ 2026-10-15: "cover page" = the screens before the game (welcome and name, also age and the player picker), too blank and plain. Character: wanted realistic proportions, colour, shadows and depth like *Attack on Titan* / *GTA V*; customiser like a game's (BGMI). Ask the owner (a) what "cover page" means. It is most likely the first screen a child sees (`/#/onboarding` "Hello!", or the profile picker), but it could also be the School look-dev scene at `/#/dev/look`. (b) What exactly they dislike about each, and what they would like instead (references or examples help). Do not redesign before this is answered.
+- [x] **Redesign the cover page** to the owner's direction (D-025). ✅ Approved by the owner 2026-10-15. All text through `t()`, Help button still present, calm mode respected. Show screenshots and get approval.
+- [x] **Redesign the character** (and the customiser) to the owner's direction (D-024, D-025). ✅ 🛑 Character gate approved by the owner 2026-10-15. Was: Redesign the character to the owner's direction (`src/character/Character.tsx`, `spec.ts`, `character.css`). Keep the `CharacterSpec` shape, or migrate saved profiles in `store.ts` (bump the persist `version`). Keep every option the plan requires. Check every combination on `/#/dev/characters`. 🛑 Re-run the character gate.
+- [x] 🛑 **Re-run the look-development gate** (2026-10-15: the owner asked for the scene to match the characters; restyled per D-026). ✅ Approved by the owner 2026-10-15. on `/#/dev/look` with the new character, and get the owner's approval of the scene style.
+- [ ] **Open the Phase 2 pull request** from `p2-character-scene` to `main`, wait for green CI, merge with a merge commit (owner preference), then start Phase 3 on a new branch.
 
 ### Phase 3: School end to end (MILESTONE A)
 
@@ -372,3 +382,24 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: Help Centre numbers are sourced from PIB pages but **not yet owner-verified** (`help.json` → `review.status: "unverified"`, SETUP.md §5). Language picker shows English only until P6. `t()` doesn't re-render on a language change yet (P6). Names with hyphens or apostrophes are rejected per §4 (D-014). Sounds are synthesised placeholders.
 - Owner: fact-check `content/help.json` (SETUP.md §5) and the font licences.
 - Next task: P2 › Character › paper-doll SVG character rig and options.
+
+**P2 Character and scene engine: paused at 🛑 character gate (2026-10-14)**
+- Done: the four Character tasks (SVG rig with 10 skin tones, 8 hairstyles, 6 hair colours, 5 outfits, patka/hijab/dupatta, glasses, bag; idle/walk/talk/wave/gasp/cheer; builder in onboarding and `/me/character`; portraits; `/dev/characters`). The profile store moved to v2 with `avatar`.
+- Hacky / watch: front-facing body with a walk-in-place stride (no true side view). The school bag shows mostly as straps. The shoulders are a little boxy.
+- ✅ Owner approved the character look on 2026-10-14. Next: P2 › Scene engine › engine core.
+
+**P2: paused at 🛑 look-development gate (2026-10-14)**
+- Done: every P2 task. Scene engine (pure `sceneReducer` + `Scene` player): parallax, camera, walking with blockers, keyboard/walk pad/tap-to-walk, hotspots with prompts, "Things to do here", dialogue (portraits, typewriter, choices, aria-live, read aloud, retry), objectives, Mitthu (follow, perch, 20 s hint). `/dev/scene` sandbox. School look-dev at `/dev/look`. 155 unit and 34 e2e tests green.
+- Hacky / watch: the look-dev page reuses the sandbox story and placeholder props (the box and notice). The real School story and props come in P3. Phone walk pad is only checked through `pointer: coarse`, not on a real device yet. No per-frame performance profiling yet (P7).
+- Waiting for: owner approval of the visual style at `/dev/look`. Then the next task is P3 › author `content/scenes/school.json`.
+
+**Handoff (2026-10-15): start of the next session**
+- State: P0 and P1 are merged to `main` (PRs #1, #2). All of P2 is built and pushed on branch `p2-character-scene` (no PR yet). 155 unit and 34 e2e tests green locally.
+- Owner feedback: they do **not like the cover page or the character design**. The character gate is reopened, and the look-dev gate is not approved. Phase 3 must not start until both are redesigned and approved.
+- Exact next task: P2 › Owner feedback rework › "Clarify the feedback first". Ask the owner before changing any art.
+
+**P2 rework: paused at 🛑 character gate and cover approval (2026-10-15)**
+- Done: owner feedback clarified. New painted cover backdrop and immersive welcome, name, age and player-picker screens (D-025). Character rig redrawn with realistic proportions, ink outlines and cel shading (D-024); same `CharacterSpec`, no store migration. Customiser rebuilt as a dark game-style studio with part tabs. 155 unit and 35 e2e tests green.
+- Hacky / watch: still a front view (no true side view for walking). The raised-arm wave is a straight arm (no elbow bend). The welcome-screen explorers are hidden behind the text on very short phone screens.
+- ✅ Owner approved the cover screens and the character on 2026-10-15. Now at the 🛑 look-dev gate on `/#/dev/look` (presented 2026-10-15). After approval: open the P2 pull request.
+- Look-dev gate, round 2 (2026-10-15): the owner asked for the School scene to match the new characters. Restyled with outlines, hard cel shadows and deeper colours, and rescaled the building so a child is shorter than a door (D-026). Characters in scenes are now 400 units tall (adults 470). All checks green. ✅ Owner approved 2026-10-15; P2 pull request opened. The sandbox props (box, notice) are still flat placeholders until P3.

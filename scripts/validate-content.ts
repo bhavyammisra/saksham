@@ -227,6 +227,24 @@ function canReachGoodEnd(nodes: Record<string, StoryNode>, start: string): boole
   return false
 }
 
+// ---------------------------------------------------------------- people
+
+/** Every hotspot npc and every node speaker must be a known person ("player" is the child). */
+export function validatePeople(raw: unknown, npcIds: Set<string>): string[] {
+  if (!isObject(raw)) return []
+  const errors: string[] = []
+  const scene = raw as Partial<SceneDef>
+  for (const h of Array.isArray(scene.hotspots) ? scene.hotspots : []) {
+    if (h?.npc !== undefined && !npcIds.has(h.npc)) errors.push(`hotspot "${h.id}" uses unknown npc "${h.npc}"`)
+  }
+  for (const node of Object.values(isObject(scene.nodes) ? scene.nodes : {})) {
+    if (isObject(node) && typeof node.speaker === 'string' && node.speaker !== 'player' && !npcIds.has(node.speaker)) {
+      errors.push(`node "${node.id}" has unknown speaker "${node.speaker}"`)
+    }
+  }
+  return errors
+}
+
 // ---------------------------------------------------------------- UI strings
 
 /** Finds t('key') calls in source text. */
@@ -323,6 +341,7 @@ function main(): void {
   const problems: string[] = []
   const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'))
 
+  const npcIds = new Set(Object.keys(readJson(join(root, 'content', 'npcs.json')) as object))
   const sceneFiles = listFiles(join(root, 'content', 'scenes'), (n) => n.endsWith('.json'))
   for (const file of sceneFiles) {
     let scene: unknown
@@ -332,7 +351,7 @@ function main(): void {
       problems.push(`${relative(root, file)}: not valid JSON (${(error as Error).message})`)
       continue
     }
-    for (const p of validateScene(scene)) problems.push(`${relative(root, file)}: ${p}`)
+    for (const p of [...validateScene(scene), ...validatePeople(scene, npcIds)]) problems.push(`${relative(root, file)}: ${p}`)
   }
 
   const sourceFiles = listFiles(join(root, 'src'), (n) => /\.tsx?$/.test(n) && !n.includes('.test.'))

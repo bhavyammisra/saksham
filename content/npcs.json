@@ -1,0 +1,22 @@
+{
+  "mitthu": { "name": "Mitthu", "kind": "parrot" },
+  "ravi": {
+    "name": "Ravi",
+    "look": { "skin": "skin-7", "hair": "curly", "hairColor": "black", "outfit": "uniform", "bag": true }
+  },
+  "meena-didi": {
+    "name": "Meena Didi",
+    "adult": true,
+    "look": {
+      "skin": "skin-4",
+      "hair": "bun",
+      "hairColor": "dark-brown",
+      "outfit": "salwar",
+      "outfitColor": "peacock",
+      "headwear": "dupatta",
+      "headwearColor": "cream",
+      "glasses": true,
+      "bag": false
+    }
+  }
+}

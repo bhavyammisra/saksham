@@ -1,0 +1,106 @@
+/* Character animations (src/character/Character.tsx).
+   Each pose = a static position + an optional looping animation.
+   Calm mode removes the animations but keeps the static position,
+   so a wave is still a raised arm and a cheer is still raised arms. */
+
+/* Pivots, in the character's 120 x 360 design units. */
+.ch {
+  overflow: visible; /* raised arms may reach above the drawing's box */
+}
+.ch .ch-part {
+  transform-box: view-box;
+}
+.ch .ch-body { transform-origin: 60px 350px; }
+.ch .ch-head { transform-origin: 60px 70px; }
+.ch .ch-arm-l { transform-origin: 33px 101px; }
+.ch .ch-arm-r { transform-origin: 87px 101px; }
+.ch .ch-leg-l { transform-origin: 50px 190px; }
+.ch .ch-leg-r { transform-origin: 70px 190px; }
+.ch .ch-eyes { transform-origin: 60px 46px; }
+.ch .ch-mouth-talk { transform-origin: 60px 62.8px; }
+
+/* Blink, in every pose. */
+.ch .ch-eyes { animation: ch-blink 4.6s infinite; }
+@keyframes ch-blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+/* idle: breathing and a slow look around */
+.ch[data-pose='idle'] .ch-body { animation: ch-breathe 3.6s ease-in-out infinite; }
+.ch[data-pose='idle'] .ch-head { animation: ch-look 7s ease-in-out infinite; }
+@keyframes ch-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+@keyframes ch-look {
+  0%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(1.5deg); }
+  70% { transform: rotate(-1deg); }
+}
+
+/* walk: legs and arms swing in opposite pairs, with a small bob */
+.ch[data-pose='walk'] .ch-leg-l { animation: ch-stride 0.7s ease-in-out infinite alternate; }
+.ch[data-pose='walk'] .ch-leg-r { animation: ch-stride 0.7s ease-in-out infinite alternate-reverse; }
+.ch[data-pose='walk'] .ch-arm-l { animation: ch-swing 0.7s ease-in-out infinite alternate-reverse; }
+.ch[data-pose='walk'] .ch-arm-r { animation: ch-swing 0.7s ease-in-out infinite alternate; }
+.ch[data-pose='walk'] .ch-body { animation: ch-bob 0.35s ease-in-out infinite alternate; }
+@keyframes ch-stride {
+  from { transform: rotate(14deg); }
+  to { transform: rotate(-14deg); }
+}
+@keyframes ch-swing {
+  from { transform: rotate(10deg); }
+  to { transform: rotate(-10deg); }
+}
+@keyframes ch-bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-2.5px); }
+}
+
+/* talk: the mouth opens and closes, the head nods a little */
+.ch[data-pose='talk'] .ch-mouth-talk { animation: ch-talk 0.26s ease-in-out infinite alternate; }
+.ch[data-pose='talk'] .ch-head { animation: ch-nod 1.4s ease-in-out infinite; }
+@keyframes ch-talk {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.35); }
+}
+@keyframes ch-nod {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-2deg); }
+  65% { transform: rotate(1.5deg); }
+}
+
+/* wave: right arm raised, hand waving */
+.ch[data-pose='wave'] .ch-arm-r {
+  transform: rotate(-155deg);
+  animation: ch-wave 0.5s ease-in-out infinite alternate;
+}
+@keyframes ch-wave {
+  from { transform: rotate(-145deg); }
+  to { transform: rotate(-168deg); }
+}
+
+/* gasp (once): a small step back, hands lift */
+.ch[data-pose='gasp'] .ch-arm-l { transform: rotate(22deg); }
+.ch[data-pose='gasp'] .ch-arm-r { transform: rotate(-22deg); }
+.ch[data-pose='gasp'] .ch-body { animation: ch-gasp 0.5s ease-out 1; }
+@keyframes ch-gasp {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(-2px, -3px); }
+}
+
+/* cheer (twice): both arms up, small jumps */
+.ch[data-pose='cheer'] .ch-arm-l { transform: rotate(150deg); }
+.ch[data-pose='cheer'] .ch-arm-r { transform: rotate(-150deg); }
+.ch[data-pose='cheer'] .ch-body { animation: ch-jump 0.45s ease-out 2; }
+@keyframes ch-jump {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+}
+
+/* Calm mode: no movement at all, poses stay as still pictures. */
+html[data-calm] .ch,
+html[data-calm] .ch * {
+  animation: none !important;
+}

@@ -4,6 +4,38 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 **Current work is governed by `docs/BUILD_PLAN.md`. Read it first. Resume at the first unchecked box.**
 
+## Where we are (update this at the end of every session)
+
+- **Phase:** 2 of 0–7 (Character and scene engine). All P2 features are built and pushed on branch `p2-character-scene`, but **Phase 2 is not finished**.
+- **Owner feedback rework (2026-10-15):** the cover screens (everything before the game) and the character were redesigned, along with the customiser (D-024, D-025). The owner approved the cover screens, the character and the restyled School scene on 2026-10-15 (both 🛑 gates passed). The P2 pull request is open: merge it with a merge commit once CI is green, then start Phase 3 on a new branch.
+- **Merged to `main`:** P0 (PR #1) and P1 (PR #2). The P2 PR is not opened yet.
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-022).
+
+## Start of every session
+
+1. Read this file, then `docs/BUILD_PLAN.md`, from the top through the latest session notes.
+2. `git status` and `git log --oneline -5`. Make sure you are on the phase branch, not `main`.
+3. `npm ci` if needed, then run lint, typecheck, validate, test and e2e, so you start from green.
+4. Resume at the **first unchecked box** in BUILD_PLAN. Stop at every 🛑 gate.
+
+## Map of the code (details in docs/ARCHITECTURE.md)
+
+- `content/`: typed JSON. `types.ts` is the contract, plus `strings.en.json`, `help.json`, `npcs.json`, `buildings.json` and `scenes/*.json` (only the `sandbox` scene so far).
+- `src/lib/`: `rules.ts` (pure game rules), `store.ts` (persisted zustand, version 2), `i18n.ts`, `calm.ts`, `sound.ts`.
+- `src/character/`: the SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu`.
+- `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`), plus `Scene.tsx` (draws it), `Dialogue.tsx` and `WalkPad.tsx`.
+- `src/art/`: scene art by key (`index.ts` registry, `sandbox.tsx`, `school.tsx`).
+- `src/screens/`, `src/components/` (Shell, HelpButton, SettingsDialog, Button, Page).
+- `scripts/validate-content.ts`: `npm run validate`, also run in CI.
+- Dev pages: `/#/dev/characters` (every character combination), `/#/dev/scene` (engine sandbox), `/#/dev/look` (School look-dev).
+
+## Tooling notes (Windows machine)
+
+- GitHub CLI is installed at `C:Program FilesGitHub CLIgh.exe`. Old terminals may not have it on PATH, so call it by full path if `gh` isn't found. Auto-merge is turned off for this repo: after CI is green, merge with `gh pr merge <n> --merge`. The owner prefers merge commits, so the `P<n>:` commits stay in history.
+- In Git Bash, arguments that start with `/` (such as `/dev/characters`) are rewritten into Windows paths. Prefix the command with `MSYS_NO_PATHCONV=1`, and pass Windows paths (`cygpath -w`) for output files.
+- The browser pane's screenshots can be stale or time out. For reliable visual checks, take screenshots with a small throwaway Playwright script against `npm run dev` (keep such scripts out of the repo).
+- Vite's file watcher can miss two writes to the same file in quick succession. If the page shows old code, restart the dev server.
+
 ## Owner and ownership
 
 This project is being built from scratch and must end up **fully understood by its owner**, who will have to explain it in a viva.
@@ -21,7 +53,8 @@ This project is being built from scratch and must end up **fully understood by i
 - `npm run build`: `tsc -b && vite build` into `dist/`
 - `npm run lint`: ESLint (typescript-eslint, react-hooks, jsx-a11y)
 - `npm run typecheck`: `tsc -b` (app, configs and e2e tests)
-- `npm run test`: Vitest unit tests (`src/**/*.test.ts`)
+- `npm run test`: Vitest unit tests (`src/**/*.test.ts`, `scripts/*.test.ts`)
+- `npm run validate`: content validator (scene graphs, flags, NPCs, UI string keys, Help Centre sources)
 - `npm run e2e`: Playwright against the built app (`tests/e2e/`). It builds and serves on port 4173 itself.
 
 Before saying a task is done: lint, typecheck, test and build must all pass.

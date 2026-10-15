@@ -1,0 +1,23 @@
+/* Mitthu: a gentle bob while perched, wing flaps while flying. Off in calm mode. */
+.mitthu {
+  animation: mitthu-bob 2.4s ease-in-out infinite;
+}
+.mitthu .mitthu-wing {
+  transform-box: view-box;
+  transform-origin: 50px 52px;
+}
+.mitthu[data-flying='true'] .mitthu-wing {
+  animation: mitthu-flap 0.22s ease-in-out infinite alternate;
+}
+@keyframes mitthu-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -3%; }
+}
+@keyframes mitthu-flap {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-38deg); }
+}
+html[data-calm] .mitthu,
+html[data-calm] .mitthu * {
+  animation: none !important;
+}

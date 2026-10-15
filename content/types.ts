@@ -30,7 +30,8 @@ export interface SceneDef {
 export interface Layer {
   id: string
   art: string
-  speed: number // parallax factor, 1 = foreground
+  speed: number // parallax factor, 1 = foreground; 0 = fixed to the screen (light, haze)
+  front?: boolean // drawn in front of the characters (default: only layers faster than 1)
 }
 
 export interface Hotspot {
@@ -124,4 +125,13 @@ export interface Helpline {
   when: string // when to call, in a child's words
   hours: string
   sources: { title: string; url: string }[] // official pages that state this number
+}
+
+// People (and Mitthu) who appear in scenes and dialogue (content/npcs.json).
+// A hotspot's `npc` and a node's `speaker` refer to these ids; "player" means the child.
+export interface NpcDef {
+  name: string
+  kind?: 'person' | 'parrot' // default person
+  adult?: boolean // adults are drawn taller, with adult head proportions
+  look?: Record<string, string | boolean> // a CharacterSpec; missing parts use defaults
 }

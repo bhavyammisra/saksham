@@ -132,3 +132,67 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Choice:** `src/lib/sound.ts` exposes `sound.play(name)` with three short synthesised sounds (`tap`, `soft`, `success`) made from oscillators. The volume rule is the pure function `soundGain()`, which is unit-tested. `main.tsx` passes the "Sound effects" setting in. `SoundRouteSync` silences everything while the route is `/help`. The standard `Button` plays `tap`.
 - **Why:** Synthesised sound needs no audio files, so there is no licence to check and no download. The audio context is created only after a tap or key press, as browsers require. Recorded ambience and music come in Phase 6.
 - **Alternatives:** Howler.js (a dependency we don't need yet), `<audio>` tags (needs files, and is harder to mix).
+
+## D-019 Player character: one hand-written SVG rig, CSS animations
+
+- **Context:** The plan asks for a paper-doll character with realistic proportions, many options and several animations, shared by scenes, dialogue portraits and results.
+- **Choice:** `src/character/Character.tsx` is one SVG rig in a 120 × 360 design space. Its parts are groups that pivot at the neck, shoulders and hips. Outfits, hairstyles and head coverings are drawn onto the same parts, so every combination moves the same way. The head is scaled up 12% to read as a child (about 6 heads tall). Shading is a light-to-shadow gradient on each shape, lit from the upper left, with warm-brown shadows (`color.ts`) and no outlines. The choices are a small JSON object (`CharacterSpec`, in `spec.ts`): 10 skin tones, 8 hairstyles, 6 hair colours, 5 outfits (two school uniforms, kurta pyjama, salwar kameez, T-shirt and jeans), 6 clothing colours, patka, hijab or dupatta in 6 colours, glasses, and a school bag. Poses (idle, walk, talk, wave, gasp, cheer) are CSS in `character.css`: each is a static position plus an optional animation. Calm mode removes the animations and keeps the positions. Facing left mirrors the `<svg>` with CSS, so the pivots stay correct. The portrait view is the same drawing with a head-and-shoulders `viewBox`.
+- **Why:** One file of plain shapes the owner can read and tweak. There are no image assets to licence, and it stays sharp at any size. CSS keyframes are simpler than JavaScript animation for loops like walking and blinking.
+- **Alternatives:** Raster sprites (a licence for every frame, blurry when scaled), Rive or Spine rigs (new tools and dependencies), the `motion` library for every loop (more code for the same result).
+
+## D-020 Character builder, portraits, and the character saved per profile
+
+- **Context:** Players pick a character during onboarding and can change it in Me. Dialogue and results need a head-and-shoulders portrait.
+- **Choice:** `CharacterBuilder` is a controlled component: a live preview that waves after each change, a row per part (thumbnails for styles, swatches for colours, Yes/No for glasses and bag), and "Surprise me". Selected choices get a dark ring and a tick (never colour alone). Onboarding starts from a random character. `/me/character` edits a draft and saves on "This is me!". `Portrait` reuses the same drawing with a portrait `viewBox`. Each profile now stores `avatar`. The saved state moved to version 2, with a migration that gives older profiles the default character, and loading repairs any invalid avatar with `normalizeSpec`.
+- **Why:** One drawing everywhere means the player always looks like themselves. Thumbnails show the actual result, which young players understand better than words.
+- **Alternatives:** Text-only option lists (harder for 8-year-olds), a separate portrait drawing (two things to keep in sync).
+
+## D-021 Scene engine: one pure reducer, drawn by React
+
+- **Context:** The engine must play any scene from its JSON alone, never refer to a building by id, work with keyboard, touch and tap, and be testable.
+- **Choice:**
+  - **Logic** (`src/engine/movement.ts`, `story.ts`, `sceneState.ts`) is pure. `sceneReducer(scene)` turns actions (`tick`, `walkTo`, `use`, `jumpTo`, `interactNearby`, `next`, `choose`, `activity`) into a new `SceneState`: position, camera, Mitthu, dialogue, flags, retries, hint, exit, completed. A `tick` carries the elapsed time and the current time, so walking speed doesn't depend on frame rate and Mitthu's 20-second hint is measured, not counted. When nothing visible changes, the reducer returns the same state object, so an idle scene doesn't redraw.
+  - **Drawing** (`Scene.tsx`) runs a `requestAnimationFrame` loop that only sends `tick`s. Keys (arrows/A/D, E, Enter), the touch walk pad and tap-to-walk send actions. Layers come from the art registry (`src/art`) by key: speed < 1 is behind the stage, speed > 1 is in front. People come from `content/npcs.json`.
+  - **Accessibility:** "Things to do here" jumps straight to any visible hotspot. The dialogue sits below the scene (never covering the speakers), types by grapheme, and announces each full line through `aria-live`. Read-aloud uses the browser's own speech.
+  - **Calm mode** turns off parallax, camera smoothing, the typewriter, bobbing and screen nudges. **Gentle** scenes play sounds at half volume and never nudge the screen.
+- **Why:** A pure reducer is the simplest way to make a game loop testable and explainable: 41 unit tests play the real sandbox JSON, including a full walkthrough with a retry. React only draws.
+- **Alternatives:** A canvas game engine such as Phaser or PixiJS (a big dependency, and canvas is invisible to screen readers), game state kept in refs and mutated (fast but hard to test).
+
+## D-022 Scene art: hand-drawn SVG layers with one lighting logic
+
+- **Context:** The art direction asks for grounded, warm, painterly scenes with golden-hour light, light shafts, grain, depth blur and ambient life, kept consistent across every building. The Phase 2 gate decides whether this approach is good enough.
+- **Choice:** Each scene's art is plain SVG components in `src/art/<scene>.tsx`, registered by key in `src/art/index.ts`. The School look-dev has seven layers: sky 0.05, far hills 0.15 (blurred), town 0.4 (lightly blurred), trees 0.65, school and courtyard 1 (the stage), a light layer fixed to the screen and drawn in front, and blurred foreground leaves at 1.35.
+  - **One lighting logic everywhere:** the sun is low on the right, warm light falls on right-facing surfaces, and the left side gets cool violet-grey shade. Shadows are cast long to the left, and colours fade into a warm haze with distance (`HAZE`).
+  - **The light layer** (warm colour grade, three soft shafts, dust, vignette) sits in front of the characters, so they share the same light. For that, layers gained an optional `front` flag in `content/types.ts`.
+  - **Film grain** is an engine-level overlay, so every scene has the same texture.
+  - **Ambient life** (birds, dust, a slow shaft glow) is CSS animation that stops in calm mode. Seeded random numbers keep each scene identical on every visit.
+- **Why:** No image files to licence, sharp at any screen size, small to download (the whole School backdrop is code), and it shares the character's style. The light layer is the cheapest way to make every element feel lit by the same sun.
+- **Alternatives:** Painted raster backdrops (would look richer, but need an artist and licences, are heavy on school connections, and blur when scaled), WebGL or 3D (out of scope; a stretch goal in §3).
+
+## D-023 Character design and cover page reopened on owner feedback
+
+- **Context:** On 2026-10-15 the owner said they do not like the cover page or the character design (D-019, D-020). The character gate had been approved on 2026-10-14; the look-dev gate (D-022) was still waiting.
+- **Choice:** Phase 2 gets an "Owner feedback rework" section in BUILD_PLAN: clarify the feedback, redesign the cover page, redesign the character, then re-run both 🛑 gates. Phase 3 does not start until both are approved.
+- **Why:** The plan's rule is to change the look before more scenes depend on it. Every later scene, portrait and result screen reuses the character.
+- **Still open:** what "cover page" refers to (most likely the first screen, `/#/onboarding`). The next session asks the owner first. The engine (D-021) is unaffected; only art and the first screen change.
+
+## D-024 Character redesign: painted game-character look
+
+- **Context:** The owner found the first character (D-019) fake-looking and asked for the feel of *Attack on Titan* or *GTA V* characters: realistic body proportions, colour, shadows and depth, without copying either.
+- **Choice:** The same single SVG rig, `CharacterSpec` and options (so saved profiles and the scene engine are unchanged), redrawn: about 6.5 heads tall with real anatomy (shoulder caps, tapering arms and legs, knees, hands with thumbs, a defined jaw and chin, almond eyes with irises, lash lines and lid shadows, a shaped nose and lips). Shading is "cel" style: a thin ink outline in a dark version of each colour, a hard edge between the lit side and a cool plum shadow (`shade()` in `color.ts`), a bright rim on the lit edge, and painted cast shadows (hair on the forehead, chin on the neck, arms on the body, sleeves on arms). Trousers are joined by a still hip piece so the legs can swing. The SVG may draw outside its box, so a raised arm isn't cut off.
+- **Why:** Anime and game characters read as "real" mostly through proportions, hard-edged light and shadow, and outlines, all of which SVG does cheaply. Keeping the rig means no migration and every pose, portrait and scene keeps working.
+- **Alternatives:** 3D models or raster art (needs an artist, licences, much heavier downloads); a full 3/4 view (twice the drawing work for every option; may come later).
+
+## D-025 Cover screens and a game-style character customiser
+
+- **Context:** The owner said the screens before the game (welcome, name, then age and the player picker) were blank plain text, and asked for the customiser to feel like a game's (e.g. BGMI).
+- **Choice:** A painted cover backdrop (`src/art/cover.tsx`): a golden-hour rooftop view over an Indian town with a skyline, kites, birds, marigold lights and dust, all SVG and CSS. The welcome screen shows a gold game title, Mitthu's greeting in a glass panel, a glowing start button and three explorers on the roof. The name and age steps use glass cards over a dimmed backdrop with a "Step n of 3" bar; the player picker uses portrait cards. These screens use `Shell immersive` (a see-through top bar; "Need help?" stays). The customiser is a dark studio: the character large on a lit platform with "Try a pose" buttons, part tabs (Face, Hair, Clothes, Head covering, Extras; a proper ARIA tab list with arrow keys), and item tiles with a gold frame and a tick for the chosen one.
+- **Why:** The first screens set the tone for the whole game. No new dependencies; every string goes through `t()`; calm mode stops all of the motion.
+- **Alternatives:** A video or raster title screen (heavy, needs licences); keeping one long scrolling list in the customiser (simple, but did not feel like a game).
+
+## D-026 School scene restyled to match the characters
+
+- **Context:** After the character redesign (D-024), the owner chose to restyle the School look-dev scene rather than approve it, because the soft, outline-free backdrop (D-022) didn't match the outlined, cel-shaded characters. The building was also too small: doors came up to a child's shoulders.
+- **Choice:** Same layers and parallax, redrawn with the character rules: ink outlines in the characters' dark plum (3 units on the stage, thinner further back, none on the hazy hills), flat colours with hard-edged shadow shapes instead of soft gradients and blur (only the nearest leaves and the light shafts stay soft, for depth), and deeper colours. The building, wall, trees and planters are rescaled so a child (now 400 units tall in scenes, adults 470) is shorter than a door. Character outlines got slightly thicker (1.05 units) so they hold up at scene size.
+- **Why:** One consistent look across the characters and every scene. Later buildings copy this scene's rules.
+- **Alternatives:** Keeping the soft painted backdrop with only the characters outlined (approved by nobody; looked like stickers on a painting).

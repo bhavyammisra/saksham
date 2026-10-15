@@ -2,7 +2,7 @@
 
 A web game that teaches Indian children (8 to 16) their legal rights. The child walks through a small town, talks to people, helps solve a problem, and earns a rights card. UCS503 Software Engineering Lab project, TIET Patiala.
 
-Status: Phase 1 (core: rules, store, app shell, Help Centre, safety tests). See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md).
+Status: Phase 2 (character and scene engine), with the character and cover page being redesigned on owner feedback before Phase 3. See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md).
 
 ## Run it
 
