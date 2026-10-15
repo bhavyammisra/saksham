@@ -186,7 +186,7 @@ function Cel({ id, base }: { id: string; base: string }) {
 }
 
 /** Outline for a shape filled with `base`. */
-const line = (base: string, width = 0.8) => ({
+const line = (base: string, width = 1.05) => ({
   stroke: ink(base),
   strokeWidth: width,
   strokeLinejoin: 'round' as const,

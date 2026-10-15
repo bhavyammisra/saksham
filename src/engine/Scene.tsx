@@ -20,8 +20,8 @@ import { isObjectiveDone, nearbyHotspot, nextObjective, visibleHotspots } from '
 import { WalkPad } from './WalkPad'
 import './scene.css'
 
-const PLAYER_HEIGHT = 330 // design units (the scene is 1000 tall)
-const ADULT_HEIGHT = 395
+const PLAYER_HEIGHT = 400 // design units (the scene is 1000 tall)
+const ADULT_HEIGHT = 470
 const MITTHU_SIZE = 80
 
 export interface SceneResult {
