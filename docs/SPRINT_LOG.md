@@ -14,7 +14,7 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
 - **Done:** `content/types.ts` plus a validator in CI; `rules.ts` with 58 requirement-named tests; persisted store; all 12 routes with start redirect and profile guard; shell with Help button, nav and settings (calm motion persists); calm Help Centre from `help.json` with government sources; onboarding and profile picker; synthesised sound manager; 16 safety-invariant e2e tests.
 - **Next:** P2 Character and scene engine, starting with the paper-doll SVG character (ends at the 🛑 character gate).
 
-## P2 Character and scene engine (2026-10-14 to 2026-10-15), in progress
+## P2 Character and scene engine (2026-10-14 to 2026-10-15)
 
 - **Goal:** A player character and a data-driven scene engine, with the look approved on one real scene before more scenes are built.
 - **Done:**
@@ -25,4 +25,16 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
   - Engine sandbox and the School look-dev backdrop.
   - 155 unit and 34 e2e tests.
 - **Feedback:** The owner approved the character on 2026-10-14, then on 2026-10-15 said they don't like the cover page or the character design. Rework is required before Phase 3.
-- **Next:** clarify the feedback, redesign the cover page and the character, re-run both gates, open and merge the P2 PR, then start P3.
+- **Rework (2026-10-15):** cover screens, character and customiser redesigned (D-024, D-025); School scene restyled to match (D-026). The owner approved all three; both gates passed. PR #3 merged.
+- **Next:** P3 School end to end.
+
+## P3 School end to end, MILESTONE A (2026-10-15)
+
+- **Goal:** One building playable from the town to results, saved across reloads, proven by a demo-path test.
+- **Done:**
+  - School story (Lata at the gate, two gentle retries, a good ending), rights card and a 6-question quiz (D-027). Every card carries a fact-check record.
+  - `/play/:id`: Mitthu's arrival line, scene, card flip, quiz with explanations and the hint round, results with stars, badges and unlocks (D-028).
+  - Temporary town hub from `buildings.json` (D-029).
+  - 171 unit and 41 e2e tests (including the demo path), all green. Found and fixed the real cause of a flaky walking test.
+- **Waiting on the owner:** fact-check the School card (SETUP.md §6).
+- **Next:** open and merge the P3 PR, then P4 Town and all buildings.

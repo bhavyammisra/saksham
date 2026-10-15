@@ -28,10 +28,15 @@ test.beforeEach(async ({ page }) => {
 
 test('FR-02 / FR-03 keyboard: walk with the arrow keys, see the prompt, press E to talk', async ({ page }) => {
   await page.getByRole('region', { name: /Scene:/ }).focus()
-  await page.keyboard.down('ArrowRight')
   const prompt = page.locator('.scene-prompt', { hasText: 'Talk to Ravi' })
-  await expect(prompt).toBeVisible({ timeout: 5000 })
-  await page.keyboard.up('ArrowRight')
+  // Walk in short taps (about 36 units each) and check between them. Holding the key while
+  // waiting could walk straight past Ravi on a busy machine: his prompt only shows within 120 units.
+  for (let i = 0; i < 60 && !(await prompt.isVisible()); i++) {
+    await page.keyboard.down('ArrowRight')
+    await page.waitForTimeout(100)
+    await page.keyboard.up('ArrowRight')
+  }
+  await expect(prompt).toBeVisible()
   await page.keyboard.press('e')
   // The line is announced through the aria-live region.
   await expect(live(page)).toHaveText(`Ravi: ${sandbox.nodes['ravi-hello'].text}`)

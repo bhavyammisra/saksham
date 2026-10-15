@@ -22,6 +22,7 @@ export interface SceneDef {
   hotspots: Hotspot[]
   objectives: Objective[]
   startNode: string
+  intro?: string // node opened when the player arrives (Mitthu introduces the place)
   nodes: Record<string, StoryNode>
   card: Card
   games: GameDef[] // quiz first, sort later
@@ -78,6 +79,19 @@ export interface Card {
   ifItHappens: string
   law: string // legal text, rendered exactly as written
   source: string // where the legal text comes from
+  review: ContentReview // not shown: the owner's fact check of this card
+}
+
+/**
+ * The owner's fact check of legal or safety content (BUILD_PLAN §10, §13). Not shown in the app.
+ * `checks` lists every claim to verify, with the official source to verify it against.
+ */
+export interface ContentReview {
+  status: 'unverified' | 'verified'
+  checkedBy: string | null
+  checkedOn: string | null
+  note: string
+  checks?: string[]
 }
 
 // Games. The quiz comes first; the sort game is added in Phase 4.
@@ -101,6 +115,8 @@ export interface QuizQuestion {
 // The town's buildings, in unlock order (content/buildings.json).
 export interface BuildingInfo {
   id: string
+  name: string // shown in the town
+  right: string // the right it teaches, shown in the town
   teaser?: boolean // locked "Coming soon" building, never playable
 }
 
@@ -115,7 +131,7 @@ export interface HelpContent {
   rights: { title: string; items: string[] }
   disclaimer: string
   // Not shown in the app. Tracks the owner's fact-check of numbers and wording.
-  review: { status: 'unverified' | 'verified'; checkedBy: string | null; checkedOn: string | null; note: string }
+  review: ContentReview
 }
 
 export interface Helpline {

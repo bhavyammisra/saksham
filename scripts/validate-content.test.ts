@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -45,6 +45,7 @@ function validScene(): SceneDef {
       ifItHappens: 'Tell an adult.',
       law: 'Law text',
       source: 'Source',
+      review: { status: 'unverified', checkedBy: null, checkedOn: null, note: 'Check the law text.' },
     },
     games: [
       {
@@ -161,6 +162,22 @@ describe('NFR-07 content validation: scenes', () => {
     expect(validateScene(broken((s) => (s.card.law = '')))).toContain('card.law must be non-empty text')
   })
 
+  it('requires a fact-check record on every card', () => {
+    expect(validateScene(broken((s) => delete (s.card as Partial<SceneDef['card']>).review))).toContain(
+      'card.review is missing (add { status: "unverified", ... } for the owner to fact-check)',
+    )
+  })
+
+  it('rejects a card marked verified without who checked it and when', () => {
+    const errors = validateScene(broken((s) => (s.card.review.status = 'verified')))
+    expect(errors).toContain('card.review is "verified" but has no "checkedBy" and "checkedOn"')
+  })
+
+  it('accepts a verified card with a name and date', () => {
+    const scene = broken((s) => (s.card.review = { status: 'verified', checkedBy: 'Owner', checkedOn: '2026-10-20', note: 'Checked.' }))
+    expect(validateScene(scene)).toEqual([])
+  })
+
   it('rejects a quiz answer outside the options', () => {
     expect(validateScene(broken((s) => (s.games[0].questions[0].answer = 2)))).toContain(
       'quiz "test-quiz" question "q1".answer must be an index into options',
@@ -235,5 +252,23 @@ describe('NFR-07 content validation: people', () => {
       'hotspot "friend" uses unknown npc "ghost"',
       'node "good" has unknown speaker "stranger"',
     ])
+  })
+})
+
+describe('buildings list', () => {
+  const good = [
+    { id: 'school', name: 'The School', right: 'Education' },
+    { id: 'park', name: 'Park', right: 'Play', teaser: true },
+  ]
+
+  it('accepts a valid list', () => {
+    expect(validateBuildings(good)).toEqual([])
+  })
+
+  it('rejects duplicates, missing names and a teaser first', () => {
+    const errors = validateBuildings([{ id: 'park', name: 'Park', right: 'Play', teaser: true }, { id: 'park', right: 'x' }])
+    expect(errors).toContain('building "park" is duplicated')
+    expect(errors).toContain('building "park" needs a "name" and a "right"')
+    expect(errors).toContain('the first building must be playable (it is always unlocked)')
   })
 })

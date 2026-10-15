@@ -39,7 +39,7 @@ Two age bands: `young` (8 to 11) and `teen` (12 to 16). The band changes the car
 
 ### Art direction
 
-Grounded and warm, **not cartoonish**: semi-realistic proportions, painterly layered vector scenes, soft golden light, subtle grain, light shafts, depth blur on far layers, real Indian materials and colours (painted plaster, tiles, wood, brass, marigold garlands). No thick outlines, no big-head mascots. Mitthu is the only slightly stylised character. The visual style must be consistent across every scene: one palette family, one lighting logic.
+Grounded and warm, **not cartoonish**: realistic proportions, layered vector scenes, golden light, subtle grain, light shafts, depth blur on far layers, real Indian materials and colours (painted plaster, tiles, wood, brass, marigold garlands). **Updated 2026-10-15 at the owner's request (D-024, D-026):** a painted game-character look, with thin ink outlines, hard-edged cel shadows and deeper colours on characters and near scenery (thinner outlines further back, none on distant hills). No big-head mascots. Mitthu is the only slightly stylised character. The visual style must be consistent across every scene: one palette family, one lighting logic.
 
 Honest constraint: the look depends on art quality. So there is a **look-development gate** (Phase 2) where the owner approves the style on one scene before any other scene is built.
 
@@ -229,14 +229,14 @@ The owner said they do **not like the cover page or the character design**. Both
 - [x] **Redesign the cover page** to the owner's direction (D-025). ✅ Approved by the owner 2026-10-15. All text through `t()`, Help button still present, calm mode respected. Show screenshots and get approval.
 - [x] **Redesign the character** (and the customiser) to the owner's direction (D-024, D-025). ✅ 🛑 Character gate approved by the owner 2026-10-15. Was: Redesign the character to the owner's direction (`src/character/Character.tsx`, `spec.ts`, `character.css`). Keep the `CharacterSpec` shape, or migrate saved profiles in `store.ts` (bump the persist `version`). Keep every option the plan requires. Check every combination on `/#/dev/characters`. 🛑 Re-run the character gate.
 - [x] 🛑 **Re-run the look-development gate** (2026-10-15: the owner asked for the scene to match the characters; restyled per D-026). ✅ Approved by the owner 2026-10-15. on `/#/dev/look` with the new character, and get the owner's approval of the scene style.
-- [ ] **Open the Phase 2 pull request** from `p2-character-scene` to `main`, wait for green CI, merge with a merge commit (owner preference), then start Phase 3 on a new branch.
+- [x] **Open the Phase 2 pull request** ✅ PR #3, CI green, merged with a merge commit on 2026-10-15. Phase 3 started on branch `p3-school`. Was: Open the Phase 2 pull request from `p2-character-scene` to `main`, wait for green CI, merge with a merge commit (owner preference), then start Phase 3 on a new branch.
 
 ### Phase 3: School end to end (MILESTONE A)
 
-- [ ] Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
-- [ ] Card reveal (flippable, band-aware), quiz game (band filtering, hint round, explanations), results (stars rule, badges, saving progress).
-- [ ] Temporary simple hub (a list of buildings with lock states) so School can start and finish, with unlock saved across reloads.
-- [ ] Demo-path e2e test: profile, character, School, card flip, quiz, results, Help Centre.
+- [x] Author `content/scenes/school.json`: ✅ 2026-10-15 (D-027). Lata's story, rights card and a 6-question quiz. Legal text is marked `unverified` for the owner's fact check (SETUP.md §6). Was: Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
+- [x] Card reveal (flippable, band-aware), quiz game (band filtering, hint round, explanations), results (stars rule, badges, saving progress). ✅ 2026-10-15 (D-028): `/play/:id` runs scene → card → quiz → results; Mitthu's arrival line (`intro`).
+- [x] Temporary simple hub (a list of buildings with lock states) so School can start and finish, with unlock saved across reloads. ✅ 2026-10-15 (D-029): `/town`.
+- [x] Demo-path e2e test: profile, character, School, card flip, quiz, results, Help Centre. ✅ 2026-10-15: `tests/e2e/demo-path.spec.ts`.
 
 Done when: School plays from start to results, progress survives a reload, and the demo-path test passes. Write session notes.
 
@@ -403,3 +403,28 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: still a front view (no true side view for walking). The raised-arm wave is a straight arm (no elbow bend). The welcome-screen explorers are hidden behind the text on very short phone screens.
 - ✅ Owner approved the cover screens and the character on 2026-10-15. Now at the 🛑 look-dev gate on `/#/dev/look` (presented 2026-10-15). After approval: open the P2 pull request.
 - Look-dev gate, round 2 (2026-10-15): the owner asked for the School scene to match the new characters. Restyled with outlines, hard cel shadows and deeper colours, and rescaled the building so a child is shorter than a door (D-026). Characters in scenes are now 400 units tall (adults 470). All checks green. ✅ Owner approved 2026-10-15; P2 pull request opened. The sandbox props (box, notice) are still flat placeholders until P3.
+
+**P2 done, P3 started (2026-10-15)**
+- Done: PR #3 (all of Phase 2, including the owner-feedback rework) merged to `main` with a merge commit after green CI. Branch `p3-school` created from `main`; lint, typecheck, validate, 155 unit and 35 e2e tests green.
+- Next task: P3 › author `content/scenes/school.json` (theme: education). Legal fields must be sourced and marked for the owner's fact check.
+
+**P3: School story written (2026-10-15)**
+- Done: `content/scenes/school.json`. Lata, 9, watches from the gate because her family thinks school costs money and that she can't be admitted without a birth certificate. The player hears about her from Ravi, talks to her, reads the admissions notice and asks Meena Didi. There are two weaker choices with gentle retries, and a good ending. The rights card quotes Article 21A and RTE Act section 14(2). The quiz has 4 questions for everyone plus 2 for teens. New: Lata (`npcs.json`); notice board and signpost props; a `review` block on every card, which the validator enforces; `/dev/look` now plays the real School story. 6 new story tests.
+- Hacky / watch: the engine never opens `startNode` by itself, so there is no Mitthu arrival line yet (§2 step 1); add it with the card and quiz work. `ambience: "school"` has no sound until P6.
+- Owner: fact-check the School card (SETUP.md §6). Article 21A matched the Ministry of Education page; the rest is unverified.
+- Next task: P3 › card reveal, quiz game and results.
+
+**P3: card, quiz and results (2026-10-15)**
+- Done: `/play/:id` (`src/screens/Play.tsx`) plays a building's whole loop: scene, rights card (flips; young band gets "Tell me more"; law shown exactly as written), quiz (band-filtered, an explanation after each answer, Mitthu's hint round under 60% that never changes the score), and results (stars with the reason for each, score, card saved to the Book, new badges, "a new place is open"). Results are saved and survive a reload. Badges are a pure rule (`badgesFor`, D-028). Scenes can have an `intro` node that opens on arrival (School has Mitthu's line). Locked buildings can't be played. 169 unit and 39 e2e tests green.
+- Hacky / watch: the "Back to the town" button goes to the placeholder `/town` until the temporary hub (next task). The badge icon is one generic shape for now. One older e2e test (keyboard walking) was flaky under load; the real cause and fix are in the next note.
+- Next task: P3 › temporary simple hub (a list of buildings with lock states).
+
+**P3: temporary town hub (2026-10-15)**
+- Done: `/town` (`src/screens/Town.tsx`) lists every building from `content/buildings.json` (which gained `name` and `right`, checked by the validator). Each card shows its state: playable, stars once finished, "Locked. Finish X first.", "Being built" (unlocked but no scene yet), or "Coming soon" (teasers). Mitthu suggests the recommended building. Unlocks come from saved progress, so they survive a reload. The rules now take `BuildingRef` (just id and teaser). 171 unit and 40 e2e tests green.
+- Fixed a flaky test: the keyboard-walking e2e held the arrow key while waiting for Ravi's prompt. On a busy machine it walked past the 240-unit prompt zone before releasing, so E did nothing. It now walks in short taps (`tests/e2e/scene.spec.ts`). It wasn't an app bug.
+- Next task: P3 › demo-path e2e test (profile, character, School, card flip, quiz, results, Help Centre).
+
+**P3 School end to end: done (MILESTONE A, 2026-10-15)**
+- Done: every P3 task. "Done when" is met: School plays from start to results, progress survives a reload, and the demo-path test passes (`tests/e2e/demo-path.spec.ts`; shared School steps now live in `tests/e2e/helpers.ts`). 171 unit and 41 e2e tests, lint, typecheck, validate and build all green. Sprint log, test report and architecture map updated.
+- Hacky / watch: the School card's legal text is still `unverified` (SETUP.md §6). The hub is temporary (Phase 4 makes the town walkable). Demo mode exists in the store but has no on-screen switch yet (Phase 4). One badge icon for every badge.
+- Next task: open the P3 pull request (`p3-school` → `main`), merge with a merge commit after green CI, then P4 › walkable town scene on a new branch.

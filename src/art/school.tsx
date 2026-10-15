@@ -7,7 +7,7 @@
 // Layers (back to front): sky 0.05 · far hills 0.15 · town 0.4 · trees 0.65 ·
 // school and courtyard 1 (the stage) · light 0 (fixed, in front) · foreground leaves 1.35.
 
-import { GROUND_Y, SCENE_HEIGHT, type LayerArt } from './types'
+import { GROUND_Y, SCENE_HEIGHT, type LayerArt, type PropArt } from './types'
 import './school.css'
 
 const H = SCENE_HEIGHT
@@ -433,4 +433,69 @@ export const schoolLayers: Record<string, LayerArt> = {
   'school.building': School,
   'school.light': Light,
   'school.foreground': Foreground,
+}
+
+// ---------------------------------------------------------------- props (hotspot objects, same style as the stage)
+
+/** The school notice board: a wooden board on two legs with pinned papers (strokes stand in for words). */
+const NoticeBoard: PropArt = {
+  width: 240,
+  height: 340,
+  Art: () => (
+    <svg viewBox="0 0 240 340" className="size-full">
+      <g {...ink(3)}>
+        <rect x="40" y="170" width="16" height="168" fill="#5a3f30" />
+        <rect x="184" y="170" width="16" height="168" fill="#5a3f30" />
+        <rect x="8" y="10" width="224" height="190" rx="6" fill="#7a4f34" />
+        <rect x="22" y="24" width="196" height="162" rx="3" fill="#c79a6a" />
+      </g>
+      {/* Hard cel shadow under the top edge of the frame and on the left leg. */}
+      <rect x="22" y="24" width="196" height="16" fill={shadow('#c79a6a', 0.3)} />
+      <rect x="40" y="200" width="7" height="136" fill={shadow('#5a3f30', 0.4)} />
+      {/* Pinned papers. The big one is the admissions notice, with a drawing of children at a school door. */}
+      <g {...ink(2)}>
+        <rect x="36" y="40" width="100" height="132" fill="#fbf3e2" />
+        <rect x="148" y="48" width="58" height="62" fill="#e8f0f4" transform="rotate(4 177 79)" />
+        <rect x="150" y="122" width="54" height="50" fill="#f6dfa8" transform="rotate(-3 177 147)" />
+      </g>
+      <rect x="48" y="52" width="76" height="9" rx="3" fill="#a8401f" />
+      {[72, 84, 96].map((y) => (
+        <rect key={y} x="48" y={y} width={y === 96 ? 52 : 76} height="5" rx="2" fill="#8d7a66" />
+      ))}
+      <path d="M58 160 L58 128 Q72 114 86 128 L86 160 Z" fill={DOOR} {...ink(2)} />
+      <circle cx="100" cy="136" r="6" fill="#d6956a" {...ink(1.5)} />
+      <path d="M94 160 L95 144 L105 144 L106 160 Z" fill="#e8962d" {...ink(1.5)} />
+      <circle cx="116" cy="140" r="5" fill="#a86f4c" {...ink(1.5)} />
+      <path d="M111 160 L112 147 L120 147 L121 160 Z" fill="#2c6a94" {...ink(1.5)} />
+      {[160, 172, 184].map((y) => (
+        <rect key={y} x="156" y={y - 96} width="40" height="4" rx="2" fill="#8d9aa4" />
+      ))}
+      {[48, 136, 178, 176].map((x, i) => (
+        <circle key={i} cx={x} cy={i < 2 ? 46 : i === 2 ? 52 : 126} r="5" fill={i % 2 ? '#c9501a' : '#2e6a4c'} {...ink(1.5)} />
+      ))}
+    </svg>
+  ),
+}
+
+/** A signpost pointing back to the town: an arrow and a little house (no words in the art). */
+const Signpost: PropArt = {
+  width: 180,
+  height: 380,
+  Art: () => (
+    <svg viewBox="0 0 180 380" className="size-full">
+      <rect x="82" y="60" width="18" height="318" fill="#6a4632" {...ink(3)} />
+      <rect x="82" y="60" width="7" height="318" fill={shadow('#6a4632', 0.4)} />
+      <path d="M150 60 L40 60 L8 98 L40 136 L150 136 Z" fill="#2e6a4c" {...ink(3)} />
+      <path d="M150 120 L40 120 L32 128 L40 136 L150 136 Z" fill={shadow('#2e6a4c', 0.35)} />
+      <path d="M62 112 L62 90 L84 74 L106 90 L106 112 Z" fill="#f1e8d2" {...ink(2)} />
+      <rect x="78" y="96" width="12" height="16" fill={TRIM} {...ink(1.5)} />
+      <path d="M112 98 L138 98" stroke="#f1e8d2" strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx="91" cy="376" rx="40" ry="6" fill={SHADE} opacity="0.25" />
+    </svg>
+  ),
+}
+
+export const schoolProps: Record<string, PropArt> = {
+  'school.notice': NoticeBoard,
+  'school.signpost': Signpost,
 }

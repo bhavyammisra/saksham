@@ -87,6 +87,7 @@ export function validateScene(raw: unknown): string[] {
   if (isText(scene.startNode) && !nodeExists(scene.startNode)) {
     fail(`"startNode" points to missing node "${scene.startNode}"`)
   }
+  if (scene.intro !== undefined && !nodeExists(scene.intro)) fail(`"intro" points to missing node "${String(scene.intro)}"`)
 
   const flagsSet = new Set<string>()
   for (const [key, node] of Object.entries(nodes)) {
@@ -175,7 +176,10 @@ export function validateScene(raw: unknown): string[] {
 
   // Card
   if (!isObject(scene.card)) fail('"card" is missing')
-  else for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
+  else {
+    for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
+    validateReview(scene.card.review).forEach((p) => fail(`card.review ${p}`))
+  }
 
   // Games
   if (!Array.isArray(scene.games) || scene.games.length === 0) {
@@ -225,6 +229,24 @@ function canReachGoodEnd(nodes: Record<string, StoryNode>, start: string): boole
     for (const choice of node.choices ?? []) queue.push(choice.to)
   }
   return false
+}
+
+// ---------------------------------------------------------------- buildings
+
+/** The town's buildings: unique ids, a name and a right each, and a playable first building. */
+export function validateBuildings(raw: unknown): string[] {
+  if (!Array.isArray(raw) || raw.length === 0) return ['buildings must be a non-empty list']
+  const errors: string[] = []
+  const ids = new Set<string>()
+  raw.forEach((b, i) => {
+    if (!isObject(b) || !isText(b.id)) return void errors.push(`buildings[${i}] needs an "id"`)
+    if (ids.has(b.id)) errors.push(`building "${b.id}" is duplicated`)
+    ids.add(b.id)
+    if (!isText(b.name) || !isText(b.right)) errors.push(`building "${b.id}" needs a "name" and a "right"`)
+    if (b.teaser !== undefined && typeof b.teaser !== 'boolean') errors.push(`building "${b.id}".teaser must be true or false`)
+  })
+  if (isObject(raw[0]) && raw[0].teaser === true) errors.push('the first building must be playable (it is always unlocked)')
+  return errors
 }
 
 // ---------------------------------------------------------------- people
@@ -277,6 +299,22 @@ export function isOfficialSource(url: string): boolean {
   }
 }
 
+/**
+ * A fact-check record (legal and safety content). "verified" needs who checked it and when,
+ * so a card can never be marked checked by accident.
+ */
+export function validateReview(raw: unknown): string[] {
+  if (!isObject(raw)) return ['is missing (add { status: "unverified", ... } for the owner to fact-check)']
+  const errors: string[] = []
+  if (raw.status !== 'unverified' && raw.status !== 'verified') errors.push('status must be "unverified" or "verified"')
+  if (!isText(raw.note)) errors.push('needs a "note"')
+  if (raw.checks !== undefined && !isStringList(raw.checks)) errors.push('checks must be a list of text')
+  if (raw.status === 'verified' && (!isText(raw.checkedBy) || !isText(raw.checkedOn))) {
+    errors.push('is "verified" but has no "checkedBy" and "checkedOn"')
+  }
+  return errors
+}
+
 /** Every helpline needs a dialable number and at least one official source page. */
 export function validateHelp(raw: unknown): string[] {
   if (!isObject(raw)) return ['help content is not a JSON object']
@@ -310,6 +348,7 @@ export function validateHelp(raw: unknown): string[] {
       }
     })
   }
+  validateReview(help.review).forEach((p) => errors.push(`review ${p}`))
   for (const section of ['trustedAdult', 'rights'] as const) {
     const value = help[section]
     const list = section === 'trustedAdult' ? 'steps' : 'items'
@@ -358,6 +397,10 @@ function main(): void {
   const usedKeys = sourceFiles.flatMap((file) => findStringKeys(readFileSync(file, 'utf8')))
   for (const p of validateStrings(readJson(join(root, 'content', 'strings.en.json')), usedKeys)) {
     problems.push(`content/strings.en.json: ${p}`)
+  }
+
+  for (const p of validateBuildings(readJson(join(root, 'content', 'buildings.json')))) {
+    problems.push(`content/buildings.json: ${p}`)
   }
 
   for (const p of validateHelp(readJson(join(root, 'content', 'help.json')))) {

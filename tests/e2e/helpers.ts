@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test'
+import school from '../../content/scenes/school.json' with { type: 'json' }
 import strings from '../../content/strings.en.json' with { type: 'json' }
 
 export { strings }
@@ -13,4 +14,52 @@ export async function createPlayer(page: Page, name: string, band: 'young' | 'te
   await page.getByRole('button', { name: label }).click()
   await page.getByRole('button', { name: strings['builder.done'] }).click()
   await expect(page).toHaveURL(/#\/town$/)
+}
+
+// ---------------------------------------------------------------- playing the School
+
+export const thingsToDo = (page: Page) => page.getByRole('region', { name: strings['scene.thingsToDo'] })
+const next = (page: Page) => page.getByRole('button', { name: strings['scene.next'], exact: true })
+
+/** Presses Next until a choice appears or the conversation closes. */
+export async function talkThrough(page: Page) {
+  for (let i = 0; i < 16; i++) {
+    if (!(await next(page).isVisible())) return
+    await next(page).click()
+  }
+}
+
+/**
+ * Plays the School story to the good ending, with one weaker choice first (one retry).
+ * Opens /play/school first unless `alreadyThere` (e.g. the player arrived from the town).
+ */
+export async function playStory(page: Page, alreadyThere = false) {
+  if (!alreadyThere) await page.goto('/#/play/school')
+  // Arriving: Mitthu's intro line opens by itself.
+  await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(school.nodes.intro.text)
+  await talkThrough(page)
+  const list = thingsToDo(page)
+  for (const label of ['Talk to Ravi', 'Talk to the girl at the gate', 'Read the notice board']) {
+    await list.getByRole('button', { name: label }).click()
+    await talkThrough(page)
+  }
+  await list.getByRole('button', { name: 'Ask Meena Didi for help' }).click()
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Never mind/ }).click()
+  await talkThrough(page)
+  await page.getByRole('button', { name: /wants to study here/ }).click()
+  await talkThrough(page)
+}
+
+/** Answers the quiz: `rightAnswers` says, question by question, whether to pick the right option. */
+export async function answerQuiz(page: Page, rightAnswers: boolean[], questions = school.games[0]!.questions.filter((q) => !q.band)) {
+  for (const [i, right] of rightAnswers.entries()) {
+    const q = questions[i]!
+    await expect(page.getByRole('heading', { name: q.text })).toBeVisible()
+    const option = right ? q.answer : (q.answer + 1) % q.options.length
+    await page.getByRole('button', { name: q.options[option], exact: true }).click()
+    await expect(page.getByText(right ? strings['quiz.correct'] : strings['quiz.notQuite'])).toBeVisible()
+    const isLast = i === rightAnswers.length - 1
+    await page.getByRole('button', { name: isLast ? strings['quiz.finish'] : strings['quiz.next'] }).click()
+  }
 }

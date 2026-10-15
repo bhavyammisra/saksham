@@ -55,6 +55,9 @@ export type SceneAction =
   | { type: 'activity' }
 
 export function initialSceneState(scene: SceneDef): SceneState {
+  const story: StoryState = { flags: new Set(), retries: 0, reachedGood: false }
+  // Arriving: Mitthu introduces the place in one line, if the scene has an intro.
+  const arrival = scene.intro ? startDialogue(scene, scene.intro, story) : { dialogue: null, story }
   return {
     x: scene.spawn.x,
     facing: 'right',
@@ -63,8 +66,8 @@ export function initialSceneState(scene: SceneDef): SceneState {
     mitthuX: scene.spawn.x - MITTHU_DISTANCE,
     target: null,
     pending: null,
-    story: { flags: new Set(), retries: 0, reachedGood: false },
-    dialogue: null,
+    story: arrival.story,
+    dialogue: arrival.dialogue,
     fx: null,
     shake: 0,
     idleSince: null,

@@ -14,11 +14,12 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 | Folder | Holds | Status |
 | --- | --- | --- |
 | `content/` | Typed JSON: UI strings, scenes, help copy, people; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1); `npcs.json`, `scenes/sandbox.json` (P2) |
-| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, later `sync.ts`, `supabase.ts` | all but sync/supabase (P1) |
+| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, `scenes.ts` (content registry: building id → scene), later `sync.ts`, `supabase.ts` | P1, P3 |
 | `src/engine/` | Pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts`) and the scene player (`Scene.tsx`, `Dialogue.tsx`, `WalkPad.tsx`, `hooks.ts`, `people.ts`, `speech.ts`) | P2 |
-| `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (design under rework) |
-| `src/art/` | Scene art registry by key (`index.ts`), `sandbox.tsx`, `school.tsx` (look-dev) | P2 |
-| `src/screens/` | One component per route: Onboarding, Profiles, HelpCentre, Me (+ character), guards, Placeholder; dev pages DevCharacters, DevScene, DevLook | P1, P2 |
+| `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), game-style `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (redesigned, D-024/D-025) |
+| `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Results` | P3 |
+| `src/art/` | Scene art registry by key (`index.ts`), `sandbox.tsx`, `school.tsx` (School layers and props), `cover.tsx` (cover backdrop) | P2, P3 |
+| `src/screens/` | One component per route: Onboarding, Profiles, Town (temporary hub), Play, HelpCentre, Me (+ character), guards, Placeholder; dev pages DevCharacters, DevScene, DevLook | P1 to P3 |
 | `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
 | `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |

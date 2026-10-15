@@ -115,7 +115,8 @@
     "teen": "Test text for teen players.",
     "ifItHappens": "Tell a trusted adult.",
     "law": "Test law text.",
-    "source": "Test source."
+    "source": "Test source.",
+    "review": { "status": "unverified", "checkedBy": null, "checkedOn": null, "note": "Test card for the engine sandbox. Never shown to children." }
   },
   "games": [
     {
