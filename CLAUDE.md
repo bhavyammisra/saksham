@@ -7,7 +7,7 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 ## Where we are (update this at the end of every session)
 
 - **Phase:** 2 of 0–7 (Character and scene engine). All P2 features are built and pushed on branch `p2-character-scene`, but **Phase 2 is not finished**.
-- **Owner feedback rework (2026-10-15):** the cover screens (everything before the game) and the character were redesigned, along with the customiser (D-024, D-025). **Waiting for the owner's approval** (🛑 character gate), then the 🛑 look-dev gate on `/#/dev/look`, before Phase 3.
+- **Owner feedback rework (2026-10-15):** the cover screens (everything before the game) and the character were redesigned, along with the customiser (D-024, D-025). The owner **approved both on 2026-10-15** (🛑 character gate passed). Now waiting at the 🛑 look-dev gate on `/#/dev/look`; after that, open the P2 PR, then Phase 3.
 - **Merged to `main`:** P0 (PR #1) and P1 (PR #2). The P2 PR is not opened yet.
 - **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-022).
 
