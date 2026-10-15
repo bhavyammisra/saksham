@@ -1,6 +1,7 @@
 // The playable scenes, by building id. Like the art registry, this is the one place
 // that lists content files; the engine itself never refers to a building by id.
 
+import dhabaJson from '@content/scenes/dhaba.json'
 import schoolJson from '@content/scenes/school.json'
 import townJson from '@content/scenes/town.json'
 import buildingsJson from '@content/buildings.json'
@@ -10,6 +11,7 @@ export const buildings = buildingsJson as BuildingInfo[]
 
 const scenes: Record<string, SceneDef> = {
   school: schoolJson as SceneDef,
+  dhaba: dhabaJson as SceneDef,
 }
 
 /** The town: the walkable hub that links to every building. */

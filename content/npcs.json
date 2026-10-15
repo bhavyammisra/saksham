@@ -39,5 +39,46 @@
       "headwear": "none",
       "bag": false
     }
+  },
+  "raju": {
+    "name": "Raju",
+    "look": {
+      "skin": "skin-7",
+      "hair": "short",
+      "hairColor": "soft-black",
+      "outfit": "casual",
+      "outfitColor": "leaf",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "mohan-bhaiya": {
+    "name": "Mohan Bhaiya",
+    "adult": true,
+    "look": {
+      "skin": "skin-5",
+      "hair": "short",
+      "hairColor": "black",
+      "outfit": "kurta",
+      "outfitColor": "marigold",
+      "headwear": "none",
+      "glasses": false,
+      "bag": false
+    }
+  },
+  "sunita-didi": {
+    "name": "Sunita Didi",
+    "adult": true,
+    "look": {
+      "skin": "skin-6",
+      "hair": "bun",
+      "hairColor": "black",
+      "outfit": "salwar",
+      "outfitColor": "rose",
+      "headwear": "dupatta",
+      "headwearColor": "saffron",
+      "glasses": true,
+      "bag": true
+    }
   }
 }

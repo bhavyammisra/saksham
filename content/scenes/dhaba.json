@@ -1,0 +1,272 @@
+{
+  "id": "dhaba",
+  "title": "The Dhaba",
+  "right": "Freedom from child labour",
+  "tagline": "Help Raju get back to school.",
+  "tone": "gentle",
+  "width": 3400,
+  "layers": [
+    { "id": "sky", "art": "school.sky", "speed": 0.05 },
+    { "id": "far", "art": "school.far", "speed": 0.15 },
+    { "id": "houses", "art": "school.town", "speed": 0.4 },
+    { "id": "trees", "art": "school.trees", "speed": 0.65 },
+    { "id": "dhaba", "art": "dhaba.stage", "speed": 1 },
+    { "id": "light", "art": "school.light", "speed": 0, "front": true },
+    { "id": "foreground", "art": "school.foreground", "speed": 1.35 }
+  ],
+  "walkable": { "minX": 150, "maxX": 3250 },
+  "spawn": { "x": 420 },
+  "ambience": "dhaba",
+  "hotspots": [
+    { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
+    { "id": "mohan", "x": 1000, "label": "Talk to Mohan Bhaiya", "kind": "npc", "npc": "mohan-bhaiya", "node": "mohan-hello" },
+    { "id": "sunita-busy", "x": 1650, "label": "Say hello to Sunita Didi", "kind": "npc", "npc": "sunita-didi", "node": "sunita-busy", "hideIf": ["met-raju"] },
+    { "id": "sunita", "x": 1650, "label": "Ask Sunita Didi for help", "kind": "npc", "npc": "sunita-didi", "node": "sunita-hello", "showIf": ["met-raju"] },
+    { "id": "notebook", "x": 2300, "label": "Look at the notebook on the shelf", "kind": "object", "art": "dhaba.notebook", "node": "notebook" },
+    { "id": "raju", "x": 2750, "label": "Talk to the boy washing glasses", "kind": "npc", "npc": "raju", "node": "raju-hello", "hideIf": ["met-raju"] },
+    { "id": "raju-again", "x": 2750, "label": "Talk to Raju", "kind": "npc", "npc": "raju", "node": "raju-again", "showIf": ["met-raju"] }
+  ],
+  "objectives": [
+    { "id": "meet-raju", "text": "Talk to the boy washing glasses", "requires": ["met-raju"] },
+    { "id": "notebook", "text": "Look at the notebook on the shelf", "requires": ["saw-notebook"] },
+    { "id": "ask-sunita", "text": "Ask Sunita Didi how to help Raju", "requires": ["asked-sunita"] }
+  ],
+  "startNode": "raju-hello",
+  "intro": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "The Dhaba! Fresh rotis and hot chai. Truck drivers stop here all day. Hmm, it's a school morning. Who's that at the back?",
+      "end": "good"
+    },
+
+    "mohan-hello": {
+      "id": "mohan-hello",
+      "speaker": "mohan-bhaiya",
+      "mood": "neutral",
+      "text": "Welcome, welcome! Chai is ready in two minutes. Sorry, it's very busy this morning.",
+      "end": "good"
+    },
+
+    "sunita-busy": {
+      "id": "sunita-busy",
+      "speaker": "sunita-didi",
+      "mood": "happy",
+      "text": "Hello! I'm Sunita, from the anganwadi near the well. Just having my chai before the little ones arrive.",
+      "end": "good"
+    },
+
+    "raju-hello": {
+      "id": "raju-hello",
+      "speaker": "raju",
+      "mood": "neutral",
+      "text": "Oh, hello. I'm Raju. Sorry, I can't stop. There are lots of glasses to wash.",
+      "next": "player-raju"
+    },
+    "player-raju": {
+      "id": "player-raju",
+      "speaker": "player",
+      "text": "Aren't you coming to school? It's Monday.",
+      "next": "raju-2"
+    },
+    "raju-2": {
+      "id": "raju-2",
+      "speaker": "raju",
+      "mood": "sad",
+      "text": "I'm twelve. I used to go to school. Then my father got sick, so now I come here every day from early morning to make some money.",
+      "next": "raju-3"
+    },
+    "raju-3": {
+      "id": "raju-3",
+      "speaker": "raju",
+      "mood": "sad",
+      "text": "I miss my friends. And maths. I was good at maths.",
+      "set": ["met-raju"],
+      "next": "mitthu-raju"
+    },
+    "mitthu-raju": {
+      "id": "mitthu-raju",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Raju should be in school, not working all day. Let's find a grown-up who knows how to help.",
+      "end": "good"
+    },
+    "raju-again": {
+      "id": "raju-again",
+      "speaker": "raju",
+      "mood": "neutral",
+      "text": "Thanks for talking to me. Most people just order chai.",
+      "end": "good"
+    },
+
+    "notebook": {
+      "id": "notebook",
+      "speaker": "mitthu",
+      "mood": "surprised",
+      "text": "A Class 6 maths notebook, with Raju's name on it. The last page has sums from two months ago, all marked right.",
+      "set": ["saw-notebook"],
+      "fx": "gasp",
+      "end": "good"
+    },
+
+    "sunita-hello": {
+      "id": "sunita-hello",
+      "speaker": "sunita-didi",
+      "mood": "happy",
+      "text": "You look worried. Is something wrong?",
+      "choices": [
+        { "label": "Nothing. Raju is just helping out a little.", "to": "sunita-weak-1", "kind": "weak" },
+        { "label": "Raju should work faster, so he can finish early.", "to": "sunita-weak-2", "kind": "weak" },
+        {
+          "label": "Raju is twelve. He works here all day instead of going to school, because his father is sick. Can you help him?",
+          "to": "sunita-good",
+          "kind": "good"
+        }
+      ]
+    },
+    "sunita-weak-1": {
+      "id": "sunita-weak-1",
+      "speaker": "sunita-didi",
+      "mood": "neutral",
+      "text": "All right. But if something is worrying you, you can always tell me.",
+      "next": "mitthu-retry-1"
+    },
+    "mitthu-retry-1": {
+      "id": "mitthu-retry-1",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "Raju isn't helping out a little. He's here all day and he misses school. Let's try that again.",
+      "end": "retry"
+    },
+    "sunita-weak-2": {
+      "id": "sunita-weak-2",
+      "speaker": "sunita-didi",
+      "mood": "worried",
+      "text": "Faster? He's only a child. Tell me, why is he working at all?",
+      "next": "mitthu-retry-2"
+    },
+    "mitthu-retry-2": {
+      "id": "mitthu-retry-2",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Sunita Didi needs the whole story: how old Raju is, and why he isn't in school. Let's try that again.",
+      "end": "retry"
+    },
+    "sunita-good": {
+      "id": "sunita-good",
+      "speaker": "sunita-didi",
+      "mood": "happy",
+      "text": "Thank you for telling me. You were brave, and kind.",
+      "set": ["asked-sunita"],
+      "next": "sunita-good-2"
+    },
+    "sunita-good-2": {
+      "id": "sunita-good-2",
+      "speaker": "sunita-didi",
+      "mood": "neutral",
+      "text": "No child under fourteen should be made to work, in a dhaba or anywhere else. Raju's job is to learn and to play.",
+      "next": "sunita-good-3"
+    },
+    "sunita-good-3": {
+      "id": "sunita-good-3",
+      "speaker": "sunita-didi",
+      "mood": "happy",
+      "text": "I'll visit his family today. There is help for families when a parent is ill, so Raju doesn't have to earn. And I'll talk to Mohan Bhaiya. If we need more help, we can call 1098.",
+      "next": "player-good"
+    },
+    "player-good": {
+      "id": "player-good",
+      "speaker": "player",
+      "text": "Can I tell Raju? He'll be so happy.",
+      "next": "mitthu-good"
+    },
+    "mitthu-good": {
+      "id": "mitthu-good",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Next week, Raju is back in Class 6, sitting next to Lata. And he still beats everyone at maths!",
+      "fx": "cheer",
+      "end": "good"
+    }
+  },
+  "card": {
+    "id": "freedom-from-child-labour",
+    "title": "Childhood is for learning, not working",
+    "kid": "No child under 14 can be made to work in any job. A child's job is to learn and to play. Young people aged 14 to 18 must not do dangerous work.",
+    "teen": "In India, no child under 14 may be employed or allowed to work in any occupation or process. A child may help their own family, or their family's business, only after school hours or in the holidays, and never in dangerous work. Young people aged 14 to 18 (called adolescents in the law) must not work in hazardous occupations or processes.",
+    "ifItHappens": "If you know a child who is made to work instead of going to school, tell a trusted adult: a teacher, an anganwadi worker or someone in your family. You can also call 1098 for free, at any time.",
+    "law": "Article 24, Constitution of India: \"No child below the age of fourteen years shall be employed to work in any factory or mine or engaged in any other hazardous employment.\"\n\nSection 3(1), Child and Adolescent Labour (Prohibition and Regulation) Act, 1986: \"No child shall be employed or permitted to work in any occupation or process.\"",
+    "source": "Constitution of India, Article 24. The Child and Adolescent Labour (Prohibition and Regulation) Act, 1986, as amended in 2016: sections 2, 3 and 3A.",
+    "review": {
+      "status": "unverified",
+      "checkedBy": null,
+      "checkedOn": null,
+      "note": "Written by Claude, 2026-10-15. The official PDFs (labour.gov.in, indiacode.nic.in) did not open from Claude's tools. The two quotes in card.law match secondary sources (constitutionofindia.net for Article 24; lawx.in for section 3(1) of the 2016-amended Act). Check every item in \"checks\" against India Code (https://www.indiacode.nic.in) or the Ministry of Labour and Employment (https://labour.gov.in). Penalties are deliberately not mentioned. Then set status to \"verified\" with your name and the date (see docs/SETUP.md §6).",
+      "checks": [
+        "card.law: the exact wording of Article 24, quoted.",
+        "card.law: the exact wording of section 3(1) of the Act as amended in 2016, quoted.",
+        "card.source: the Act's name after the 2016 amendment, and that sections 2, 3 and 3A are the right ones.",
+        "card.kid, card.teen, quiz: a \"child\" is under 14 (section 2), and no child may be employed in any occupation or process (section 3(1)).",
+        "card.teen, quiz: the family exception: helping the family or family enterprise only after school hours or in vacations, and never in hazardous work (section 3(2)(a)).",
+        "card.teen, card.kid, quiz: adolescents (14 to 18) must not work in hazardous occupations or processes (section 3A).",
+        "Scene (Sunita Didi): \"No child under fourteen should be made to work, in a dhaba or anywhere else\" is accurate.",
+        "Scene (Sunita Didi): there is help for families when a parent is ill (general statement; no scheme is named).",
+        "card.ifItHappens and scene: 1098 is the right number to suggest (same check as the Help Centre, SETUP.md §5)."
+      ]
+    }
+  },
+  "games": [
+    {
+      "kind": "quiz",
+      "id": "dhaba-quiz",
+      "questions": [
+        {
+          "id": "age",
+          "text": "Raju is 12. Can a dhaba give him a job washing glasses?",
+          "options": ["Yes, if he works hard.", "No. No child under 14 can be made to work in any job.", "Yes, but only on weekdays."],
+          "answer": 1,
+          "explanation": "The law says no child under 14 can be employed or allowed to work in any job. Raju's job is to learn."
+        },
+        {
+          "id": "childs-job",
+          "text": "What is the most important job for a 12-year-old like Raju?",
+          "options": ["Earning money for the family", "Going to school, learning and playing", "Washing dishes"],
+          "answer": 1,
+          "explanation": "A child's job is to learn and to play. When a family needs help, it's for grown-ups to find it."
+        },
+        {
+          "id": "who-to-tell",
+          "text": "You think a child is being made to work instead of going to school. What is a good thing to do?",
+          "options": ["Tell a trusted adult, like a teacher or an anganwadi worker", "Tell the child to work faster", "Say nothing"],
+          "answer": 0,
+          "explanation": "A trusted adult can talk to the family and find help. Telling them is how you help."
+        },
+        {
+          "id": "helpline",
+          "text": "What can you call 1098 for?",
+          "options": ["To order food", "To get help for a child", "To book a train ticket"],
+          "answer": 1,
+          "explanation": "1098 is a free number you can call at any time to get help for a child."
+        },
+        {
+          "id": "adolescents",
+          "text": "Meera is 16. Can she be given dangerous work, such as in a mine?",
+          "options": ["Yes, she is old enough.", "No. Young people aged 14 to 18 must not do hazardous work.", "Only if her parents agree."],
+          "answer": 1,
+          "explanation": "The law protects adolescents (14 to 18) too: they must not work in hazardous occupations or processes.",
+          "band": "teen"
+        },
+        {
+          "id": "family",
+          "text": "When may a child under 14 help in their own family's business?",
+          "options": ["Any time, even during school hours", "Only after school hours or in the holidays, and never in dangerous work", "Never, not even at home"],
+          "answer": 1,
+          "explanation": "A child may help their own family only after school hours or in the holidays, and the work must not be dangerous.",
+          "band": "teen"
+        }
+      ]
+    }
+  ]
+}

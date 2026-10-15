@@ -57,7 +57,7 @@ test('Demo path: profile, character, School, card flip, quiz, results, Help Cent
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()
   await page.reload()
   await expect(page.getByRole('link', { name: strings['town.playAgain'].replace('{name}', 'The School') })).toBeVisible()
-  await expect(page.getByText(strings['town.beingBuilt'])).toBeVisible() // the Dhaba is open now
+  await expect(page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The Dhaba') })).toBeVisible() // the Dhaba is open now
 
   // 9. Help is one tap away, and the Help Centre is calm (no Help button of its own).
   await page.getByTestId('help-button').click()

@@ -64,3 +64,13 @@ Every scene's rights card (`card` in `content/scenes/<id>.json`) has a `review` 
 3. In the same Act, confirm: ages 6 to 14 (section 3); "elementary education" means Classes 1 to 8 (section 2(f)); no fee may stop a child finishing elementary education (section 3(2)); private unaided schools keep at least 25% of entry-class seats for weaker and disadvantaged groups (section 12(1)(c)).
 4. Read the card text (`kid`, `teen`, `ifItHappens`), Meena Didi's lines (`didi-good-2`) and the six quiz questions. Each must agree with points 1 to 3. Change any wording **in the JSON only**: the app shows it exactly as written.
 5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn` (YYYY-MM-DD).
+
+**Dhaba (`content/scenes/dhaba.json`), freedom from child labour:**
+
+Claude could not open the official PDFs (labour.gov.in, indiacode.nic.in) from its tools, so both quotes were matched only against secondary sources: [constitutionofindia.net](https://www.constitutionofindia.net/constitution_of_india/fundamental_rights/articles/Article%2024) for Article 24, and [lawx.in](https://lawx.in/acts/section/74/660/6272) for section 3(1).
+
+1. `card.law` quotes Article 24 of the Constitution. Check the wording against the Constitution of India (https://legislative.gov.in).
+2. `card.law` quotes section 3(1) of the Child and Adolescent Labour (Prohibition and Regulation) Act, 1986, **as amended in 2016**: "No child shall be employed or permitted to work in any occupation or process." Check it on India Code (https://www.indiacode.nic.in) or the Ministry of Labour and Employment (https://labour.gov.in). The wording before 2016 was different.
+3. In the same Act, confirm: a "child" is under 14 (section 2); the family exception: helping one's family or family enterprise only after school hours or in vacations, and never in hazardous work (section 3(2)(a)); adolescents aged 14 to 18 must not work in hazardous occupations or processes (section 3A).
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Sunita Didi's lines (`sunita-good-2`, `sunita-good-3`) and the six quiz questions. Each must agree with points 1 to 3. Penalties are deliberately not mentioned anywhere.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.

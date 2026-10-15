@@ -24,7 +24,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | 🔄 in progress on `p4-town` (3 of 6 tasks) | not opened | D-030 to D-032 |
+| P4 Town and all buildings | 🔄 in progress on `p4-town` (3 of 6 tasks, plus the Dhaba) | not opened | D-030 to D-033 |
 | P5 Backend | ⬜ | | |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
@@ -43,6 +43,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Task | Where |
 | --- | --- |
 | Fact-check the School rights card (Article 21A matched the Ministry of Education page; the rest is unverified) | SETUP.md §6, `content/scenes/school.json` › `card.review` |
+| Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
 | Fact-check the Help Centre numbers and sentences | SETUP.md §5, `content/help.json` › `review` |
 | Confirm the two font licences | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
@@ -54,7 +55,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Walkable town scene (doors, locked replies, teasers, Help door) | ✅ D-030 |
 | Mitthu's guidance, return celebration, town changing with progress | ✅ D-031 |
 | Book, Me, Credits, badges, demo mode | ✅ D-032 |
-| Dhaba, Home and Panchayat scenes | ⬜ **next** (each needs its legal text fact-checked, like School) |
+| Dhaba, Home and Panchayat scenes | 🔄 Dhaba ✅ (D-033); **next: Home** (gentle tone), then Panchayat. Each needs its legal text fact-checked |
 | Sort game, in at least two buildings | ⬜ |
 | Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ |
 
@@ -509,3 +510,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `tests/e2e/collection.spec.ts` (7: Book collected and empty, Me, Credits, demo by typing, by long press, not from a text box), `src/lib/scenes.test.ts` (3), and a `seedPlayer` e2e helper that loads a saved player without playing.
 - Hacky / watch: the Book has only one real card until the other buildings exist. Badges use one shared icon. `/community` is still a placeholder (its own P4 task).
 - Next task: P4 › Dhaba, Home and Panchayat as scenes (content and art only; Home uses the `gentle` tone; every legal claim goes to the owner's fact check, like School in SETUP.md §6).
+
+**P4: the Dhaba (2026-10-15)**
+- Done: `content/scenes/dhaba.json` (gentle tone): Raju, 12, works at the dhaba instead of school; the player listens, finds his notebook, and tells Sunita Didi (anganwadi worker). Two gentle retries, a good ending, a rights card (Article 24 and section 3(1) of the 2016-amended Act; no penalties), and a 4 + 2 question quiz. New characters (Raju, Mohan Bhaiya, Sunita Didi), stage art `src/art/dhaba.tsx` and a notebook prop. Registered in `src/lib/scenes.ts`, so the town's Dhaba door now opens after the School, and the results and celebration say so. D-033.
+- Tests: `src/engine/dhaba.test.ts` (6), a Dhaba play-through e2e in `play.spec.ts` (gentle note links to Help), and updated expectations now that the Dhaba exists (Book shows 2 cards, the Dhaba is "Visit", not "Being built").
+- Owner: fact-check the Dhaba card (SETUP.md §6). The official PDFs did not open from Claude's tools; the quotes match secondary sources only.
+- Next task: P4 › the Home scene (`gentle` tone, safety at home; handled only through conversation and witnessing, never by showing harm). Then the Panchayat.

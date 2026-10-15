@@ -1,7 +1,8 @@
 // Playing the School building end to end at /play/school: story, rights card, quiz, results.
 import { expect, test } from '@playwright/test'
+import dhaba from '../../content/scenes/dhaba.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, createPlayer, playStory, strings, thingsToDo } from './helpers.ts'
+import { answerQuiz, createPlayer, playStory, seedPlayer, strings, talkThrough, thingsToDo } from './helpers.ts'
 
 // These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
 test.describe.configure({ timeout: 60_000 })
@@ -29,8 +30,8 @@ test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results th
   await answerQuiz(page, [true, true, true, false])
   await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
   await expect(page.getByText(strings['badge.firstSteps'])).toBeVisible()
-  // The Dhaba is unlocked by the rules, but its story isn't written yet, so nothing claims it is open.
-  await expect(page.getByText(strings['results.unlocked'])).toHaveCount(0)
+  // Finishing the School opens the Dhaba (its story exists, so the game says so).
+  await expect(page.getByText(strings['results.unlocked'])).toBeVisible()
 
   // Back in the town: Mitthu celebrates once; School shows its stars, the Dhaba is now open, Home is still locked.
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()
@@ -38,12 +39,13 @@ test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results th
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['town.title'])
   const celebration = page.getByRole('status').filter({ hasText: strings['town.welcomeBack'].replace('{name}', 'Asha') })
   await expect(celebration).toContainText(strings['town.earned'].replace('{n}', '2').replace('{place}', 'The School'))
+  await expect(celebration).toContainText(strings['town.nowOpen'].replace('{place}', 'The Dhaba'))
   await page.getByRole('button', { name: strings['town.celebrateClose'] }).click()
   await expect(celebration).toHaveCount(0)
   // Lata now stands outside the School, and the town has changed.
   await expect(thingsToDo(page).getByRole('button', { name: 'Talk to Lata' })).toBeVisible()
   await expect(page.getByText(strings['town.stars'].replace('{n}', '2'))).toBeAttached()
-  await expect(page.getByText(strings['town.beingBuilt'])).toBeVisible()
+  await expect(page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The Dhaba') })).toBeVisible()
   await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))).toBeVisible()
 
   await page.reload()
@@ -100,4 +102,29 @@ test('FR-07 the town starts with only the School open, and links to it', async (
   await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The School'))).toBeVisible()
   await page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The School') }).click()
   await expect(page).toHaveURL(/#\/play\/school$/)
+})
+
+test('FR-04 / FR-07 the Dhaba (after the School) plays in the gentle tone, and its results point to Need help?', async ({ page }) => {
+  await seedPlayer(page, '/play/dhaba', { school: true })
+  await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(dhaba.nodes.intro.text)
+  await talkThrough(page)
+  const list = thingsToDo(page)
+  for (const label of ['Talk to the boy washing glasses', 'Look at the notebook on the shelf']) {
+    await list.getByRole('button', { name: label }).click()
+    await talkThrough(page)
+  }
+  await list.getByRole('button', { name: 'Ask Sunita Didi for help' }).click()
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Raju is twelve/ }).click()
+  await talkThrough(page)
+
+  await page.getByRole('button', { name: strings['card.flip'] }).click()
+  await expect(page.locator('blockquote')).toHaveText(dhaba.card.law)
+  await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
+  await answerQuiz(page, [true, true, true, true], dhaba.games[0]!.questions.filter((q) => !q.band))
+
+  // No retries and every answer right: 3 stars. Gentle scenes add a quiet link to Help.
+  await expect(page.getByText(strings['results.stars'].replace('{n}', '3')).last()).toBeVisible()
+  await expect(page.getByText(strings['results.gentle'])).toBeVisible()
+  await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
 })

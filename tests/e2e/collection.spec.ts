@@ -5,7 +5,7 @@ import { seedPlayer, strings } from './helpers.ts'
 
 test('FR-05 the Book shows collected cards, and each reads exactly as written', async ({ page }) => {
   await seedPlayer(page, '/book', { school: true })
-  await expect(page.getByText(strings['book.count'].replace('{n}', '1').replace('{total}', '1'))).toBeVisible()
+  await expect(page.getByText(strings['book.count'].replace('{n}', '1').replace('{total}', '2'))).toBeVisible()
   await page.getByRole('button', { name: strings['book.read'].replace('{title}', school.card.title) }).click()
   await expect(page.getByRole('heading', { name: school.card.title })).toBeVisible()
   await expect(page.locator('blockquote')).toHaveText(school.card.law)
@@ -15,7 +15,7 @@ test('FR-05 the Book shows collected cards, and each reads exactly as written', 
 
 test('FR-05 a new player\'s Book is empty and says how to collect the School card', async ({ page }) => {
   await seedPlayer(page, '/book')
-  await expect(page.getByText(strings['book.count'].replace('{n}', '0').replace('{total}', '1'))).toBeVisible()
+  await expect(page.getByText(strings['book.count'].replace('{n}', '0').replace('{total}', '2'))).toBeVisible()
   await expect(page.getByText(strings['book.helpAt'].replace('{place}', 'The School'))).toBeVisible()
   await expect(page.getByRole('button', { name: /Read the card/ })).toHaveCount(0)
 })

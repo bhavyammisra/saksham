@@ -48,5 +48,6 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
   - Mitthu points the way; a once-only return celebration; finished places get garlands, lanterns and more bunting; Lata appears after the School (D-031).
   - Performance: removing full-screen blend modes and live blurs took the town from 33 to 59 fps, the School from 30 to 47, and the cover forms from 10–15 to 60 (headless Chromium).
   - Book, Me (badges, settings, switch player), Credits and demo mode (D-032).
+  - The Dhaba: child labour, told gently (D-033).
   - 189 unit and 52 e2e tests green.
-- **Next:** Dhaba, Home and Panchayat scenes.
+- **Next:** the Home scene, then the Panchayat.
