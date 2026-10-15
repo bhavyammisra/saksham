@@ -6,6 +6,7 @@ import type { CharacterSpec } from '@/character/spec'
 import { Button } from '@/components/Button'
 import { t, type StringKey } from '@/lib/i18n'
 import type { BadgeId, Score } from '@/lib/rules'
+import { BADGE_TEXT } from './badgeText'
 import './play.css'
 
 /** What one play-through earned (worked out by the Play screen when the quiz ends). */
@@ -15,14 +16,6 @@ export interface Summary {
   retries: number
   newBadges: BadgeId[]
   unlocked: boolean // the next building opened just now
-}
-
-const BADGE_TEXT: Record<BadgeId, { name: StringKey; about: StringKey }> = {
-  'first-steps': { name: 'badge.firstSteps', about: 'badge.firstStepsAbout' },
-  'kind-helper': { name: 'badge.kindHelper', about: 'badge.kindHelperAbout' },
-  'quiz-whiz': { name: 'badge.quizWhiz', about: 'badge.quizWhizAbout' },
-  'right-first-time': { name: 'badge.rightFirstTime', about: 'badge.rightFirstTimeAbout' },
-  'all-buildings': { name: 'badge.allBuildings', about: 'badge.allBuildingsAbout' },
 }
 
 // Why each star was given, in the order of the rules (BUILD_PLAN §7).

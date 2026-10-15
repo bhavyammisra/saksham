@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { Shell } from '@/components/Shell'
 import { SoundRouteSync } from '@/components/SoundRouteSync'
+import { Book } from '@/screens/Book'
+import { Credits } from '@/screens/Credits'
 import { DevCharacters } from '@/screens/DevCharacters'
 import { DevLook } from '@/screens/DevLook'
 import { DevScene } from '@/screens/DevScene'
@@ -43,10 +45,10 @@ export default function App() {
 
         {/* Screens with the top bar and the main navigation. */}
         <Route element={<Shell nav />}>
-          <Route path="/credits" element={<Placeholder title="credits.title" />} />
+          <Route path="/credits" element={<Credits />} />
           <Route element={<RequireProfile />}>
             <Route path="/town" element={<Town />} />
-            <Route path="/book" element={<Placeholder title="book.title" />} />
+            <Route path="/book" element={<Book />} />
             <Route path="/community" element={<Placeholder title="community.title" />} />
             <Route path="/me" element={<Me />} />
             <Route path="/me/character" element={<MeCharacter />} />

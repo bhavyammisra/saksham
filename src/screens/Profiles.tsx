@@ -52,7 +52,7 @@ export function Profiles() {
                 setActiveProfile(null)
                 navigate('/onboarding')
               }}
-              className={`${card} border-2 border-dashed border-white/40 bg-[#1d1630]/70 backdrop-blur-md hover:border-marigold`}
+              className={`${card} border-2 border-dashed border-white/40 bg-[#1d1630]/80 hover:border-marigold`}
             >
               <span aria-hidden="true" className="grid size-20 place-items-center rounded-full border-2 border-white/50 text-5xl leading-none">
                 +

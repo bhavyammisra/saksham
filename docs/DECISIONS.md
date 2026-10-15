@@ -243,3 +243,15 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
   - **Honest announcements:** "A new place is open" (results and celebration) appears only if that building's story exists, so the door really opens. Until the Dhaba is written, unlocking shows as "Being built" on its card.
 - **Why:** Progress belongs to the host; content and art just react to flags, the same tool scenes already use. Keeping the celebration in route state, not saved data, means it can never show twice or leak into another player's town.
 - **Alternatives:** Celebration saved in the store (needs clean-up, can show twice); a separate "town state" passed to art (a second mechanism next to flags); announcing every rule-level unlock (told children a door was open when it wasn't).
+
+## D-032 Book, Me, Credits and demo mode
+
+- **Context:** BUILD_PLAN P4 asks for the Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges and demo mode. The data already existed: `extras.cards`, `extras.badges`, progress, and the demo-mode rules.
+- **Choice:**
+  - **Book** (`/book`): one slot per playable building, in town order (`cardsInTown()` in `src/lib/scenes.ts`). A collected card shows its front and opens to read again; others lie face down and say how to collect them ("Help at The School…", or "still being written"). The card's front, back and details are now shared pieces (`src/play/RightsCard.tsx`) used by both the card reveal and the Book, so a card always reads the same.
+  - **Me**: portrait and the player's own star total, all five badges marked "Earned" or "Not earned yet" (words, not just colour), the settings (`SettingsControls`, the same switches as the Settings dialog), "Switch player", and a link to Credits. Badge names live in one place (`src/play/badgeText.ts`).
+  - **Credits** (`/credits`): art and sound are made in code for this project; the fonts come from `content/credits.json` (keep in step with `docs/ASSET_LICENSES.md`); and every card's `source` is shown exactly as written.
+  - **Demo mode** (`src/components/DemoMode.tsx`, in the Shell, so it works on every screen): type d-e-m-o anywhere except a text box, or press and hold the logo for 2 seconds (a long press doesn't also follow the link). A "Demo mode" chip in the top bar turns it off, and screen readers hear when it turns on. Demo mode opens every playable building by the existing `isUnlocked` rule; a building whose story isn't written still says "Being built".
+  - Removed the last live blurs (the top bar, a customiser button, a profile card), following the performance rule from D-030.
+- **Why:** Everything reads from data that already exists, so there is no new saved state and nothing to migrate. Sharing the card pieces keeps legal text identical wherever it appears.
+- **Alternatives:** A separate Book card design (risks the law reading differently in two places); demo mode as a hidden route (harder to show in a viva, and the plan names the key sequence and the long press).

@@ -65,6 +65,10 @@
   to { opacity: 1; transform: none; }
 }
 
+/* In the Book, cards lie flat: the front faces you without the flip, and nothing glows. */
+.rights-card-flat .rights-card-front { transform: none; }
+.rights-card-flat .rights-card-back { animation: none; }
+
 html[data-calm] .rights-card-inner { transition: none !important; }
 html[data-calm] .rights-card-back,
 html[data-calm] .card-details,

@@ -75,7 +75,6 @@ export function Town() {
 
   return (
     <Page title={t('town.title')} wide>
-      {demo && <p className="mb-3 inline-block rounded-pill bg-peacock px-3 py-1 text-sm font-semibold text-white">{t('town.demo')}</p>}
       <div className="relative">
         <Scene scene={townScene} locked={locked} startX={startX} startFlags={startFlags} skipIntro={from !== undefined} guide={guide} onExit={onExit} onComplete={onComplete} />
         {celebration && profile && (

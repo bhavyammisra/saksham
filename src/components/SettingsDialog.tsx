@@ -20,8 +20,6 @@ const languages: { lang: Lang; label: StringKey }[] = [{ lang: 'en', label: 'lan
  */
 export function SettingsDialog() {
   const dialog = useRef<HTMLDialogElement>(null)
-  const settings = useStore((s) => s.settings)
-  const updateSettings = useStore((s) => s.updateSettings)
 
   return (
     <>
@@ -44,35 +42,7 @@ export function SettingsDialog() {
           {t('settings.title')}
         </h2>
 
-        <ul className="mt-4 space-y-2">
-          {toggles.map(({ key, label, hint }) => (
-            <li key={key}>
-              <SwitchRow
-                label={t(label)}
-                hint={hint ? t(hint) : undefined}
-                on={settings[key]}
-                onChange={(on) => updateSettings({ [key]: on } as Partial<Settings>)}
-              />
-            </li>
-          ))}
-        </ul>
-
-        <fieldset className="mt-6">
-          <legend className="font-semibold">{t('settings.language')}</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {languages.map(({ lang, label }) => (
-              <button
-                key={lang}
-                type="button"
-                aria-pressed={settings.lang === lang}
-                onClick={() => updateSettings({ lang })}
-                className="min-h-tap rounded-button border-2 border-sand px-4 aria-pressed:border-ink aria-pressed:bg-marigold-soft aria-pressed:font-semibold"
-              >
-                {t(label)}
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        <SettingsControls />
 
         <form method="dialog" className="mt-6 text-right">
           <button
@@ -83,6 +53,45 @@ export function SettingsDialog() {
           </button>
         </form>
       </dialog>
+    </>
+  )
+}
+
+/** The settings switches and language choice. Used in the Settings dialog and on the Me page. */
+export function SettingsControls() {
+  const settings = useStore((s) => s.settings)
+  const updateSettings = useStore((s) => s.updateSettings)
+  return (
+    <>
+      <ul className="mt-4 space-y-2">
+        {toggles.map(({ key, label, hint }) => (
+          <li key={key}>
+            <SwitchRow
+              label={t(label)}
+              hint={hint ? t(hint) : undefined}
+              on={settings[key]}
+              onChange={(on) => updateSettings({ [key]: on } as Partial<Settings>)}
+            />
+          </li>
+        ))}
+      </ul>
+
+      <fieldset className="mt-6">
+        <legend className="font-semibold">{t('settings.language')}</legend>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {languages.map(({ lang, label }) => (
+            <button
+              key={lang}
+              type="button"
+              aria-pressed={settings.lang === lang}
+              onClick={() => updateSettings({ lang })}
+              className="min-h-tap rounded-button border-2 border-sand px-4 aria-pressed:border-ink aria-pressed:bg-marigold-soft aria-pressed:font-semibold"
+            >
+              {t(label)}
+            </button>
+          ))}
+        </div>
+      </fieldset>
     </>
   )
 }

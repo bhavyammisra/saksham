@@ -82,7 +82,7 @@ export function CharacterBuilder({
                   sound.play('tap')
                   setPose(p.pose)
                 }}
-                className="min-h-tap rounded-pill border border-white/25 bg-white/10 px-4 text-sm font-semibold backdrop-blur hover:bg-white/20"
+                className="min-h-tap rounded-pill border border-white/25 bg-white/10 px-4 text-sm font-semibold hover:bg-white/20"
               >
                 {t(p.label)}
               </button>

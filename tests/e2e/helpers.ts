@@ -63,3 +63,40 @@ export async function answerQuiz(page: Page, rightAnswers: boolean[], questions 
     await page.getByRole('button', { name: isLast ? strings['quiz.finish'] : strings['quiz.next'] }).click()
   }
 }
+
+// ---------------------------------------------------------------- a saved player, without playing
+
+/**
+ * Loads a player straight into saved storage (the same shape the app saves), then opens `path`.
+ * Much faster than playing a building when a test only needs the result.
+ */
+export async function seedPlayer(
+  page: Page,
+  path: string,
+  { band = 'young', school = false, badges = [] as string[], demo = false }: { band?: 'young' | 'teen'; school?: boolean; badges?: string[]; demo?: boolean } = {},
+) {
+  await page.goto('/')
+  await page.evaluate(
+    ({ band, school, badges, demo }) => {
+      const avatar = { skin: 'skin-4', hair: 'two-plaits', hairColor: 'black', outfit: 'salwar', outfitColor: 'peacock', headwear: 'none', headwearColor: 'navy', glasses: false, bag: false }
+      const progress = school ? { school: { stars: 2, bestScore: 75, completed: true } } : {}
+      const cards = school ? ['right-to-education'] : []
+      localStorage.setItem(
+        'saksham',
+        JSON.stringify({
+          version: 2,
+          state: {
+            profiles: [{ id: 'p1', firstName: 'Asha', band, createdAt: 1, avatar }],
+            activeProfileId: 'p1',
+            settings: {},
+            demo,
+            data: { p1: { progress, extras: { cards, badges, marigolds: [], pledges: [] } } },
+          },
+        }),
+      )
+    },
+    { band, school, badges, demo },
+  )
+  await page.goto('about:blank')
+  await page.goto(`/#${path}`)
+}

@@ -24,7 +24,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | 🔄 in progress on `p4-town` (2 of 6 tasks) | not opened | D-030, D-031 |
+| P4 Town and all buildings | 🔄 in progress on `p4-town` (3 of 6 tasks) | not opened | D-030 to D-032 |
 | P5 Backend | ⬜ | | |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
@@ -53,8 +53,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | --- | --- |
 | Walkable town scene (doors, locked replies, teasers, Help door) | ✅ D-030 |
 | Mitthu's guidance, return celebration, town changing with progress | ✅ D-031 |
-| Book, Me, Credits, badges, demo mode | ⬜ **next** |
-| Dhaba, Home and Panchayat scenes | ⬜ (each needs its legal text fact-checked, like School) |
+| Book, Me, Credits, badges, demo mode | ✅ D-032 |
+| Dhaba, Home and Panchayat scenes | ⬜ **next** (each needs its legal text fact-checked, like School) |
 | Sort game, in at least two buildings | ⬜ |
 | Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ |
 
@@ -292,7 +292,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 - [x] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door. ✅ 2026-10-15 (D-030).
 - [x] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers). ✅ 2026-10-15 (D-031).
-- [ ] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode.
+- [x] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode. ✅ 2026-10-15 (D-032).
 
 #### Remaining buildings
 
@@ -495,7 +495,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 
 **Handoff for the next session (2026-10-15)**
 - **State:** branch `p4-town`, everything committed and pushed (last commit `P4: Mitthu's guidance, return celebration, and a town that changes with progress`). P0 to P3 are merged to `main`. 186 unit and 45 e2e tests green; lint, typecheck, validate and build pass. See **Checkpoints** at the top for every phase, gate and owner task.
-- **Exact next task:** P4 › Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode. The data already exists: `extras.cards` and `extras.badges` in the store, badge names in `strings.en.json` (`badge.*`), `rules.ts` demo-mode helpers (`nextDemoBuffer`, `isDemoCode`) and `store.setDemo`. `/book`, `/community` and `/credits` are still `Placeholder` routes in `src/App.tsx`.
+- **Exact next task:** P4 › Dhaba, Home and Panchayat as scenes (see the latest note at the bottom). Done since this handoff was first written: the Book, Me, Credits and demo mode (D-032). `/community` is still a `Placeholder` route in `src/App.tsx`.
 - **How the town works (for the next buildings):** buildings are `exit` hotspots in `content/scenes/town.json` with `to` = building id and a `lockedNode`. `Town.tsx` decides locks (`isUnlocked` + whether `getScene(id)` exists), sets `done:<id>` flags from progress (`hostFlags`), and points Mitthu at `recommendedBuilding`. Adding a building = its scene JSON + art, plus one line in `src/lib/scenes.ts`; its door then opens by itself, and its celebration says "open now".
 - **Rules learned the hard way (keep them):**
   - No full-screen `mix-blend-mode`, no `backdrop-filter`, and no `filter: blur` on animated pictures: without a GPU each halves the frame rate (D-030). Put moving things in their own small SVG layer; keep huge SVGs (the town street) still.
@@ -503,3 +503,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
   - For screenshots, a throwaway Playwright script against the dev server (port 5174 when 5173 is taken) works best; close the browser pane's tab afterwards so it doesn't animate in the background.
   - Writing files with Python on Windows: open with `newline='\n'` (the repo is LF), and use double quotes around test names that contain an apostrophe.
 - **Owner:** the School card fact check (SETUP.md §6) is the most important open item before anyone plays it.
+
+**P4: Book, Me, Credits and demo mode (2026-10-15)**
+- Done: `/book` (card album, read any collected card again), Me (stars, all badges earned or not yet, settings, switch player, link to Credits), `/credits` (made-in-code art, fonts from `content/credits.json`, every card's source exactly as written), and demo mode (type "demo" or hold the logo 2 s; a top-bar chip turns it off). Shared card pieces in `src/play/RightsCard.tsx`; badge names in `src/play/badgeText.ts`; `SettingsControls` shared by the dialog and Me. Removed the last live blurs (D-030 rule).
+- Tests: `tests/e2e/collection.spec.ts` (7: Book collected and empty, Me, Credits, demo by typing, by long press, not from a text box), `src/lib/scenes.test.ts` (3), and a `seedPlayer` e2e helper that loads a saved player without playing.
+- Hacky / watch: the Book has only one real card until the other buildings exist. Badges use one shared icon. `/community` is still a placeholder (its own P4 task).
+- Next task: P4 › Dhaba, Home and Panchayat as scenes (content and art only; Home uses the `gentle` tone; every legal claim goes to the owner's fact check, like School in SETUP.md §6).

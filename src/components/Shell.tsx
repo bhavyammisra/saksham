@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import { t, type StringKey } from '@/lib/i18n'
+import { DemoChip, useDemoMode } from './DemoMode'
 import { HelpButton } from './HelpButton'
 import { SettingsDialog } from './SettingsDialog'
 
@@ -16,6 +17,7 @@ const navItems: { to: string; label: StringKey }[] = [
  * the main navigation: in the top bar on wide screens, at the bottom on phones.
  */
 export function Shell({ nav = false, immersive = false }: { nav?: boolean; immersive?: boolean }) {
+  const logoDemo = useDemoMode() // type "demo", or hold the logo for 2 seconds
   return (
     <div className="relative flex min-h-dvh flex-col">
       <a
@@ -35,12 +37,13 @@ export function Shell({ nav = false, immersive = false }: { nav?: boolean; immer
         className={
           immersive
             ? 'absolute inset-x-0 top-0 z-20 bg-gradient-to-b from-black/45 to-transparent'
-            : 'sticky top-0 z-10 border-b border-sand bg-plaster/95 backdrop-blur'
+            : 'sticky top-0 z-10 border-b border-sand bg-plaster/95'
         }
       >
         <div className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-2">
           <Link
             to="/"
+            {...logoDemo}
             aria-label={t('shell.home')}
             className={`inline-flex min-h-tap items-center text-xl font-semibold ${immersive ? 'text-white/90' : 'text-terracotta-deep'}`}
           >
@@ -48,6 +51,7 @@ export function Shell({ nav = false, immersive = false }: { nav?: boolean; immer
           </Link>
           {nav && <NavLinks className="ml-6 hidden gap-1 md:flex" />}
           <div className="ml-auto flex items-center gap-2">
+            <DemoChip />
             <HelpButton />
             <SettingsDialog />
           </div>

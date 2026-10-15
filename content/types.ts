@@ -157,3 +157,9 @@ export interface NpcDef {
   adult?: boolean // adults are drawn taller, with adult head proportions
   look?: Record<string, string | boolean> // a CharacterSpec; missing parts use defaults
 }
+
+// Credits (content/credits.json): shown on the Credits screen exactly as written.
+// Keep in step with docs/ASSET_LICENSES.md.
+export interface CreditsContent {
+  fonts: { name: string; by: string; licence: string; use: string }[]
+}
