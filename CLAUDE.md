@@ -8,7 +8,7 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 - **Phase:** 3 of 0–7 (School end to end, MILESTONE A), on branch `p3-school`. Next task: author `content/scenes/school.json`.
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2) and P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-022).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-026).
 
 ## Start of every session
 
