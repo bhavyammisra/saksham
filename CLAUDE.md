@@ -6,9 +6,8 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 2 of 0–7 (Character and scene engine). All P2 features are built and pushed on branch `p2-character-scene`, but **Phase 2 is not finished**.
-- **Owner feedback rework (2026-10-15):** the cover screens (everything before the game) and the character were redesigned, along with the customiser (D-024, D-025). The owner approved the cover screens, the character and the restyled School scene on 2026-10-15 (both 🛑 gates passed). The P2 pull request is open: merge it with a merge commit once CI is green, then start Phase 3 on a new branch.
-- **Merged to `main`:** P0 (PR #1) and P1 (PR #2). The P2 PR is not opened yet.
+- **Phase:** 3 of 0–7 (School end to end, MILESTONE A), on branch `p3-school`. Next task: author `content/scenes/school.json`.
+- **Merged to `main`:** P0 (PR #1), P1 (PR #2) and P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026).
 - **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-022).
 
 ## Start of every session
