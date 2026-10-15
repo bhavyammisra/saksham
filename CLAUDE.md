@@ -32,7 +32,7 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Tooling notes (Windows machine)
 
-- GitHub CLI is installed at `C:Program FilesGitHub CLIgh.exe`. Old terminals may not have it on PATH, so call it by full path if `gh` isn't found. Auto-merge is turned off for this repo: after CI is green, merge with `gh pr merge <n> --merge`. The owner prefers merge commits, so the `P<n>:` commits stay in history.
+- GitHub CLI is installed at `C:\Program Files\GitHub CLI\gh.exe`. Old terminals may not have it on PATH, so call it by full path if `gh` isn't found. Auto-merge is turned off for this repo: after CI is green, merge with `gh pr merge <n> --merge`. The owner prefers merge commits, so the `P<n>:` commits stay in history.
 - In Git Bash, arguments that start with `/` (such as `/dev/characters`) are rewritten into Windows paths. Prefix the command with `MSYS_NO_PATHCONV=1`, and pass Windows paths (`cygpath -w`) for output files.
 - The browser pane's screenshots can be stale or time out. For reliable visual checks, take screenshots with a small throwaway Playwright script against `npm run dev` (keep such scripts out of the repo).
 - Vite's file watcher can miss two writes to the same file in quick succession. If the page shows old code, restart the dev server.
