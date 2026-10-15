@@ -1,8 +1,17 @@
 {
-  "mitthu": { "name": "Mitthu", "kind": "parrot" },
+  "mitthu": {
+    "name": "Mitthu",
+    "kind": "parrot"
+  },
   "ravi": {
     "name": "Ravi",
-    "look": { "skin": "skin-7", "hair": "curly", "hairColor": "black", "outfit": "uniform", "bag": true }
+    "look": {
+      "skin": "skin-7",
+      "hair": "curly",
+      "hairColor": "black",
+      "outfit": "uniform",
+      "bag": true
+    }
   },
   "meena-didi": {
     "name": "Meena Didi",
@@ -16,6 +25,18 @@
       "headwear": "dupatta",
       "headwearColor": "cream",
       "glasses": true,
+      "bag": false
+    }
+  },
+  "lata": {
+    "name": "Lata",
+    "look": {
+      "skin": "skin-6",
+      "hair": "plait",
+      "hairColor": "black",
+      "outfit": "salwar",
+      "outfitColor": "rose",
+      "headwear": "none",
       "bag": false
     }
   }

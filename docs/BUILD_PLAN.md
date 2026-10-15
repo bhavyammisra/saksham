@@ -39,7 +39,7 @@ Two age bands: `young` (8 to 11) and `teen` (12 to 16). The band changes the car
 
 ### Art direction
 
-Grounded and warm, **not cartoonish**: semi-realistic proportions, painterly layered vector scenes, soft golden light, subtle grain, light shafts, depth blur on far layers, real Indian materials and colours (painted plaster, tiles, wood, brass, marigold garlands). No thick outlines, no big-head mascots. Mitthu is the only slightly stylised character. The visual style must be consistent across every scene: one palette family, one lighting logic.
+Grounded and warm, **not cartoonish**: realistic proportions, layered vector scenes, golden light, subtle grain, light shafts, depth blur on far layers, real Indian materials and colours (painted plaster, tiles, wood, brass, marigold garlands). **Updated 2026-10-15 at the owner's request (D-024, D-026):** a painted game-character look, with thin ink outlines, hard-edged cel shadows and deeper colours on characters and near scenery (thinner outlines further back, none on distant hills). No big-head mascots. Mitthu is the only slightly stylised character. The visual style must be consistent across every scene: one palette family, one lighting logic.
 
 Honest constraint: the look depends on art quality. So there is a **look-development gate** (Phase 2) where the owner approves the style on one scene before any other scene is built.
 
@@ -233,7 +233,7 @@ The owner said they do **not like the cover page or the character design**. Both
 
 ### Phase 3: School end to end (MILESTONE A)
 
-- [ ] Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
+- [x] Author `content/scenes/school.json`: ✅ 2026-10-15 (D-027). Lata's story, rights card and a 6-question quiz. Legal text is marked `unverified` for the owner's fact check (SETUP.md §6). Was: Author `content/scenes/school.json`: hotspots, objectives, dialogue nodes, a good ending, weaker choices with gentle consequences, and the `card`. Write in the voice described in §10. Legal fields (`law`, `source`) must be accurate and sourced; mark them for the owner's fact check.
 - [ ] Card reveal (flippable, band-aware), quiz game (band filtering, hint round, explanations), results (stars rule, badges, saving progress).
 - [ ] Temporary simple hub (a list of buildings with lock states) so School can start and finish, with unlock saved across reloads.
 - [ ] Demo-path e2e test: profile, character, School, card flip, quiz, results, Help Centre.
@@ -407,3 +407,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P2 done, P3 started (2026-10-15)**
 - Done: PR #3 (all of Phase 2, including the owner-feedback rework) merged to `main` with a merge commit after green CI. Branch `p3-school` created from `main`; lint, typecheck, validate, 155 unit and 35 e2e tests green.
 - Next task: P3 › author `content/scenes/school.json` (theme: education). Legal fields must be sourced and marked for the owner's fact check.
+
+**P3: School story written (2026-10-15)**
+- Done: `content/scenes/school.json`. Lata, 9, watches from the gate because her family thinks school costs money and that she can't be admitted without a birth certificate. The player hears about her from Ravi, talks to her, reads the admissions notice and asks Meena Didi. There are two weaker choices with gentle retries, and a good ending. The rights card quotes Article 21A and RTE Act section 14(2). The quiz has 4 questions for everyone plus 2 for teens. New: Lata (`npcs.json`); notice board and signpost props; a `review` block on every card, which the validator enforces; `/dev/look` now plays the real School story. 6 new story tests.
+- Hacky / watch: the engine never opens `startNode` by itself, so there is no Mitthu arrival line yet (§2 step 1); add it with the card and quiz work. `ambience: "school"` has no sound until P6.
+- Owner: fact-check the School card (SETUP.md §6). Article 21A matched the Ministry of Education page; the rest is unverified.
+- Next task: P3 › card reveal, quiz game and results.

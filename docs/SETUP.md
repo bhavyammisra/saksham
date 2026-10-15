@@ -52,3 +52,15 @@ Filled in during Phase 5: create the project, enable anonymous sign-ins and emai
 4. When done, set `review.status` to `"verified"`, and fill in `checkedBy` and `checkedOn` (YYYY-MM-DD).
 
 Claude could not open 112.gov.in, cybercrime.gov.in or telemanas.mohfw.gov.in from its tools (connection refused or JavaScript-only pages). The numbers were cross-checked against PIB press releases instead.
+
+## 6. Fact-check each rights card ⬜ (owner, before any child uses the app)
+
+Every scene's rights card (`card` in `content/scenes/<id>.json`) has a `review` block, which is never shown in the app. `review.checks` lists each claim to verify. The validator refuses `"verified"` unless `checkedBy` and `checkedOn` are filled in.
+
+**School (`content/scenes/school.json`), the right to education:**
+
+1. `card.law` quotes Article 21A of the Constitution. Claude compared this with the Ministry of Education page (https://www.education.gov.in/en/fundamental_rights_article-21A), and it matches. Confirm it once more.
+2. `card.law` also quotes RTE Act section 14(2): "No child shall be denied admission in a school for lack of age proof." Claude found this wording only in secondary sources. Check it against the Act on India Code (https://www.indiacode.nic.in, search "Right of Children to Free and Compulsory Education Act").
+3. In the same Act, confirm: ages 6 to 14 (section 3); "elementary education" means Classes 1 to 8 (section 2(f)); no fee may stop a child finishing elementary education (section 3(2)); private unaided schools keep at least 25% of entry-class seats for weaker and disadvantaged groups (section 12(1)(c)).
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Meena Didi's lines (`didi-good-2`) and the six quiz questions. Each must agree with points 1 to 3. Change any wording **in the JSON only**: the app shows it exactly as written.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn` (YYYY-MM-DD).

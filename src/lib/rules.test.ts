@@ -192,6 +192,7 @@ describe('FR-05 card text by age band', () => {
     ifItHappens: 'Tell',
     law: 'Law',
     source: 'Src',
+    review: { status: 'unverified', checkedBy: null, checkedOn: null, note: 'n' },
   }
 
   it('young players see kid text with teen text behind "Tell me more"', () => {

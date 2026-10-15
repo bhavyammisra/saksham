@@ -45,6 +45,7 @@ function validScene(): SceneDef {
       ifItHappens: 'Tell an adult.',
       law: 'Law text',
       source: 'Source',
+      review: { status: 'unverified', checkedBy: null, checkedOn: null, note: 'Check the law text.' },
     },
     games: [
       {
@@ -159,6 +160,22 @@ describe('NFR-07 content validation: scenes', () => {
 
   it('rejects an incomplete card', () => {
     expect(validateScene(broken((s) => (s.card.law = '')))).toContain('card.law must be non-empty text')
+  })
+
+  it('requires a fact-check record on every card', () => {
+    expect(validateScene(broken((s) => delete (s.card as Partial<SceneDef['card']>).review))).toContain(
+      'card.review is missing (add { status: "unverified", ... } for the owner to fact-check)',
+    )
+  })
+
+  it('rejects a card marked verified without who checked it and when', () => {
+    const errors = validateScene(broken((s) => (s.card.review.status = 'verified')))
+    expect(errors).toContain('card.review is "verified" but has no "checkedBy" and "checkedOn"')
+  })
+
+  it('accepts a verified card with a name and date', () => {
+    const scene = broken((s) => (s.card.review = { status: 'verified', checkedBy: 'Owner', checkedOn: '2026-10-20', note: 'Checked.' }))
+    expect(validateScene(scene)).toEqual([])
   })
 
   it('rejects a quiz answer outside the options', () => {

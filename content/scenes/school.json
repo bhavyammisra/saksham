@@ -1,0 +1,290 @@
+{
+  "id": "school",
+  "title": "The School",
+  "right": "The right to education",
+  "tagline": "Help Lata find her way into school.",
+  "tone": "normal",
+  "width": 3600,
+  "layers": [
+    { "id": "sky", "art": "school.sky", "speed": 0.05 },
+    { "id": "far", "art": "school.far", "speed": 0.15 },
+    { "id": "town", "art": "school.town", "speed": 0.4 },
+    { "id": "trees", "art": "school.trees", "speed": 0.65 },
+    { "id": "school", "art": "school.building", "speed": 1 },
+    { "id": "light", "art": "school.light", "speed": 0, "front": true },
+    { "id": "foreground", "art": "school.foreground", "speed": 1.35 }
+  ],
+  "walkable": { "minX": 150, "maxX": 3450 },
+  "spawn": { "x": 420 },
+  "ambience": "school",
+  "hotspots": [
+    { "id": "lata", "x": 790, "label": "Talk to the girl at the gate", "kind": "npc", "npc": "lata", "node": "lata-hello", "hideIf": ["met-lata"] },
+    { "id": "lata-again", "x": 790, "label": "Talk to Lata", "kind": "npc", "npc": "lata", "node": "lata-again", "showIf": ["met-lata"] },
+    { "id": "ravi", "x": 1450, "label": "Talk to Ravi", "kind": "npc", "npc": "ravi", "node": "ravi-hello" },
+    { "id": "notice", "x": 1900, "label": "Read the notice board", "kind": "object", "art": "school.notice", "node": "notice" },
+    { "id": "didi-busy", "x": 2400, "label": "Talk to Meena Didi", "kind": "npc", "npc": "meena-didi", "node": "didi-busy", "hideIf": ["met-lata"] },
+    { "id": "didi", "x": 2400, "label": "Ask Meena Didi for help", "kind": "npc", "npc": "meena-didi", "node": "didi-hello", "showIf": ["met-lata"] },
+    { "id": "exit", "x": 3350, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" }
+  ],
+  "objectives": [
+    { "id": "hear-ravi", "text": "Find out what is worrying Ravi", "requires": ["heard-about-lata"] },
+    { "id": "meet-lata", "text": "Talk to Lata at the school gate", "requires": ["met-lata"] },
+    { "id": "read-notice", "text": "Read the notice board", "requires": ["read-notice"] },
+    { "id": "ask-didi", "text": "Ask Meena Didi how to help Lata", "requires": ["asked-didi"] }
+  ],
+  "startNode": "ravi-hello",
+  "nodes": {
+    "ravi-hello": {
+      "id": "ravi-hello",
+      "speaker": "ravi",
+      "mood": "worried",
+      "text": "Hi! See that girl by the gate? That's Lata. Her family moved in next to ours last month.",
+      "next": "ravi-2"
+    },
+    "ravi-2": {
+      "id": "ravi-2",
+      "speaker": "ravi",
+      "mood": "worried",
+      "text": "She comes here every morning and watches us go in. But she never comes inside.",
+      "set": ["heard-about-lata"],
+      "next": "player-ravi"
+    },
+    "player-ravi": {
+      "id": "player-ravi",
+      "speaker": "player",
+      "text": "Maybe I can say hello to her.",
+      "next": "ravi-3"
+    },
+    "ravi-3": {
+      "id": "ravi-3",
+      "speaker": "ravi",
+      "mood": "happy",
+      "text": "Good idea. She's shy, but she's really nice. She can do sums in her head faster than me!",
+      "end": "good"
+    },
+
+    "lata-hello": {
+      "id": "lata-hello",
+      "speaker": "lata",
+      "mood": "neutral",
+      "text": "Oh! Hello. I'm Lata. I like watching the morning assembly.",
+      "next": "player-lata"
+    },
+    "player-lata": {
+      "id": "player-lata",
+      "speaker": "player",
+      "text": "Why don't you come in with us?",
+      "next": "lata-2"
+    },
+    "lata-2": {
+      "id": "lata-2",
+      "speaker": "lata",
+      "mood": "sad",
+      "text": "Amma says school costs money we don't have. And a man in our old town said they won't take me without a birth certificate.",
+      "next": "lata-3"
+    },
+    "lata-3": {
+      "id": "lata-3",
+      "speaker": "lata",
+      "mood": "sad",
+      "text": "I never had one. So I just watch from here.",
+      "set": ["met-lata"],
+      "next": "mitthu-lata"
+    },
+    "mitthu-lata": {
+      "id": "mitthu-lata",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Hmm. Is that really true? Let's look at the notice board, and then ask someone who knows.",
+      "end": "good"
+    },
+    "lata-again": {
+      "id": "lata-again",
+      "speaker": "lata",
+      "mood": "neutral",
+      "text": "I'll wait here. Thank you for asking about me.",
+      "end": "good"
+    },
+
+    "notice": {
+      "id": "notice",
+      "speaker": "mitthu",
+      "mood": "surprised",
+      "text": "The notice says: \"Admissions open for children aged 6 to 14. Come to the school office. Meena Didi will help you.\"",
+      "set": ["read-notice"],
+      "fx": "gasp",
+      "next": "notice-2"
+    },
+    "notice-2": {
+      "id": "notice-2",
+      "speaker": "player",
+      "text": "Lata is 9. Meena Didi might know what to do.",
+      "end": "good"
+    },
+
+    "didi-busy": {
+      "id": "didi-busy",
+      "speaker": "meena-didi",
+      "mood": "happy",
+      "text": "Good morning! I'm getting the classroom ready. Have you met everyone yet? Ravi looks like he wants to tell you something.",
+      "end": "good"
+    },
+    "didi-hello": {
+      "id": "didi-hello",
+      "speaker": "meena-didi",
+      "mood": "happy",
+      "text": "Good morning! You look like you have something to tell me.",
+      "choices": [
+        { "label": "Never mind. It's not my business.", "to": "didi-weak-1", "kind": "weak" },
+        { "label": "There's a girl at the gate. Maybe she can come next year?", "to": "didi-weak-2", "kind": "weak" },
+        {
+          "label": "Lata, at the gate, wants to study here. Her family thinks school costs money and she has no birth certificate. Can you help?",
+          "to": "didi-good",
+          "kind": "good"
+        }
+      ]
+    },
+    "didi-weak-1": {
+      "id": "didi-weak-1",
+      "speaker": "meena-didi",
+      "mood": "neutral",
+      "text": "All right. If you ever want to talk, my door is open.",
+      "next": "mitthu-retry-1"
+    },
+    "mitthu-retry-1": {
+      "id": "mitthu-retry-1",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "Lata is still waiting by the gate. Telling a teacher is how we help. Let's try that again.",
+      "end": "retry"
+    },
+    "didi-weak-2": {
+      "id": "didi-weak-2",
+      "speaker": "meena-didi",
+      "mood": "worried",
+      "text": "Next year? Every month away from class is a month of lessons missed. What is stopping her?",
+      "next": "mitthu-retry-2"
+    },
+    "mitthu-retry-2": {
+      "id": "mitthu-retry-2",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Meena Didi needs to know what the problem is. Tell her what Lata told you. Let's try that again.",
+      "end": "retry"
+    },
+    "didi-good": {
+      "id": "didi-good",
+      "speaker": "meena-didi",
+      "mood": "happy",
+      "text": "Thank you for telling me. You did exactly the right thing.",
+      "set": ["asked-didi"],
+      "next": "didi-good-2"
+    },
+    "didi-good-2": {
+      "id": "didi-good-2",
+      "speaker": "meena-didi",
+      "mood": "neutral",
+      "text": "Every child from 6 to 14 has the right to study, free, in a government school like ours. And no child can be turned away because they have no birth certificate.",
+      "next": "didi-good-3"
+    },
+    "didi-good-3": {
+      "id": "didi-good-3",
+      "speaker": "meena-didi",
+      "mood": "happy",
+      "text": "I'll walk over with the admission form and talk to her Amma today. Will you come and introduce me?",
+      "next": "player-good"
+    },
+    "player-good": {
+      "id": "player-good",
+      "speaker": "player",
+      "text": "Yes! I'll show you where she is.",
+      "next": "mitthu-good"
+    },
+    "mitthu-good": {
+      "id": "mitthu-good",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Tomorrow Lata walks through the gate with a new notebook. You helped her get there!",
+      "fx": "cheer",
+      "end": "good"
+    }
+  },
+  "card": {
+    "id": "right-to-education",
+    "title": "The right to go to school",
+    "kid": "Every child from 6 to 14 years old has the right to go to school for free. A school cannot send a child away just because they have no birth certificate.",
+    "teen": "In India, every child aged 6 to 14 has the right to free and compulsory education in a neighbourhood school, until they finish elementary education (Classes 1 to 8). A child does not have to pay fees for this. A school cannot refuse admission because a child has no proof of age, such as a birth certificate. Private schools must keep at least 25% of their entry-class seats for children from weaker and disadvantaged groups.",
+    "ifItHappens": "If a child you know is not going to school, tell a teacher, the head teacher or a trusted adult. They can help with admission. You can also call 1098 to ask for help.",
+    "law": "Article 21A, Constitution of India: \"The State shall provide free and compulsory education to all children of the age of six to fourteen years in such manner as the State may, by law, determine.\"\n\nSection 14(2), Right of Children to Free and Compulsory Education Act, 2009: \"No child shall be denied admission in a school for lack of age proof.\"",
+    "source": "Constitution of India, Article 21A (added by the Constitution (Eighty-sixth Amendment) Act, 2002). The Right of Children to Free and Compulsory Education Act, 2009, sections 2(f), 3, 12(1)(c) and 14(2).",
+    "review": {
+      "status": "unverified",
+      "checkedBy": null,
+      "checkedOn": null,
+      "note": "Written by Claude, 2026-10-15. Article 21A's wording was compared with the Ministry of Education page (https://www.education.gov.in/en/fundamental_rights_article-21A) and matches. Everything else was written from memory and checked only against secondary sources. Check every item in \"checks\" against India Code (https://www.indiacode.nic.in) and the Constitution of India published by the Legislative Department (https://legislative.gov.in). Fix any wording that differs, then set status to \"verified\" with your name and the date (see docs/SETUP.md §6).",
+      "checks": [
+        "card.law: the exact wording of Article 21A, quoted.",
+        "card.law: the exact wording of RTE Act section 14(2), quoted.",
+        "card.source: Article 21A was added by the 86th Amendment Act, 2002.",
+        "card.kid, card.teen, quiz: the right covers ages 6 to 14 (RTE Act section 3).",
+        "card.teen, quiz: elementary education means Classes 1 to 8 (RTE Act section 2(f)).",
+        "card.teen, quiz: no fee or charge may stop a child from finishing elementary education (RTE Act section 3(2)).",
+        "card.teen, quiz: private unaided schools keep at least 25% of entry-class seats for weaker and disadvantaged groups (RTE Act section 12(1)(c)).",
+        "Scene (Meena Didi) and quiz: a government school is free for this age group.",
+        "card.ifItHappens: 1098 is the right number to suggest (same check as the Help Centre, SETUP.md §5)."
+      ]
+    }
+  },
+  "games": [
+    {
+      "kind": "quiz",
+      "id": "school-quiz",
+      "questions": [
+        {
+          "id": "age",
+          "text": "Lata is 9 years old. Does she have the right to go to school?",
+          "options": ["Yes. Every child from 6 to 14 has this right.", "Only if her family can pay fees.", "Only if she was born in this town."],
+          "answer": 0,
+          "explanation": "Every child aged 6 to 14 has the right to free education. Money and where you were born do not change that."
+        },
+        {
+          "id": "age-proof",
+          "text": "A school says: \"No birth certificate, no admission.\" What is true?",
+          "options": ["The child must stay at home.", "A child cannot be turned away just because they have no proof of age.", "The child must wait until they are 14."],
+          "answer": 1,
+          "explanation": "The law says no child can be denied admission for lack of age proof. The school must still let them in."
+        },
+        {
+          "id": "who-to-tell",
+          "text": "A friend has stopped coming to school. What is a good thing to do?",
+          "options": ["Say nothing. It is not your business.", "Tell a teacher or another trusted adult.", "Tell everyone in class about it."],
+          "answer": 1,
+          "explanation": "A teacher or trusted adult can find out what is wrong and help. Telling them is how you help your friend."
+        },
+        {
+          "id": "fees",
+          "text": "Can a government school charge fees for a child in Class 4?",
+          "options": ["Yes, every school charges fees.", "No. Education up to Class 8 is free for children aged 6 to 14.", "Only for girls."],
+          "answer": 1,
+          "explanation": "Children aged 6 to 14 have the right to free education until they finish Class 8."
+        },
+        {
+          "id": "elementary",
+          "text": "The right to free and compulsory education lasts until a child finishes which class?",
+          "options": ["Class 5", "Class 8", "Class 12"],
+          "answer": 1,
+          "explanation": "The law covers elementary education, which means Classes 1 to 8.",
+          "band": "teen"
+        },
+        {
+          "id": "private-seats",
+          "text": "What must private schools do for children from weaker and disadvantaged groups?",
+          "options": ["Nothing.", "Keep at least 25% of their entry-class seats for them.", "Keep all of their seats for them."],
+          "answer": 1,
+          "explanation": "Private unaided schools must keep at least 25% of the seats in their entry class for children from weaker and disadvantaged groups.",
+          "band": "teen"
+        }
+      ]
+    }
+  ]
+}

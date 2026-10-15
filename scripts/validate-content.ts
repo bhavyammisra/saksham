@@ -175,7 +175,10 @@ export function validateScene(raw: unknown): string[] {
 
   // Card
   if (!isObject(scene.card)) fail('"card" is missing')
-  else for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
+  else {
+    for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
+    validateReview(scene.card.review).forEach((p) => fail(`card.review ${p}`))
+  }
 
   // Games
   if (!Array.isArray(scene.games) || scene.games.length === 0) {
@@ -277,6 +280,22 @@ export function isOfficialSource(url: string): boolean {
   }
 }
 
+/**
+ * A fact-check record (legal and safety content). "verified" needs who checked it and when,
+ * so a card can never be marked checked by accident.
+ */
+export function validateReview(raw: unknown): string[] {
+  if (!isObject(raw)) return ['is missing (add { status: "unverified", ... } for the owner to fact-check)']
+  const errors: string[] = []
+  if (raw.status !== 'unverified' && raw.status !== 'verified') errors.push('status must be "unverified" or "verified"')
+  if (!isText(raw.note)) errors.push('needs a "note"')
+  if (raw.checks !== undefined && !isStringList(raw.checks)) errors.push('checks must be a list of text')
+  if (raw.status === 'verified' && (!isText(raw.checkedBy) || !isText(raw.checkedOn))) {
+    errors.push('is "verified" but has no "checkedBy" and "checkedOn"')
+  }
+  return errors
+}
+
 /** Every helpline needs a dialable number and at least one official source page. */
 export function validateHelp(raw: unknown): string[] {
   if (!isObject(raw)) return ['help content is not a JSON object']
@@ -310,6 +329,7 @@ export function validateHelp(raw: unknown): string[] {
       }
     })
   }
+  validateReview(help.review).forEach((p) => errors.push(`review ${p}`))
   for (const section of ['trustedAdult', 'rights'] as const) {
     const value = help[section]
     const list = section === 'trustedAdult' ? 'steps' : 'items'

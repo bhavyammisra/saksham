@@ -53,7 +53,7 @@ const scene: SceneDef = {
     good: { id: 'good', speaker: 'ravi', text: 'Yay', end: 'good' },
     note: { id: 'note', speaker: 'mitthu', text: 'A note', end: 'good' },
   },
-  card: { id: 'c', title: 'T', kid: 'k', teen: 't', ifItHappens: 'i', law: 'l', source: 's' },
+  card: { id: 'c', title: 'T', kid: 'k', teen: 't', ifItHappens: 'i', law: 'l', source: 's', review: { status: 'unverified', checkedBy: null, checkedOn: null, note: 'n' } },
   games: [],
 }
 
