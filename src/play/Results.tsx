@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import type { Tone } from '@content/types'
 import { Portrait } from '@/character/Portrait'
+import type { Celebration } from '@/components/ReturnCelebration'
 import type { CharacterSpec } from '@/character/spec'
 import { Button } from '@/components/Button'
 import { t, type StringKey } from '@/lib/i18n'
@@ -34,6 +35,7 @@ const STAR_REASONS: StringKey[] = ['results.starFinish', 'results.starQuiz', 're
  */
 export function Results({
   from,
+  celebration,
   name,
   avatar,
   summary,
@@ -41,6 +43,7 @@ export function Results({
   onAgain,
 }: {
   from: string // the building just played: the town puts the player back outside its door
+  celebration: Celebration | null // what the town celebrates when the player walks back out
   name: string
   avatar: CharacterSpec
   summary: Summary
@@ -106,7 +109,7 @@ export function Results({
       )}
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link to="/town" state={{ from }} className="inline-flex min-h-tap items-center rounded-button bg-terracotta px-5 font-semibold text-white hover:bg-terracotta-deep">
+        <Link to="/town" state={{ from, celebration }} className="inline-flex min-h-tap items-center rounded-button bg-terracotta px-5 font-semibold text-white hover:bg-terracotta-deep">
           {t('play.backToTown')}
         </Link>
         <Button look="secondary" onClick={onAgain}>

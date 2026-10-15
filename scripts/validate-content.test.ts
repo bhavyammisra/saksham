@@ -188,6 +188,16 @@ describe('NFR-07 content validation: scenes', () => {
     expect(validateScene(broken((s) => (s.hub = true)))).toContain('a hub has no "card" or "games"')
   })
 
+  it('accepts showIf flags that the host sets (hostFlags), and rejects unknown ones', () => {
+    const scene = broken((s) => {
+      s.hostFlags = ['done:park']
+      s.hotspots[0].showIf = ['done:park']
+    })
+    expect(validateScene(scene)).toEqual([])
+    const bad = broken((s) => (s.hotspots[0].showIf = ['done:park']))
+    expect(validateScene(bad).some((e) => e.includes('uses flag "done:park" that no node sets'))).toBe(true)
+  })
+
   it("checks an exit's lockedNode", () => {
     const errors = validateScene(
       broken((s) => {

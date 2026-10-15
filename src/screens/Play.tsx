@@ -8,6 +8,7 @@ import { buildings, getScene, nextBuilding } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { CardReveal } from '@/play/CardReveal'
 import { Quiz } from '@/play/Quiz'
+import type { Celebration } from '@/components/ReturnCelebration'
 import { Results, type Summary } from '@/play/Results'
 
 type Stage = 'scene' | 'card' | 'quiz' | 'results'
@@ -31,6 +32,7 @@ export function Play() {
   const [run, setRun] = useState(0) // bumping this restarts the scene ("Play again")
   const [retries, setRetries] = useState(0)
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [celebration, setCelebration] = useState<Celebration | null>(null)
 
   const onComplete = useCallback((result: SceneResult) => {
     setRetries(result.retries)
@@ -66,13 +68,20 @@ export function Play() {
     newBadges.forEach((b) => store.addExtra('badges', b))
 
     const nowOpen = next !== null && isUnlocked(next, buildings, after?.progress ?? {}, store.demo)
-    setSummary({ stars: starsFor(result), score, retries, newBadges, unlocked: !wasOpen && nowOpen })
+    const stars = starsFor(result)
+    const name = (buildingId: string | null) => buildings.find((b) => b.id === buildingId)?.name ?? null
+    // Only announce a place as open if its story exists, so the door really opens.
+    const opened = !wasOpen && nowOpen && next !== null && getScene(next) !== null ? name(next) : null
+    setSummary({ stars, score, retries, newBadges, unlocked: opened !== null })
+    // What the town celebrates when the player walks back out (shown once).
+    setCelebration({ place: name(id) ?? scene.title, stars, opened, tone: scene.tone })
     setStage('results')
   }
 
   const again = () => {
     setStage('scene')
     setSummary(null)
+    setCelebration(null)
     setRetries(0)
     setRun((n) => n + 1)
   }
@@ -83,7 +92,7 @@ export function Play() {
       {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
       {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games?.[0]?.questions ?? [], profile.band)} onDone={finish} />}
       {stage === 'results' && summary && (
-        <Results from={id} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
+        <Results from={id} celebration={celebration} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
       )}
     </Page>
   )

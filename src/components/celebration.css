@@ -1,0 +1,49 @@
+/* Return celebration in the town (ReturnCelebration.tsx). Calm mode: nothing moves or falls. */
+
+.celebration-card {
+  animation: celebration-pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+@keyframes celebration-pop {
+  from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Confetti falls once, then is gone. */
+.celebration-confetti {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: celebration-fall 2.6s ease-in 1 both;
+}
+@keyframes celebration-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(110vh) rotate(540deg); }
+}
+
+/* Gentle scenes: a few soft sparkles that rise and fade. */
+.celebration-sparkle {
+  position: absolute;
+  bottom: 10%;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  opacity: 0;
+  box-shadow: 0 0 10px 4px rgb(255 243 207 / 0.7);
+  animation: celebration-rise 3.2s ease-out 1 both;
+}
+@keyframes celebration-rise {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-50vh); }
+}
+
+html[data-calm] .celebration-confetti,
+html[data-calm] .celebration-sparkle {
+  display: none;
+}
+html[data-calm] .celebration-card {
+  animation: none;
+}

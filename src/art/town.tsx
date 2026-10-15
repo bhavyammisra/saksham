@@ -272,8 +272,40 @@ function HelpKiosk({ x }: { x: number }) {
 
 // ---------------------------------------------------------------- the street layer (stage, speed 1)
 
-const Street: LayerArt = ({ width }) => {
+// ---------------------------------------------------------------- celebrating finished places
+
+/** Door heights in this file, for hanging a garland over each door. */
+const DOOR_TOPS: Record<string, number> = { school: BASE - 450, dhaba: BASE - 360, home: BASE - 300, panchayat: BASE - 450 }
+
+/** A marigold toran over the door and three paper lanterns: this place has been helped. */
+function Festive({ x, top }: { x: number; top: number }) {
+  const lanterns = [x - 170, x, x + 170]
+  return (
+    <g>
+      {Array.from({ length: 13 }, (_, j) => {
+        const t = j / 12
+        const gx = x - 120 + t * 240
+        const gy = top - 10 + Math.sin(t * Math.PI) * 34
+        return <circle key={j} cx={gx} cy={gy} r="11" fill={j % 3 === 0 ? '#c9501a' : '#f0a12a'} {...ink(1.5)} />
+      })}
+      {lanterns.map((lx, i) => (
+        <g key={lx}>
+          <path d={`M${lx} ${top - 120} L${lx} ${top - 80}`} {...ink(2)} />
+          <ellipse cx={lx} cy={top - 52} rx="24" ry="30" fill={['#e8962d', '#c9501a', '#e8962d'][i]} {...ink(2)} />
+          <ellipse cx={lx - 6} cy={top - 58} rx="8" ry="14" fill="#ffe0a0" opacity="0.7" />
+          <ellipse cx={lx} cy={top - 52} rx="60" ry="60" fill="#ffd27a" opacity="0.14" />
+        </g>
+      ))}
+    </g>
+  )
+}
+
+const Street: LayerArt = ({ width, flags }) => {
   const r = seeded(808)
+  // Which buildings are finished (the Town screen sets "done:<id>" from saved progress).
+  const done = Object.keys(DOOR_TOPS).filter((id) => flags?.has(`done:${id}`))
+  // The street gets more festive as more places are helped: more strings of bunting.
+  const buntingEvery = done.length >= 3 ? 1 : done.length >= 1 ? 2 : 3
   return (
     <svg {...svgProps(width)}>
       {/* Road and pavement. */}
@@ -301,9 +333,10 @@ const Street: LayerArt = ({ width }) => {
         <Lamp key={x} x={x} />
       ))}
 
-      {/* Bunting strung across the street, high up. */}
+      {/* Bunting strung across the street, high up: sparse at first, fuller as places are helped. */}
       {Array.from({ length: Math.ceil(width / 600) }, (_, k) => {
         const x0 = k * 600 + 80
+        if (k % buntingEvery !== 0) return null
         return (
           <g key={k}>
             <path d={`M${x0} 120 Q${x0 + 260} 210 ${x0 + 520} 120`} fill="none" stroke={INK} strokeWidth="2" />
@@ -317,6 +350,10 @@ const Street: LayerArt = ({ width }) => {
           </g>
         )
       })}
+
+      {done.map((id) => (
+        <Festive key={id} x={PLACES[id as keyof typeof PLACES]} top={DOOR_TOPS[id]!} />
+      ))}
 
       {/* Long evening shadows cast to the left. */}
       <g fill="#4a2f52" opacity="0.18">

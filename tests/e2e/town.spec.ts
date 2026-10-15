@@ -19,8 +19,9 @@ test.beforeEach(async ({ page }) => {
   await talkThrough(page)
 })
 
-test('FR-07 the School door is open and leads into the School', async ({ page }) => {
+test('FR-07 the School door is open and leads into the School, and Mitthu suggests it', async ({ page }) => {
   await expect(door(page, 'school')).not.toContainText(strings['scene.locked'])
+  await expect(door(page, 'school')).toContainText(strings['scene.suggested'])
   await door(page, 'school').click()
   await expect(page).toHaveURL(/#\/play\/school$/)
 })

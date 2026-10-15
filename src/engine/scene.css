@@ -14,6 +14,15 @@
   50% { translate: 0 -4px; }
 }
 
+/* Mitthu points the way: a gentle bob above the suggested place (still in calm mode). */
+.scene .scene-guide {
+  animation: scene-guide-bob 1.8s ease-in-out infinite;
+}
+@keyframes scene-guide-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -10px; }
+}
+
 /* Objects without art: a soft glow on the ground. */
 .scene .scene-sparkle {
   background: radial-gradient(circle, rgb(246 215 154 / 0.95), rgb(246 215 154 / 0));

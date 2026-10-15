@@ -54,12 +54,16 @@ export type SceneAction =
   | { type: 'choose'; index: number }
   | { type: 'activity' }
 
-/** `startX` puts the player somewhere other than the scene's spawn point (e.g. back outside a door). */
-export function initialSceneState(scene: SceneDef, startX?: number): SceneState {
+/**
+ * `startX` puts the player somewhere other than the scene's spawn point (e.g. back outside a door).
+ * `startFlags` are flags the host sets before anything happens (e.g. "done:school" from saved progress).
+ * `skipIntro` leaves out the arrival line (e.g. coming back to the town, not arriving for the first time).
+ */
+export function initialSceneState(scene: SceneDef, startX?: number, startFlags: readonly string[] = [], skipIntro = false): SceneState {
   const x = startX !== undefined ? Math.min(scene.walkable.maxX, Math.max(scene.walkable.minX, startX)) : scene.spawn.x
-  const story: StoryState = { flags: new Set(), retries: 0, reachedGood: false }
+  const story: StoryState = { flags: new Set(startFlags), retries: 0, reachedGood: false }
   // Arriving: Mitthu introduces the place in one line, if the scene has an intro.
-  const arrival = scene.intro ? startDialogue(scene, scene.intro, story) : { dialogue: null, story }
+  const arrival = scene.intro && !skipIntro ? startDialogue(scene, scene.intro, story) : { dialogue: null, story }
   return {
     x,
     facing: 'right',

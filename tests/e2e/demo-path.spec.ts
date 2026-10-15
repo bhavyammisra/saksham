@@ -52,7 +52,6 @@ test('Demo path: profile, character, School, card flip, quiz, results, Help Cent
   await expect(page.getByRole('heading', { name: strings['results.title'].replace('{name}', 'Asha') })).toBeVisible()
   await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
   await expect(page.getByText(strings['badge.quizWhiz'])).toBeVisible()
-  await expect(page.getByText(strings['results.unlocked'])).toBeVisible()
 
   // 8. Back in the town, the progress shows and survives a reload.
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()

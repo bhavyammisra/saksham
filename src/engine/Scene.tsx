@@ -36,11 +36,17 @@ interface Props {
   locked?: ReadonlySet<string>
   /** Where the player starts, instead of the scene's spawn point. */
   startX?: number
+  /** Flags set from the start, from saved progress (must be listed in the scene's hostFlags). */
+  startFlags?: readonly string[]
+  /** Leave out the scene's arrival line (e.g. walking back out of a building into the town). */
+  skipIntro?: boolean
+  /** Mitthu points at this hotspot, and uses this text for his idle hint when there are no objectives. */
+  guide?: { hotspotId: string; text: string }
 }
 
 const NOTHING_LOCKED: ReadonlySet<string> = new Set()
 
-export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, startX }: Props) {
+export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, startX, startFlags, skipIntro, guide }: Props) {
   const profile = useStore(selectActiveProfile)
   const narration = useStore((s) => s.settings.narration)
   const player = { name: profile?.firstName ?? t('scene.you'), spec: profile?.avatar ?? defaultSpec }
@@ -53,7 +59,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
   const viewWidth = scale > 0 ? size.width / scale : 1000
 
   const reducer = useMemo(() => sceneReducer(scene, locked), [scene, locked])
-  const [state, dispatch] = useReducer(reducer, scene, (s) => initialSceneState(s, startX))
+  const [state, dispatch] = useReducer(reducer, scene, (s) => initialSceneState(s, startX, startFlags, skipIntro))
 
   // ---------------------------------------------------------------- input and the frame loop
   const keys = useRef({ left: false, right: false, pad: 0 as -1 | 0 | 1 })
@@ -132,6 +138,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
   const node = state.dialogue ? scene.nodes[state.dialogue.nodeId] : undefined
   const near = state.dialogue ? null : nearbyHotspot(scene, state.x, flags)
   const objective = nextObjective(scene, flags)
+  const guided = guide ? hotspots.find((h) => h.id === guide.hotspotId) : undefined
   const px = (units: number) => units * scale
   const onGround = px(SCENE_HEIGHT - GROUND_Y)
 
@@ -143,7 +150,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
     dispatch({ type: 'walkTo', x: state.camera + (event.clientX - rect.left) / scale })
   }
 
-  const layerProps = { camera: state.camera, scale, viewWidth, sceneWidth: scene.width, calm }
+  const layerProps = { camera: state.camera, scale, viewWidth, sceneWidth: scene.width, calm, flags }
   const shake = state.shake > 0 ? `translateX(${Math.sin(state.shake * 60) * 4}px)` : undefined
 
   return (
@@ -203,6 +210,21 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
               </div>
             )}
 
+            {guided && scale > 0 && (
+              <div
+                aria-hidden="true"
+                className="scene-guide pointer-events-none absolute z-10 flex flex-col items-center"
+                style={{ left: px(guided.x), bottom: onGround + px(guided.kind === 'exit' ? 640 : hotspotHeight(guided) + 70), transform: 'translateX(-50%)' }}
+              >
+                <span className="block size-12 rounded-full bg-plaster/90 p-1 shadow-lifted">
+                  <Mitthu view="portrait" className="size-full" />
+                </span>
+                <svg viewBox="0 0 24 16" className="mt-1 h-4 w-6">
+                  <path d="M2 2 L12 13 L22 2" fill="none" stroke="#e8a33d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            )}
+
             {near && scale > 0 && (
               <button
                 type="button"
@@ -228,9 +250,9 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
 
         {/* Mitthu's hint after 20 quiet seconds. */}
         <div aria-live="polite" className="pointer-events-none absolute inset-x-0 top-3 z-20 flex justify-center px-3">
-          {state.hint && objective && !state.dialogue && (
+          {state.hint && (objective || guide) && !state.dialogue && (
             <p className="max-w-md rounded-card bg-plaster/95 px-4 py-2 text-center font-semibold shadow-lifted">
-              {t('mitthu.hint', { objective: objective.text })}
+              {objective ? t('mitthu.hint', { objective: objective.text }) : guide?.text}
             </p>
           )}
         </div>
@@ -298,6 +320,9 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
                   {locked.has(h.id) && <LockIcon />}
                   {h.label}
                   {locked.has(h.id) && <span className="sr-only"> ({t('scene.locked')})</span>}
+                  {guided?.id === h.id && (
+                    <span className="rounded-pill bg-marigold px-2 text-sm text-ink">{t('scene.suggested')}</span>
+                  )}
                 </button>
               </li>
             ))}
@@ -328,11 +353,11 @@ function hotspotHeight(h: Hotspot): number {
   return (h.art && propArt[h.art]?.height) || 120
 }
 
-const ArtFrame = memo(function ArtFrame({ Art, width }: { Art: LayerArt; width: number }) {
-  return <Art width={width} />
+const ArtFrame = memo(function ArtFrame({ Art, width, flags }: { Art: LayerArt; width: number; flags: ReadonlySet<string> }) {
+  return <Art width={width} flags={flags} />
 })
 
-function LayerView(props: { layer: Layer; camera: number; scale: number; viewWidth: number; sceneWidth: number; calm: boolean }) {
+function LayerView(props: { layer: Layer; camera: number; scale: number; viewWidth: number; sceneWidth: number; calm: boolean; flags: ReadonlySet<string> }) {
   const { layer, camera, scale, viewWidth, sceneWidth, calm } = props
   const Art = layerArt[layer.art]
   if (!Art) {
@@ -347,7 +372,7 @@ function LayerView(props: { layer: Layer; camera: number; scale: number; viewWid
       className="pointer-events-none absolute inset-y-0 left-0"
       style={{ width: width * scale, transform: `translate3d(${-layerOffset(camera, layer.speed, calm) * scale}px,0,0)` }}
     >
-      <ArtFrame Art={Art} width={width} />
+      <ArtFrame Art={Art} width={width} flags={props.flags} />
     </div>
   )
 }

@@ -5,8 +5,9 @@ import type { ComponentType } from 'react'
 export const SCENE_HEIGHT = 1000
 export const GROUND_Y = 900
 
-/** A parallax layer. It must fill `width` x SCENE_HEIGHT (width depends on the screen). */
-export type LayerArt = ComponentType<{ width: number }>
+/** A parallax layer. It must fill `width` x SCENE_HEIGHT. `flags` are the scene's current
+ * story flags (including any the host set), so art can change, e.g. lanterns once a building is done. */
+export type LayerArt = ComponentType<{ width: number; flags?: ReadonlySet<string> }>
 
 /** An object hotspot's picture: drawn in a `width` x `height` box standing on the ground. */
 export interface PropArt {

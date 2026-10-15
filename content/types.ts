@@ -24,6 +24,8 @@ export interface SceneDef {
   startNode: string
   intro?: string // node opened when the player arrives (Mitthu introduces the place)
   nodes: Record<string, StoryNode>
+  /** Flags the hosting screen may set from saved progress (e.g. "done:school"), for showIf/hideIf and art. */
+  hostFlags?: string[]
   /** A hub (the town) links to other places: it has no card or games and never "completes". */
   hub?: boolean
   card?: Card // required for every scene that is not a hub (checked by the validator)

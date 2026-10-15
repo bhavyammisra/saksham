@@ -1,7 +1,7 @@
 // Playing the School building end to end at /play/school: story, rights card, quiz, results.
 import { expect, test } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, createPlayer, playStory, strings } from './helpers.ts'
+import { answerQuiz, createPlayer, playStory, strings, thingsToDo } from './helpers.ts'
 
 // These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
 test.describe.configure({ timeout: 60_000 })
@@ -29,18 +29,26 @@ test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results th
   await answerQuiz(page, [true, true, true, false])
   await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
   await expect(page.getByText(strings['badge.firstSteps'])).toBeVisible()
-  await expect(page.getByText(strings['results.unlocked'])).toBeVisible()
+  // The Dhaba is unlocked by the rules, but its story isn't written yet, so nothing claims it is open.
+  await expect(page.getByText(strings['results.unlocked'])).toHaveCount(0)
 
-  // Back in the town: School shows its stars, the Dhaba is now open, Home is still locked.
+  // Back in the town: Mitthu celebrates once; School shows its stars, the Dhaba is now open, Home is still locked.
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()
   await expect(page).toHaveURL(/#\/town$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['town.title'])
+  const celebration = page.getByRole('status').filter({ hasText: strings['town.welcomeBack'].replace('{name}', 'Asha') })
+  await expect(celebration).toContainText(strings['town.earned'].replace('{n}', '2').replace('{place}', 'The School'))
+  await page.getByRole('button', { name: strings['town.celebrateClose'] }).click()
+  await expect(celebration).toHaveCount(0)
+  // Lata now stands outside the School, and the town has changed.
+  await expect(thingsToDo(page).getByRole('button', { name: 'Talk to Lata' })).toBeVisible()
   await expect(page.getByText(strings['town.stars'].replace('{n}', '2'))).toBeAttached()
   await expect(page.getByText(strings['town.beingBuilt'])).toBeVisible()
   await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))).toBeVisible()
 
   await page.reload()
   await expect(page.getByRole('link', { name: strings['town.playAgain'].replace('{name}', 'The School') })).toBeVisible()
+  await expect(page.getByRole('button', { name: strings['town.celebrateClose'] })).toHaveCount(0) // only once
   const saved = await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('saksham') ?? '{}').state
     return s.data[s.activeProfileId]

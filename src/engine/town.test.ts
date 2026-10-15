@@ -6,7 +6,7 @@ import buildingsJson from '@content/buildings.json'
 import townJson from '@content/scenes/town.json'
 import type { SceneDef } from '@content/types'
 import { initialSceneState, sceneReducer, type SceneState } from './sceneState'
-import { isSceneComplete } from './story'
+import { isSceneComplete, visibleHotspots } from './story'
 
 const town = townJson as SceneDef
 
@@ -52,6 +52,21 @@ describe('FR-07 the town hub', () => {
     expect(s.story.reachedGood).toBe(true)
     expect(isSceneComplete(town, s.story)).toBe(false)
     expect(s.completed).toBe(false)
+  })
+
+  it('starts with the flags the host sets from progress, and Lata appears once the School is done', () => {
+    expect(visibleHotspots(town, initialSceneState(town).story.flags).some((h) => h.id === 'lata')).toBe(false)
+    const after = initialSceneState(town, undefined, ['done:school'])
+    expect(after.story.flags.has('done:school')).toBe(true)
+    expect(visibleHotspots(town, after.story.flags).some((h) => h.id === 'lata')).toBe(true)
+  })
+
+  it('can skip the arrival line (coming back, not arriving)', () => {
+    expect(initialSceneState(town, 700, [], true).dialogue).toBeNull()
+  })
+
+  it('only lists host flags it uses, one per building', () => {
+    expect(town.hostFlags?.sort()).toEqual(buildingsJson.filter((b) => !b.teaser).map((b) => `done:${b.id}`).sort())
   })
 
   it('has one door per building, plus Help', () => {

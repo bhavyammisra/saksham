@@ -5,27 +5,126 @@
   "tagline": "Walk down the street and visit the places that are open.",
   "tone": "normal",
   "hub": true,
+  "hostFlags": [
+    "done:school",
+    "done:dhaba",
+    "done:home",
+    "done:panchayat"
+  ],
   "width": 6200,
   "layers": [
-    { "id": "sky", "art": "school.sky", "speed": 0.05 },
-    { "id": "far", "art": "school.far", "speed": 0.15 },
-    { "id": "houses", "art": "school.town", "speed": 0.4 },
-    { "id": "trees", "art": "school.trees", "speed": 0.65 },
-    { "id": "street", "art": "town.street", "speed": 1 },
-    { "id": "light", "art": "school.light", "speed": 0, "front": true },
-    { "id": "foreground", "art": "school.foreground", "speed": 1.35 }
+    {
+      "id": "sky",
+      "art": "school.sky",
+      "speed": 0.05
+    },
+    {
+      "id": "far",
+      "art": "school.far",
+      "speed": 0.15
+    },
+    {
+      "id": "houses",
+      "art": "school.town",
+      "speed": 0.4
+    },
+    {
+      "id": "trees",
+      "art": "school.trees",
+      "speed": 0.65
+    },
+    {
+      "id": "street",
+      "art": "town.street",
+      "speed": 1
+    },
+    {
+      "id": "light",
+      "art": "school.light",
+      "speed": 0,
+      "front": true
+    },
+    {
+      "id": "foreground",
+      "art": "school.foreground",
+      "speed": 1.35
+    }
   ],
-  "walkable": { "minX": 150, "maxX": 6050 },
-  "spawn": { "x": 380 },
+  "walkable": {
+    "minX": 150,
+    "maxX": 6050
+  },
+  "spawn": {
+    "x": 380
+  },
   "ambience": "town",
   "hotspots": [
-    { "id": "school", "x": 700, "label": "Go into the School", "kind": "exit", "to": "school", "lockedNode": "school-closed" },
-    { "id": "dhaba", "x": 1550, "label": "Go into the Dhaba", "kind": "exit", "to": "dhaba", "lockedNode": "dhaba-closed" },
-    { "id": "home", "x": 2400, "label": "Go into the Home", "kind": "exit", "to": "home", "lockedNode": "home-closed" },
-    { "id": "panchayat", "x": 3250, "label": "Go into the Panchayat", "kind": "exit", "to": "panchayat", "lockedNode": "panchayat-closed" },
-    { "id": "playground", "x": 4100, "label": "Go to the Playground", "kind": "exit", "to": "playground", "lockedNode": "playground-soon" },
-    { "id": "cyber-adda", "x": 4900, "label": "Go into Cyber Adda", "kind": "exit", "to": "cyber-adda", "lockedNode": "cyber-adda-soon" },
-    { "id": "help", "x": 5650, "label": "Go into the Help Centre", "kind": "exit", "to": "help" }
+    {
+      "id": "school",
+      "x": 700,
+      "label": "Go into the School",
+      "kind": "exit",
+      "to": "school",
+      "lockedNode": "school-closed"
+    },
+    {
+      "id": "lata",
+      "x": 1000,
+      "label": "Talk to Lata",
+      "kind": "npc",
+      "npc": "lata",
+      "node": "lata-town",
+      "showIf": [
+        "done:school"
+      ]
+    },
+    {
+      "id": "dhaba",
+      "x": 1550,
+      "label": "Go into the Dhaba",
+      "kind": "exit",
+      "to": "dhaba",
+      "lockedNode": "dhaba-closed"
+    },
+    {
+      "id": "home",
+      "x": 2400,
+      "label": "Go into the Home",
+      "kind": "exit",
+      "to": "home",
+      "lockedNode": "home-closed"
+    },
+    {
+      "id": "panchayat",
+      "x": 3250,
+      "label": "Go into the Panchayat",
+      "kind": "exit",
+      "to": "panchayat",
+      "lockedNode": "panchayat-closed"
+    },
+    {
+      "id": "playground",
+      "x": 4100,
+      "label": "Go to the Playground",
+      "kind": "exit",
+      "to": "playground",
+      "lockedNode": "playground-soon"
+    },
+    {
+      "id": "cyber-adda",
+      "x": 4900,
+      "label": "Go into Cyber Adda",
+      "kind": "exit",
+      "to": "cyber-adda",
+      "lockedNode": "cyber-adda-soon"
+    },
+    {
+      "id": "help",
+      "x": 5650,
+      "label": "Go into the Help Centre",
+      "kind": "exit",
+      "to": "help"
+    }
   ],
   "objectives": [],
   "startNode": "intro",
@@ -78,6 +177,19 @@
       "speaker": "mitthu",
       "mood": "happy",
       "text": "Cyber Adda's shutter is still half down. Coming soon!",
+      "end": "good"
+    },
+    "lata-town": {
+      "id": "lata-town",
+      "speaker": "lata",
+      "mood": "happy",
+      "text": "I go to school every day now! Meena Didi gave me a new notebook, and I'm the fastest at sums in my class.",
+      "next": "lata-town-2"
+    },
+    "lata-town-2": {
+      "id": "lata-town-2",
+      "speaker": "player",
+      "text": "I'm so glad. See you at assembly!",
       "end": "good"
     }
   }

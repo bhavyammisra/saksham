@@ -245,7 +245,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 #### Town hub and progression
 
 - [x] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door. ✅ 2026-10-15 (D-030).
-- [ ] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers).
+- [x] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers). ✅ 2026-10-15 (D-031).
 - [ ] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode.
 
 #### Remaining buildings
@@ -440,3 +440,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `src/engine/town.test.ts` (7), validator tests for hubs, `tests/e2e/town.spec.ts` (4). The two long journey tests (`play.spec.ts`, `demo-path.spec.ts`) allow 60 s and run in calm mode (no typewriter or ambient motion; same game logic, motion is covered by `scene.spec.ts` and `town.spec.ts`). Locally, Playwright runs at most 3 browsers at once: with up to 6, a busy laptop (another app was using a lot of CPU) starved them into timeouts, even on trivial steps. After these changes: 45/45 e2e in two consecutive full runs.
 - Hacky / watch: the engine's hotspot markers (soft glowing circles) show on every door, open or locked. The Dhaba, Home and Panchayat doors stay locked with "isn't open yet" until their stories exist. No real-device frame-rate check yet (P7).
 - Next task: P4 › recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed.
+
+**P4: a living town (2026-10-15)**
+- Done: Mitthu bobs above the suggested door, "Mitthu suggests" shows in "Things to do here", and his 20-second hint says where to go. Coming back from a building: you start outside its door without the welcome repeating, and Mitthu celebrates once (stars, any newly open place; confetti, gentle sparkles, or nothing in calm mode). Finished buildings get a marigold garland and lanterns, the bunting fills in, and Lata stands outside the School after you help her. Engine: `startFlags`/`hostFlags`, `guide`, `skipIntro`; layer art receives flags. "A new place is open" now appears only when that place's story exists.
+- Tests: town engine tests (flags, Lata, skip intro, host flags), validator test for host flags, e2e for the celebration (shown once, not after reload), Lata, and "Mitthu suggests".
+- Hacky / watch: more villagers come with each new building (only Lata so far). Mitthu's marker sits at a fixed height above doors.
+- Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.

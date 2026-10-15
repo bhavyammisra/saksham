@@ -208,5 +208,11 @@
   "town.notStarted": "Not visited yet",
   "town.demo": "Demo mode: every place is open",
   "scene.locked": "locked",
-  "town.places": "Places in the town"
+  "town.places": "Places in the town",
+  "scene.suggested": "Mitthu suggests",
+  "town.guideHint": "Mitthu: Let's go to {name}. Follow me!",
+  "town.welcomeBack": "Welcome back, {name}!",
+  "town.earned": "You earned {n} of 3 stars at {place}.",
+  "town.nowOpen": "{place} is open now. Let's go there next!",
+  "town.celebrateClose": "Thanks, Mitthu!"
 }

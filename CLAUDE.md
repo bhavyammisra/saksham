@@ -6,9 +6,9 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town`. The walkable town is built (D-030). Next task: Mitthu's guidance in the town, the return celebration, and the town changing as buildings are completed. The School card's legal text still waits for the owner's fact check (SETUP.md §6).
+- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town`. The walkable town (D-030) now guides, celebrates and changes with progress (D-031). Next task: Book, Me, Credits, badges and demo mode. The School card's legal text still waits for the owner's fact check (SETUP.md §6).
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2), P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026) and P3 (PR #4, School end to end, MILESTONE A; D-027 to D-029).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-030).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-031).
 
 ## Start of every session
 

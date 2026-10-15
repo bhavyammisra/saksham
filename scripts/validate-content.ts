@@ -90,6 +90,11 @@ export function validateScene(raw: unknown): string[] {
   if (scene.intro !== undefined && !nodeExists(scene.intro)) fail(`"intro" points to missing node "${String(scene.intro)}"`)
 
   const flagsSet = new Set<string>()
+  // Flags the host sets from saved progress count as set (they are used by showIf/hideIf and art).
+  if (scene.hostFlags !== undefined) {
+    if (!isStringList(scene.hostFlags)) fail('"hostFlags" must be a list of flags')
+    else scene.hostFlags.forEach((flag) => flagsSet.add(flag))
+  }
   for (const [key, node] of Object.entries(nodes)) {
     const where = `node "${key}"`
     if (!isObject(node)) {
