@@ -2,12 +2,12 @@
 
 Updated at the end of each phase. Test names start with the requirement IDs from BUILD_PLAN §11, so they map straight into the traceability matrix.
 
-## Counts (Phase 3, 2026-10-15)
+## Counts (Phase 4 in progress, 2026-10-15)
 
 | Type | Tool | Files | Tests | Where |
 | --- | --- | --- | --- | --- |
-| Unit | Vitest | 9 | 171 | `src/**/*.test.ts`, `scripts/*.test.ts` |
-| End-to-end | Playwright (Chromium) | 5 | 25 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts` |
+| Unit | Vitest | 10 | 186 | `src/**/*.test.ts`, `scripts/*.test.ts` |
+| End-to-end | Playwright (Chromium) | 6 | 29 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts` |
 | Safety invariants | Playwright (Chromium) | 1 | 16 | `tests/e2e/safety.spec.ts` |
 | Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` |
 | RLS (database) | | 0 | 0 | from Phase 5 |
@@ -26,16 +26,18 @@ Updated at the end of each phase. Test names start with the requirement IDs from
   - FR-17 demo mode.
   - FR-07 badges: none for an unfinished building; first steps, right first time and quiz whiz when earned; kind helper after two buildings; town hero after every playable one (teasers don't count).
   - FR-01/NFR-01 first-name rule: English and Hindi names accepted; digits, symbols, emoji and more than 20 characters rejected.
-- **`validate-content.test.ts` (30).**
+- **`validate-content.test.ts` (35).**
   - NFR-07: a valid scene passes, and one broken scene per rule fails (missing targets, no reachable good end, dead ends, unset flags, out-of-bounds hotspots, card and quiz errors).
   - NFR-09: every `t()` key in code exists.
   - NFR-06: `help.json` is valid, and sources must be https `.gov.in`/`.nic.in` pages.
   - People: every hotspot `npc` and node `speaker` must exist in `npcs.json`.
   - NFR-10: every rights card has a fact-check `review`; `"verified"` needs a name and a date.
   - `buildings.json`: unique ids, a name and a right each, and a playable first building.
+  - Hubs: no card or games; an exit's `lockedNode` must exist; hub doors lead to a building or `help`; flags in `hostFlags` count as set.
 - **`engine.test.ts` (24).** FR-02 walking bounds, blockers, tap-to-walk, camera clamping, parallax, and calm mode with no parallax. FR-03 the 120-unit prompt radius, `showIf`/`hideIf`, and nodes setting flags. FR-04 good choice to good ending; a weaker choice to consequence, retry and back to the choice, with retries counted; objectives; completion needs the good ending AND every objective.
 - **`sceneState.test.ts` (17).** Plays the real `content/scenes/sandbox.json` through `sceneReducer`: walking, blocker, calm camera, tap-to-walk, use/jump/E on hotspots, hidden hotspots, no walking while talking, exits, a full playthrough with one retry, fx, Mitthu following, and the 20-second hint (never during a conversation).
 - **`school.test.ts` (7).** Plays the real `content/scenes/school.json`: Mitthu's intro opens on arrival; Meena Didi takes the request only after the player has met Lata; both weaker choices lead back to the choice and count retries; the good choice completes the scene; it isn't complete until the notice is read; both age bands have questions; the card stays marked for the fact check until verified.
+- **`town.test.ts` (10).** Plays the real `content/scenes/town.json`: Mitthu's welcome on arrival; a locked door plays its gentle reply and does not leave; an open door exits; the Help door has no locked reply; coming back starts outside the door (clamped); the town never completes; host flags (`done:school`) are set from the start and make Lata appear; the arrival line can be skipped; one host flag and one door per building, plus Help.
 - **`spec.test.ts` (9).** Character option counts match the plan; "Surprise me" always makes a valid character; damaged saved characters are repaired.
 - **`store.test.ts` (13).** FR-01 profiles: names are cleaned and invalid names saved nothing; progress is separate per profile; switching and removing profiles work; FR-07 results go through the rules; extras are added once; settings and demo mode; each player's character is saved, changed only for the active player, and repaired if invalid.
 - **`sound.test.ts` (4).** NFR-06: full volume, half volume when gentle, silent when sound effects are off, and always silent on the Help Centre.
@@ -56,7 +58,8 @@ Updated at the end of each phase. Test names start with the requirement IDs from
   - The builder's part tabs work with the arrow keys.
 - **`scene.spec.ts` (6).** Plays `/dev/scene`: walk with the arrow keys (in short taps, so a busy machine can't walk past the prompt) and press E; "Things to do here" shows only visible hotspots; a weaker choice then the good one completes the scene with 1 retry; exits; calm mode shows whole lines at once; panel tap targets are at least 48px.
 
-- **`play.spec.ts` (5).** FR-05/06/07, plays School at `/play/school`. The card flips, "Tell me more" shows the teen text, and the law matches content exactly. 3 of 4 right with one retry gives 2 stars, the first-steps badge and the Dhaba unlocked; the town shows it all and it survives a reload. A 25% score offers the hint round, which replays the 3 missed questions and leaves the score at 1 of 4. Teen players see the teen card and all 6 questions. A locked building can't be played. A new player's town has only School open.
+- **`play.spec.ts` (5).** FR-05/06/07, plays School at `/play/school`. The card flips, "Tell me more" shows the teen text, and the law matches content exactly. 3 of 4 right with one retry gives 2 stars, the first-steps badge and the Dhaba unlocked; back in the town Mitthu celebrates once (2 stars at The School), Lata stands outside, and it all survives a reload with no second celebration. A 25% score offers the hint round, which replays the 3 missed questions and leaves the score at 1 of 4. Teen players see the teen card and all 6 questions. A locked building can't be played. A new player's town has only School open.
+- **`town.spec.ts` (4).** FR-07/08 on `/town`: the School door is open, says "Mitthu suggests" and leads into the School; a locked door says "locked", replies gently and stays in the town; teasers say "Coming soon"; the Help door opens the Help Centre and Back returns to the town.
 - **`demo-path.spec.ts` (1).** MILESTONE A, the whole journey through the real UI: welcome, name, age, customiser, town, School story with a retry, card flip, a perfect quiz (2 stars, quiz whiz), back to the town, reload, then "Need help?" to a calm Help Centre with no Help button.
 
 ### Safety invariants (`safety.spec.ts`, 16)
@@ -81,3 +84,4 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-14 | `p1-core` (PR #2) | ✅ green, merged | |
 | 2026-10-15 | `p2-character-scene` (PR #3) | ✅ green, merged | |
 | 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |
+| 2026-10-15 | `p4-town` | pushed, PR not opened yet (local: all green) | |

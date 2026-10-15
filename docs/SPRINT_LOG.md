@@ -39,3 +39,13 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
 - **Waiting on the owner:** fact-check the School card (SETUP.md §6).
 - **Merged:** PR #4, 2026-10-15.
 - **Next:** P4 Town and all buildings, on branch `p4-town`.
+
+## P4 Town and all buildings (from 2026-10-15), in progress
+
+- **Goal:** A walkable town linking every building, all four buildings playable, plus the Book, Me, Credits, demo mode, the sort game and the community screens.
+- **Done so far:**
+  - Walkable town on the same engine: hub scenes, host-controlled locked doors with gentle replies, teasers, a Help door, start outside the last door (D-030).
+  - Mitthu points the way; a once-only return celebration; finished places get garlands, lanterns and more bunting; Lata appears after the School (D-031).
+  - Performance: removing full-screen blend modes and live blurs took the town from 33 to 59 fps, the School from 30 to 47, and the cover forms from 10–15 to 60 (headless Chromium).
+  - 186 unit and 45 e2e tests green.
+- **Next:** Book, Me, Credits, badges and demo mode.

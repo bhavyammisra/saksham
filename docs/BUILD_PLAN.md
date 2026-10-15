@@ -12,6 +12,52 @@ Put this file at `docs/BUILD_PLAN.md` in a **new, empty repo**. `CLAUDE.md` in t
 - Record every significant choice in `docs/DECISIONS.md` (context, choice, why, alternatives). Never add a dependency without saying why.
 - There is no deadline. Quality and understanding beat speed. Do not cut corners to go faster, and do not add features that are not in this plan.
 
+## Checkpoints (keep this current: it is the one-glance status)
+
+Where the project stands against every phase, owner gate and owner-only task. Details are in the phase checklists (§9) and the session notes at the bottom.
+
+**Phases**
+
+| Phase | Status | Pull request | Decisions |
+| --- | --- | --- | --- |
+| P0 Foundation | ✅ merged | #1 | D-001 to D-012 |
+| P1 Core | ✅ merged | #2 | D-013 to D-018 |
+| P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
+| P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
+| P4 Town and all buildings | 🔄 in progress on `p4-town` (2 of 6 tasks) | not opened | D-030, D-031 |
+| P5 Backend | ⬜ | | |
+| P6 Experience and Hindi | ⬜ | | |
+| P7 Hardening and documentation | ⬜ | | |
+
+**🛑 Owner gates**
+
+| Gate | Status |
+| --- | --- |
+| Character look (P2) | ✅ approved 2026-10-14; reopened on feedback; ✅ re-approved 2026-10-15 after the redesign (D-024) |
+| Cover screens (owner feedback, P2) | ✅ approved 2026-10-15 (D-025) |
+| Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
+| Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
+
+**Owner-only tasks still open** (none of these block P4; all must be done before children use the app)
+
+| Task | Where |
+| --- | --- |
+| Fact-check the School rights card (Article 21A matched the Ministry of Education page; the rest is unverified) | SETUP.md §6, `content/scenes/school.json` › `card.review` |
+| Fact-check the Help Centre numbers and sentences | SETUP.md §5, `content/help.json` › `review` |
+| Confirm the two font licences | `docs/ASSET_LICENSES.md` |
+| Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
+
+**Phase 4 tasks** (detail in §9)
+
+| Task | Status |
+| --- | --- |
+| Walkable town scene (doors, locked replies, teasers, Help door) | ✅ D-030 |
+| Mitthu's guidance, return celebration, town changing with progress | ✅ D-031 |
+| Book, Me, Credits, badges, demo mode | ⬜ **next** |
+| Dhaba, Home and Panchayat scenes | ⬜ (each needs its legal text fact-checked, like School) |
+| Sort game, in at least two buildings | ⬜ |
+| Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ |
+
 ## 1. Context
 
 - Saksham is a web game that teaches Indian children (8 to 16) their legal rights. It started as a Smart India Hackathon idea (SIH1281, Ministry of Law and Justice).
@@ -208,7 +254,7 @@ Done when: CI is green and the app shows an empty shell.
 - [x] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
 - [x] Portrait renderer (head and shoulders with a mood) for dialogue and results.
 
-🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14. ⚠️ **Reopened 2026-10-15:** the owner no longer likes the character design (see "Owner feedback rework" below).
+🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14. ⚠️ Reopened 2026-10-15 on owner feedback (see "Owner feedback rework" below). ✅ **Re-approved 2026-10-15** after the redesign (D-024).
 
 #### Scene engine and look development
 
@@ -446,3 +492,14 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: town engine tests (flags, Lata, skip intro, host flags), validator test for host flags, e2e for the celebration (shown once, not after reload), Lata, and "Mitthu suggests".
 - Hacky / watch: more villagers come with each new building (only Lata so far). Mitthu's marker sits at a fixed height above doors.
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
+
+**Handoff for the next session (2026-10-15)**
+- **State:** branch `p4-town`, everything committed and pushed (last commit `P4: Mitthu's guidance, return celebration, and a town that changes with progress`). P0 to P3 are merged to `main`. 186 unit and 45 e2e tests green; lint, typecheck, validate and build pass. See **Checkpoints** at the top for every phase, gate and owner task.
+- **Exact next task:** P4 › Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode. The data already exists: `extras.cards` and `extras.badges` in the store, badge names in `strings.en.json` (`badge.*`), `rules.ts` demo-mode helpers (`nextDemoBuffer`, `isDemoCode`) and `store.setDemo`. `/book`, `/community` and `/credits` are still `Placeholder` routes in `src/App.tsx`.
+- **How the town works (for the next buildings):** buildings are `exit` hotspots in `content/scenes/town.json` with `to` = building id and a `lockedNode`. `Town.tsx` decides locks (`isUnlocked` + whether `getScene(id)` exists), sets `done:<id>` flags from progress (`hostFlags`), and points Mitthu at `recommendedBuilding`. Adding a building = its scene JSON + art, plus one line in `src/lib/scenes.ts`; its door then opens by itself, and its celebration says "open now".
+- **Rules learned the hard way (keep them):**
+  - No full-screen `mix-blend-mode`, no `backdrop-filter`, and no `filter: blur` on animated pictures: without a GPU each halves the frame rate (D-030). Put moving things in their own small SVG layer; keep huge SVGs (the town street) still.
+  - Long journey e2e tests run in calm mode (`test.use({ reducedMotion: 'reduce' })`); motion is tested by `scene.spec.ts` and `town.spec.ts`. Locally Playwright runs 3 browsers. If tests time out everywhere at once, the laptop is busy (another app); re-run before changing code.
+  - For screenshots, a throwaway Playwright script against the dev server (port 5174 when 5173 is taken) works best; close the browser pane's tab afterwards so it doesn't animate in the background.
+  - Writing files with Python on Windows: open with `newline='\n'` (the repo is LF), and use double quotes around test names that contain an apostrophe.
+- **Owner:** the School card fact check (SETUP.md §6) is the most important open item before anyone plays it.

@@ -6,9 +6,10 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town`. The walkable town (D-030) now guides, celebrates and changes with progress (D-031). Next task: Book, Me, Credits, badges and demo mode. The School card's legal text still waits for the owner's fact check (SETUP.md §6).
+- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town` (pushed, no PR yet). Done in P4: the walkable town (D-030) and its guidance, return celebration and progress decorations (D-031). **Next task: Book, Me, Credits, badges and demo mode.**
+- **Checkpoints:** the table at the top of `docs/BUILD_PLAN.md` shows every phase, 🛑 gate and owner-only task at a glance. All gates so far are approved. Owner still to do: fact-check the School card (SETUP.md §6) and the Help Centre (§5), confirm the font licences.
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2), P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026) and P3 (PR #4, School end to end, MILESTONE A; D-027 to D-029).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-031).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md` (the "Handoff" note has the exact next task and the rules learned so far). **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-031).
 
 ## Start of every session
 
@@ -22,10 +23,10 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 - `content/`: typed JSON. `types.ts` is the contract, plus `strings.en.json`, `help.json`, `npcs.json`, `buildings.json` and `scenes/*.json` (`sandbox`, `school`, and the `town` hub).
 - `src/lib/`: `rules.ts` (pure game rules), `store.ts` (persisted zustand, version 2), `i18n.ts`, `calm.ts`, `sound.ts`.
 - `src/character/`: the SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu`.
-- `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`), plus `Scene.tsx` (draws it), `Dialogue.tsx` and `WalkPad.tsx`.
+- `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`), plus `Scene.tsx` (draws it), `Dialogue.tsx` and `WalkPad.tsx`. The hosting screen can pass `locked` exits, `startX`, `startFlags`, `skipIntro` and a Mitthu `guide`; the engine never knows why.
 - `src/art/`: scene art by key (`index.ts` registry, `style.tsx` shared drawing rules, `sandbox.tsx`, `school.tsx`, `town.tsx`, `cover.tsx`).
 - `src/play/`: `CardReveal`, `Quiz`, `Results` (the end of a building). `src/lib/scenes.ts`: building id → scene.
-- `src/screens/` (Onboarding, Profiles, Town, Play, Me, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog, Button, Page, CoverScreen).
+- `src/screens/` (Onboarding, Profiles, Town, Play, Me, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog, Button, Page, CoverScreen, ReturnCelebration).
 - `scripts/validate-content.ts`: `npm run validate`, also run in CI.
 - Dev pages: `/#/dev/characters` (every character combination), `/#/dev/scene` (engine sandbox), `/#/dev/look` (School look-dev).
 
@@ -35,6 +36,7 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 - In Git Bash, arguments that start with `/` (such as `/dev/characters`) are rewritten into Windows paths. Prefix the command with `MSYS_NO_PATHCONV=1`, and pass Windows paths (`cygpath -w`) for output files.
 - The browser pane's screenshots can be stale or time out. For reliable visual checks, take screenshots with a small throwaway Playwright script against `npm run dev` (keep such scripts out of the repo).
 - Vite's file watcher can miss two writes to the same file in quick succession. If the page shows old code, restart the dev server.
+- Performance rule (D-030): no full-screen `mix-blend-mode`, no `backdrop-filter`, no `filter: blur` on animated pictures, and no animations inside very wide SVG layers. Without a GPU each one halves the frame rate.
 
 ## Owner and ownership
 
