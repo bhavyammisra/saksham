@@ -3,6 +3,13 @@ import { expect, test } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
 import { answerQuiz, createPlayer, playStory, strings } from './helpers.ts'
 
+// These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
+test.describe.configure({ timeout: 60_000 })
+// They run in calm mode (a real setting: no typewriter, nothing ambient moving), so lines appear
+// at once and the page holds still. The game logic is the same; motion is covered by
+// scene.spec.ts and town.spec.ts, which run with it on.
+test.use({ reducedMotion: 'reduce' })
+
 test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results that survive a reload', async ({ page }) => {
   await createPlayer(page, 'Asha') // young band: 4 questions
   await playStory(page)

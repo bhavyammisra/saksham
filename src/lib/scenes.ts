@@ -2,6 +2,7 @@
 // that lists content files; the engine itself never refers to a building by id.
 
 import schoolJson from '@content/scenes/school.json'
+import townJson from '@content/scenes/town.json'
 import buildingsJson from '@content/buildings.json'
 import type { BuildingInfo, SceneDef } from '@content/types'
 
@@ -10,6 +11,9 @@ export const buildings = buildingsJson as BuildingInfo[]
 const scenes: Record<string, SceneDef> = {
   school: schoolJson as SceneDef,
 }
+
+/** The town: the walkable hub that links to every building. */
+export const townScene = townJson as SceneDef
 
 /** The scene for a building, or null if it isn't written yet. */
 export function getScene(id: string): SceneDef | null {

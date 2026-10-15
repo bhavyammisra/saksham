@@ -244,7 +244,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Town hub and progression
 
-- [ ] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door.
+- [x] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door. ✅ 2026-10-15 (D-030).
 - [ ] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers).
 - [ ] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode.
 
@@ -432,3 +432,11 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P3 merged, P4 started (2026-10-15)**
 - Done: PR #4 (all of Phase 3) merged to `main` with a merge commit after green CI (lint, unit, build and e2e in both the push and pull-request runs; deploy skipped until Vercel is set up). Branch `p4-town` created from `main`; lint, typecheck, validate, 171 unit and 41 e2e tests green.
 - Next task: P4 › walkable town scene (buildings as `exit` hotspots, locked buildings stay shut with a gentle reply, teasers say "Coming soon", Help has its own door). It replaces the temporary list at `/town`.
+
+**P4: walkable town (2026-10-15)**
+- Done: `/town` is now a walkable street (`content/scenes/town.json`, art `src/art/town.tsx`) with a door per building plus a calm teal Help kiosk. Locked doors show a padlock and Mitthu's gentle reply; teasers say "Coming soon"; the Help door opens the Help Centre, and Back returns to the town. Coming back from a building starts you outside its door. The building cards stay below the street as a summary. Engine: `hub` scenes, host-controlled `locked` exits, `startX`. Validator: hub rules and hub door targets.
+- Performance: removed two full-screen blend modes (light shafts, film grain). Town 33 → 59 fps and School 30 → 47 fps in headless Chromium, with no visible change (D-030).
+- Performance, cover screens (my own P2 redesign): no blur behind forms or on glass panels, the picture holds still behind forms, and the tiny twinkles are still. Forms 10–15 → 60 fps, welcome 21 → 36 fps (D-030). This, not the town, was why journey tests timed out: they spend most of their time on those screens.
+- Tests: `src/engine/town.test.ts` (7), validator tests for hubs, `tests/e2e/town.spec.ts` (4). The two long journey tests (`play.spec.ts`, `demo-path.spec.ts`) allow 60 s and run in calm mode (no typewriter or ambient motion; same game logic, motion is covered by `scene.spec.ts` and `town.spec.ts`). Locally, Playwright runs at most 3 browsers at once: with up to 6, a busy laptop (another app was using a lot of CPU) starved them into timeouts, even on trivial steps. After these changes: 45/45 e2e in two consecutive full runs.
+- Hacky / watch: the engine's hotspot markers (soft glowing circles) show on every door, open or locked. The Dhaba, Home and Panchayat doors stay locked with "isn't open yet" until their stories exist. No real-device frame-rate check yet (P7).
+- Next task: P4 › recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed.

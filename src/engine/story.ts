@@ -111,5 +111,6 @@ export function nextObjective(scene: SceneDef, flags: Flags) {
 
 /** A scene is complete when its good ending was reached and every objective is done. */
 export function isSceneComplete(scene: SceneDef, story: StoryState): boolean {
+  if (scene.hub) return false // a hub (the town) is a place to come back to, never "finished"
   return story.reachedGood && scene.objectives.every((o) => isObjectiveDone(o, story.flags))
 }

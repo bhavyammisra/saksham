@@ -54,16 +54,18 @@ export type SceneAction =
   | { type: 'choose'; index: number }
   | { type: 'activity' }
 
-export function initialSceneState(scene: SceneDef): SceneState {
+/** `startX` puts the player somewhere other than the scene's spawn point (e.g. back outside a door). */
+export function initialSceneState(scene: SceneDef, startX?: number): SceneState {
+  const x = startX !== undefined ? Math.min(scene.walkable.maxX, Math.max(scene.walkable.minX, startX)) : scene.spawn.x
   const story: StoryState = { flags: new Set(), retries: 0, reachedGood: false }
   // Arriving: Mitthu introduces the place in one line, if the scene has an intro.
   const arrival = scene.intro ? startDialogue(scene, scene.intro, story) : { dialogue: null, story }
   return {
-    x: scene.spawn.x,
+    x,
     facing: 'right',
     walking: false,
     camera: 0,
-    mitthuX: scene.spawn.x - MITTHU_DISTANCE,
+    mitthuX: x - MITTHU_DISTANCE,
     target: null,
     pending: null,
     story: arrival.story,
@@ -77,7 +79,11 @@ export function initialSceneState(scene: SceneDef): SceneState {
   }
 }
 
-export function sceneReducer(scene: SceneDef) {
+/**
+ * `locked` lists exit hotspots the host has locked right now (e.g. a building not yet unlocked).
+ * Opening a locked exit plays its `lockedNode` instead of leaving. The engine doesn't know why it is locked.
+ */
+export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new Set()) {
   const find = (id: string) => scene.hotspots.find((h) => h.id === id) ?? null
 
   /** Where to stand to use a hotspot: beside it, on the side the player is coming from. */
@@ -90,6 +96,11 @@ export function sceneReducer(scene: SceneDef) {
   const open = (s: SceneState, h: Hotspot): SceneState => {
     if (!isHotspotVisible(h, s.story.flags)) return s
     const facing: Facing = h.x < s.x ? 'left' : h.x > s.x ? 'right' : s.facing
+    if (h.kind === 'exit' && locked.has(h.id)) {
+      if (!h.lockedNode) return { ...s, facing }
+      const reply = startDialogue(scene, h.lockedNode, s.story)
+      return withFx({ ...s, facing, target: null, pending: null, idleSince: null, hint: false, walking: false, ...reply }, h.lockedNode)
+    }
     if (h.kind === 'exit') return { ...s, facing, exit: h.id, target: null, pending: null }
     if (!h.node) return s
     const started = startDialogue(scene, h.node, s.story)

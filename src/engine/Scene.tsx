@@ -32,9 +32,15 @@ interface Props {
   scene: SceneDef
   onComplete: (result: SceneResult) => void
   onExit: (hotspot: Hotspot) => void
+  /** Exit hotspots that are locked right now (keep the same Set between renders). */
+  locked?: ReadonlySet<string>
+  /** Where the player starts, instead of the scene's spawn point. */
+  startX?: number
 }
 
-export function Scene({ scene, onComplete, onExit }: Props) {
+const NOTHING_LOCKED: ReadonlySet<string> = new Set()
+
+export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, startX }: Props) {
   const profile = useStore(selectActiveProfile)
   const narration = useStore((s) => s.settings.narration)
   const player = { name: profile?.firstName ?? t('scene.you'), spec: profile?.avatar ?? defaultSpec }
@@ -46,8 +52,8 @@ export function Scene({ scene, onComplete, onExit }: Props) {
   const scale = size.height > 0 ? size.height / SCENE_HEIGHT : 0
   const viewWidth = scale > 0 ? size.width / scale : 1000
 
-  const reducer = useMemo(() => sceneReducer(scene), [scene])
-  const [state, dispatch] = useReducer(reducer, scene, initialSceneState)
+  const reducer = useMemo(() => sceneReducer(scene, locked), [scene, locked])
+  const [state, dispatch] = useReducer(reducer, scene, (s) => initialSceneState(s, startX))
 
   // ---------------------------------------------------------------- input and the frame loop
   const keys = useRef({ left: false, right: false, pad: 0 as -1 | 0 | 1 })
@@ -204,7 +210,9 @@ export function Scene({ scene, onComplete, onExit }: Props) {
                 className="scene-prompt absolute z-10 flex min-h-tap items-center gap-2 whitespace-nowrap rounded-pill bg-plaster px-4 font-semibold text-ink shadow-lifted"
                 style={{ left: px(near.x), bottom: onGround + px(hotspotHeight(near) + 30), transform: 'translateX(-50%)' }}
               >
+                {locked.has(near.id) && <LockIcon />}
                 {near.label}
+                {locked.has(near.id) && <span className="sr-only"> ({t('scene.locked')})</span>}
                 <kbd className="rounded border border-sand bg-white px-1.5 text-sm" aria-hidden="true">
                   E
                 </kbd>
@@ -245,6 +253,8 @@ export function Scene({ scene, onComplete, onExit }: Props) {
       )}
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {/* A hub (the town) has no objectives. */}
+        {scene.objectives.length > 0 && (
         <section aria-labelledby="objectives-title" className="rounded-card bg-plaster-deep p-4">
           <h2 id="objectives-title" className="text-lg font-semibold">
             {t('scene.objectives')}
@@ -269,6 +279,7 @@ export function Scene({ scene, onComplete, onExit }: Props) {
             })}
           </ul>
         </section>
+        )}
 
         <section aria-labelledby="things-title" className="rounded-card bg-plaster-deep p-4">
           <h2 id="things-title" className="text-lg font-semibold">
@@ -282,9 +293,11 @@ export function Scene({ scene, onComplete, onExit }: Props) {
                   type="button"
                   disabled={state.dialogue !== null}
                   onClick={() => dispatch({ type: 'jumpTo', hotspotId: h.id })}
-                  className="min-h-tap rounded-button border-2 border-sand bg-plaster px-4 font-semibold hover:bg-marigold-soft disabled:opacity-50"
+                  className="inline-flex min-h-tap items-center gap-2 rounded-button border-2 border-sand bg-plaster px-4 font-semibold hover:bg-marigold-soft disabled:opacity-50"
                 >
+                  {locked.has(h.id) && <LockIcon />}
                   {h.label}
+                  {locked.has(h.id) && <span className="sr-only"> ({t('scene.locked')})</span>}
                 </button>
               </li>
             ))}
@@ -296,6 +309,16 @@ export function Scene({ scene, onComplete, onExit }: Props) {
 }
 
 // ---------------------------------------------------------------- pieces
+
+/** A small padlock shown on locked doors (the words also say "locked", for screen readers). */
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4 shrink-0" aria-hidden="true">
+      <rect x="2.5" y="7" width="11" height="8" rx="1.5" fill="currentColor" />
+      <path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  )
+}
 
 /** Layers in front of the characters: marked front, or nearer than the stage (speed > 1). */
 const isFront = (l: Layer) => l.front ?? l.speed > 1

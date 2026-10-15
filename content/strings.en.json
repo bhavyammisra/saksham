@@ -206,5 +206,7 @@
   "town.mitthuAllDone": "You've done every place so far. Amazing work!",
   "town.stars": "{n} of 3 stars",
   "town.notStarted": "Not visited yet",
-  "town.demo": "Demo mode: every place is open"
+  "town.demo": "Demo mode: every place is open",
+  "scene.locked": "locked",
+  "town.places": "Places in the town"
 }

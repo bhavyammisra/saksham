@@ -4,11 +4,13 @@
 
 import { sandboxLayers, sandboxProps } from './sandbox'
 import { schoolLayers, schoolProps } from './school'
+import { townLayers } from './town'
 import type { LayerArt, PropArt } from './types'
 
 export const layerArt: Record<string, LayerArt> = {
   ...sandboxLayers,
   ...schoolLayers,
+  ...townLayers,
 }
 
 export const propArt: Record<string, PropArt> = {

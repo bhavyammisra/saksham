@@ -82,13 +82,13 @@ describe('School scene story', () => {
   })
 
   it('has quiz questions for both age bands', () => {
-    const quiz = school.games[0]!
+    const quiz = school.games![0]!
     expect(quiz.questions.filter((q) => !q.band).length).toBeGreaterThanOrEqual(3)
     expect(quiz.questions.some((q) => q.band === 'teen')).toBe(true)
   })
 
   it('keeps its legal text marked for the owner\'s fact check until it is verified', () => {
-    const review = school.card.review
+    const review = school.card!.review
     if (review.status === 'verified') expect(review.checkedBy && review.checkedOn).toBeTruthy()
     else expect(review.checks?.length).toBeGreaterThan(0)
   })

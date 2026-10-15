@@ -20,6 +20,8 @@ type Stage = 'scene' | 'card' | 'quiz' | 'results'
 export function Play() {
   const { id = '' } = useParams()
   const scene = getScene(id)
+  // A building needs its card; a hub scene (the town) has none and isn't played here.
+  const card = scene?.card
   const profile = useStore(selectActiveProfile)
   const data = useStore(selectActiveData)
   const demo = useStore((s) => s.demo)
@@ -34,11 +36,11 @@ export function Play() {
     setRetries(result.retries)
     setStage('card')
   }, [])
-  const onExit = useCallback(() => navigate('/town'), [navigate])
+  const onExit = useCallback(() => navigate('/town', { state: { from: id } }), [navigate, id])
 
   if (!profile) return null
   const unlocked = isUnlocked(id, buildings, data?.progress ?? {}, demo)
-  if (!scene || !unlocked) {
+  if (!scene || !card || !unlocked) {
     return (
       <Page title={t('play.title')}>
         <p>{unlocked ? t('play.notFound') : t('play.locked')}</p>
@@ -58,7 +60,7 @@ export function Play() {
 
     const result: BuildingResult = { completed: true, retries, score }
     store.recordResult(id, result)
-    store.addExtra('cards', scene.card.id)
+    store.addExtra('cards', card.id)
     const after = selectActiveData(useStore.getState())
     const newBadges = badgesFor(result, after?.progress ?? {}, buildings).filter((b) => !before?.extras.badges.includes(b))
     newBadges.forEach((b) => store.addExtra('badges', b))
@@ -78,10 +80,10 @@ export function Play() {
   return (
     <Page title={scene.title} wide={stage === 'scene'}>
       {stage === 'scene' && <Scene key={run} scene={scene} onComplete={onComplete} onExit={onExit} />}
-      {stage === 'card' && <CardReveal card={scene.card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
-      {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games[0]?.questions ?? [], profile.band)} onDone={finish} />}
+      {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
+      {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games?.[0]?.questions ?? [], profile.band)} onDone={finish} />}
       {stage === 'results' && summary && (
-        <Results name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
+        <Results from={id} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
       )}
     </Page>
   )

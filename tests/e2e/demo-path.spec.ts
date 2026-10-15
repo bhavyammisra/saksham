@@ -6,6 +6,13 @@ import help from '../../content/help.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
 import { answerQuiz, playStory, strings } from './helpers.ts'
 
+// These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
+test.describe.configure({ timeout: 60_000 })
+// They run in calm mode (a real setting: no typewriter, nothing ambient moving), so lines appear
+// at once and the page holds still. The game logic is the same; motion is covered by
+// scene.spec.ts and town.spec.ts, which run with it on.
+test.use({ reducedMotion: 'reduce' })
+
 test('Demo path: profile, character, School, card flip, quiz, results, Help Centre', async ({ page }) => {
   // 1. A new player: welcome, first name, age band.
   await page.goto('/')

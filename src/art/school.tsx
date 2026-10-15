@@ -7,50 +7,23 @@
 // Layers (back to front): sky 0.05 · far hills 0.15 · town 0.4 · trees 0.65 ·
 // school and courtyard 1 (the stage) · light 0 (fixed, in front) · foreground leaves 1.35.
 
+import { HAZE, INK, Neem, SHADE, ink, mixHex, seeded, shadow, svgProps } from './style'
 import { GROUND_Y, SCENE_HEIGHT, type LayerArt, type PropArt } from './types'
 import './school.css'
 
 const H = SCENE_HEIGHT
-const HAZE = '#f0b97c' // the warm air colour that distant things fade into
-const INK = '#3a2230' // outline colour, the same dark plum as the characters' shadows
-const SHADE = '#4a2f52' // shadow tint mixed into lit colours
-
-/** Small seeded random numbers, so the same scene always looks the same. */
-function seeded(seed: number) {
-  let s = seed | 0
-  return () => {
-    s = (s + 0x6d2b79f5) | 0
-    let t = Math.imul(s ^ (s >>> 15), 1 | s)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-function mixHex(a: string, b: string, k: number) {
-  const pa = parseInt(a.slice(1), 16)
-  const pb = parseInt(b.slice(1), 16)
-  const ch = (shift: number) => Math.round(((pa >> shift) & 255) * (1 - k) + ((pb >> shift) & 255) * k)
-  return `#${((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, '0')}`
-}
-
-/** The shadow version of a lit colour (cool and darker, like the characters' cel shadows). */
-const shadow = (c: string, k = 0.32) => mixHex(c, SHADE, k)
-/** Outline props. `w` is in scene units (the stage uses 3; layers further back use less). */
-const ink = (w: number, color = INK) => ({ stroke: color, strokeWidth: w, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const })
-
-const svgProps = (width: number) => ({
-  viewBox: `0 0 ${width} ${H}`,
-  preserveAspectRatio: 'none',
-  className: 'size-full',
-})
+const TRIM = '#a8401f' // terracotta
 
 // ---------------------------------------------------------------- sky
 
 const Sky: LayerArt = ({ width }) => {
   const sunX = width * 0.82
   const r = seeded(7)
+  // Moving things live in their own small SVG on an HTML wrapper, so the browser can move
+  // them without repainting the big sky.
   return (
-    <svg {...svgProps(width)}>
+    <div className="relative size-full">
+    <svg {...svgProps(width)} className="absolute inset-0 size-full">
       <defs>
         <linearGradient id="sch-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#5f7fa6" />
@@ -83,13 +56,18 @@ const Sky: LayerArt = ({ width }) => {
           </g>
         )
       })}
-      {/* Birds crossing the sky (ambient life; stops in calm mode). */}
-      <g className="sch-birds" fill="none" stroke={INK} strokeWidth="3.5" strokeLinecap="round" opacity="0.75">
-        {[0, 1, 2].map((i) => (
-          <path key={i} d={`M${120 + i * 46} ${260 + (i % 2) * 22} q12 -12 24 0 q12 -12 24 0`} />
-        ))}
-      </g>
     </svg>
+      {/* Birds crossing the sky (ambient life; stops in calm mode). */}
+      <div className="sch-birds absolute inset-0">
+        <svg {...svgProps(width)} className="size-full">
+          <g fill="none" stroke={INK} strokeWidth="3.5" strokeLinecap="round" opacity="0.75">
+            {[0, 1, 2].map((i) => (
+              <path key={i} d={`M${120 + i * 46} ${260 + (i % 2) * 22} q12 -12 24 0 q12 -12 24 0`} />
+            ))}
+          </g>
+        </svg>
+      </div>
+    </div>
   )
 }
 
@@ -148,38 +126,6 @@ const Town: LayerArt = ({ width }) => {
 
 // ---------------------------------------------------------------- trees
 
-/** A neem tree: outlined leaf clusters in three hard-edged tones, lit from the right. */
-function Neem({ x, base, size, seed, haze = 0, line = 3 }: { x: number; base: number; size: number; seed: number; haze?: number; line?: number }) {
-  const r = seeded(seed)
-  const outline = ink(line, mixHex(INK, HAZE, haze))
-  const dark = mixHex('#2f4f35', HAZE, haze)
-  const mid = mixHex('#4f7a3c', HAZE, haze)
-  const lit = mixHex('#93a845', HAZE, haze)
-  const bark = mixHex('#5a3f30', HAZE, haze)
-  const blobs = Array.from({ length: 22 }, () => [x + (r() - 0.5) * size * 1.6, base - size * 1.15 - r() * size * 1.0, size * (0.2 + r() * 0.2)] as const)
-  return (
-    <g>
-      <path
-        d={`M${x - size * 0.08} ${base} Q${x - size * 0.02} ${base - size * 0.6} ${x - size * 0.13} ${base - size * 1.1} L${x + size * 0.1} ${base - size * 1.1} Q${x + size * 0.06} ${base - size * 0.6} ${x + size * 0.1} ${base} Z`}
-        fill={bark}
-        {...outline}
-      />
-      {/* Shaded left side of the trunk. */}
-      <path d={`M${x - size * 0.08} ${base} Q${x - size * 0.02} ${base - size * 0.6} ${x - size * 0.13} ${base - size * 1.1} L${x - size * 0.03} ${base - size * 1.1} Q${x + size * 0.01} ${base - size * 0.6} ${x - size * 0.01} ${base} Z`} fill={shadow(bark, 0.4)} />
-      {blobs.map(([bx, by, br], i) => (
-        <circle key={i} cx={bx} cy={by} r={br} fill={dark} {...outline} />
-      ))}
-      {blobs.map(([bx, by, br], i) => (
-        <circle key={`m${i}`} cx={bx + br * 0.18} cy={by - br * 0.12} r={br * 0.78} fill={mid} />
-      ))}
-      {/* Hard-edged light on the sun side of each cluster. */}
-      {blobs.map(([bx, by, br], i) => (
-        <circle key={`l${i}`} cx={bx + br * 0.46} cy={by - br * 0.32} r={br * 0.34} fill={lit} />
-      ))}
-    </g>
-  )
-}
-
 const Trees: LayerArt = ({ width }) => (
   <svg {...svgProps(width)}>
     {Array.from({ length: Math.ceil(width / 620) + 1 }, (_, i) => (
@@ -193,7 +139,6 @@ const Trees: LayerArt = ({ width }) => (
 // The building is sized for the characters (a child is 400 units tall): doors are taller than a child.
 const SCHOOL = { left: 900, right: 2700, top: 190, base: 860 }
 const WALL = '#eab36a' // painted plaster, deep ochre
-const TRIM = '#a8401f' // terracotta
 const DOOR = '#2c6a94' // classic blue doors and window frames
 const LINE = 3
 
@@ -341,52 +286,70 @@ const School: LayerArt = ({ width }) => {
 
 const Light: LayerArt = ({ width }) => {
   const shafts = 3
+  // Four stacked SVGs: the still colour grade, the blurred shafts (their slow glow animates the
+  // HTML wrapper's opacity, which the browser does cheaply), the drifting dust, and the vignette.
+  // Keeping moving parts out of the blurred SVG avoids re-blurring it every frame.
+  // The shafts use plain transparency, not a "screen" blend: full-screen blends cost about
+  // half the frame rate without a GPU (measured in P4).
+  const layer = 'absolute inset-0 size-full'
   return (
-    <svg {...svgProps(width)}>
-      <defs>
-        <linearGradient id="sch-grade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#4a3a7a" stopOpacity="0.18" />
-          <stop offset="0.55" stopColor="#ffb766" stopOpacity="0" />
-          <stop offset="1" stopColor="#ffa850" stopOpacity="0.2" />
-        </linearGradient>
-        <linearGradient id="sch-shaft" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff2cf" stopOpacity="0.5" />
-          <stop offset="1" stopColor="#fff2cf" stopOpacity="0" />
-        </linearGradient>
-        <filter id="sch-shaft-blur" x="-10%" y="-10%" width="120%" height="120%">
-          <feGaussianBlur stdDeviation="18" />
-        </filter>
-        <radialGradient id="sch-vignette" cx="0.5" cy="0.45" r="0.75">
-          <stop offset="0.6" stopColor="#2a160c" stopOpacity="0" />
-          <stop offset="1" stopColor="#2a160c" stopOpacity="0.3" />
-        </radialGradient>
-      </defs>
-      <rect width={width} height={H} fill="url(#sch-grade)" />
-      <g className="sch-shafts" style={{ mixBlendMode: 'screen' }}>
-        {/* Beams fan out from beyond the top-right corner, where the low sun is. */}
-        {Array.from({ length: shafts }, (_, i) => {
-          const top = width * (0.62 + i * 0.13)
-          const spread = 140 + i * 60
-          return (
-            <path
-              key={i}
-              d={`M${top} -40 L${top + spread} -40 L${top - width * 0.42 + spread * 2} ${H} L${top - width * 0.42} ${H} Z`}
-              fill="url(#sch-shaft)"
-              opacity={0.26 + i * 0.07}
-              filter="url(#sch-shaft-blur)"
-            />
-          )
-        })}
-      </g>
+    <div className="relative size-full">
+      <svg {...svgProps(width)} className={layer}>
+        <defs>
+          <linearGradient id="sch-grade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#4a3a7a" stopOpacity="0.18" />
+            <stop offset="0.55" stopColor="#ffb766" stopOpacity="0" />
+            <stop offset="1" stopColor="#ffa850" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+        <rect width={width} height={H} fill="url(#sch-grade)" />
+      </svg>
+      <div className={`sch-shafts ${layer}`}>
+        <svg {...svgProps(width)} className="size-full">
+          <defs>
+            <linearGradient id="sch-shaft" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#fff2cf" stopOpacity="0.5" />
+              <stop offset="1" stopColor="#fff2cf" stopOpacity="0" />
+            </linearGradient>
+            <filter id="sch-shaft-blur" x="-10%" y="-10%" width="120%" height="120%">
+              <feGaussianBlur stdDeviation="18" />
+            </filter>
+          </defs>
+          {/* Beams fan out from beyond the top-right corner, where the low sun is. */}
+          {Array.from({ length: shafts }, (_, i) => {
+            const top = width * (0.62 + i * 0.13)
+            const spread = 140 + i * 60
+            return (
+              <path
+                key={i}
+                d={`M${top} -40 L${top + spread} -40 L${top - width * 0.42 + spread * 2} ${H} L${top - width * 0.42} ${H} Z`}
+                fill="url(#sch-shaft)"
+                opacity={0.26 + i * 0.07}
+                filter="url(#sch-shaft-blur)"
+              />
+            )
+          })}
+        </svg>
+      </div>
       {/* Dust drifting in the light (ambient life; stops in calm mode). */}
-      <g className="sch-dust" fill="#fff4d6">
-        {Array.from({ length: 18 }, (_, i) => {
-          const r = seeded(900 + i)
-          return <circle key={i} cx={r() * width} cy={200 + r() * 650} r={1.5 + r() * 2.5} opacity={0.4 + r() * 0.4} style={{ animationDelay: `${-r() * 12}s` }} />
-        })}
-      </g>
-      <rect width={width} height={H} fill="url(#sch-vignette)" />
-    </svg>
+      <svg {...svgProps(width)} className={layer}>
+        <g className="sch-dust" fill="#fff4d6">
+          {Array.from({ length: 18 }, (_, i) => {
+            const r = seeded(900 + i)
+            return <circle key={i} cx={r() * width} cy={200 + r() * 650} r={1.5 + r() * 2.5} opacity={0.4 + r() * 0.4} style={{ animationDelay: `${-r() * 12}s` }} />
+          })}
+        </g>
+      </svg>
+      <svg {...svgProps(width)} className={layer}>
+        <defs>
+          <radialGradient id="sch-vignette" cx="0.5" cy="0.45" r="0.75">
+            <stop offset="0.6" stopColor="#2a160c" stopOpacity="0" />
+            <stop offset="1" stopColor="#2a160c" stopOpacity="0.3" />
+          </radialGradient>
+        </defs>
+        <rect width={width} height={H} fill="url(#sch-vignette)" />
+      </svg>
+    </div>
   )
 }
 

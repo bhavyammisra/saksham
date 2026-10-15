@@ -24,8 +24,10 @@ export interface SceneDef {
   startNode: string
   intro?: string // node opened when the player arrives (Mitthu introduces the place)
   nodes: Record<string, StoryNode>
-  card: Card
-  games: GameDef[] // quiz first, sort later
+  /** A hub (the town) links to other places: it has no card or games and never "completes". */
+  hub?: boolean
+  card?: Card // required for every scene that is not a hub (checked by the validator)
+  games?: GameDef[] // quiz first, sort later; required unless hub
 }
 
 export interface Layer {
@@ -45,6 +47,8 @@ export interface Hotspot {
   node?: string // story node to open
   showIf?: string[] // flags
   hideIf?: string[] // flags
+  to?: string // exits: where the door leads. The screen hosting the scene decides what this means.
+  lockedNode?: string // exits: node opened instead of leaving, while the host says this exit is locked
 }
 
 export interface Objective {

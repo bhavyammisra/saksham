@@ -149,6 +149,9 @@ export function validateScene(raw: unknown): string[] {
       if (h?.kind === 'npc' && !isText(h.npc)) fail(`${where} is an npc and needs "npc"`)
       if (h?.kind !== 'exit' && h?.node === undefined) fail(`${where} needs a "node" to open`)
       if (h?.node !== undefined && !nodeExists(h.node)) fail(`${where}.node points to missing node "${h.node}"`)
+      if (h?.lockedNode !== undefined && !nodeExists(h.lockedNode)) fail(`${where}.lockedNode points to missing node "${h.lockedNode}"`)
+      if (h?.lockedNode !== undefined && h.kind !== 'exit') fail(`${where} has a lockedNode but is not an exit`)
+      if (h?.to !== undefined && !isText(h.to)) fail(`${where}.to must be non-empty text`)
       for (const list of ['showIf', 'hideIf'] as const) {
         const flags = h?.[list]
         if (flags === undefined) continue
@@ -174,15 +177,22 @@ export function validateScene(raw: unknown): string[] {
     })
   }
 
-  // Card
-  if (!isObject(scene.card)) fail('"card" is missing')
+  if (scene.hub !== undefined && typeof scene.hub !== 'boolean') fail('"hub" must be true or false')
+  const isHub = scene.hub === true
+
+  // Card (every scene except a hub)
+  if (isHub) {
+    if (scene.card !== undefined || scene.games !== undefined) fail('a hub has no "card" or "games"')
+  } else if (!isObject(scene.card)) fail('"card" is missing')
   else {
     for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
     validateReview(scene.card.review).forEach((p) => fail(`card.review ${p}`))
   }
 
-  // Games
-  if (!Array.isArray(scene.games) || scene.games.length === 0) {
+  // Games (every scene except a hub)
+  if (isHub) {
+    // nothing to check
+  } else if (!Array.isArray(scene.games) || scene.games.length === 0) {
     fail('"games" must list at least one game')
   } else {
     if (!scene.games.some((g) => g?.kind === 'quiz')) fail('"games" must include a quiz')
@@ -247,6 +257,15 @@ export function validateBuildings(raw: unknown): string[] {
   })
   if (isObject(raw[0]) && raw[0].teaser === true) errors.push('the first building must be playable (it is always unlocked)')
   return errors
+}
+
+/** A hub's doors must lead somewhere real: a building in buildings.json, or "help". */
+export function validateHubLinks(raw: unknown, buildingIds: Set<string>): string[] {
+  if (!isObject(raw) || raw.hub !== true || !Array.isArray(raw.hotspots)) return []
+  return (raw.hotspots as Partial<SceneDef['hotspots'][number]>[])
+    .filter((h) => h?.kind === 'exit')
+    .filter((h) => h.to !== 'help' && !(typeof h.to === 'string' && buildingIds.has(h.to)))
+    .map((h) => `hub door "${String(h.id)}" leads to "${String(h.to)}", which is not a building or "help"`)
 }
 
 // ---------------------------------------------------------------- people
@@ -381,6 +400,8 @@ function main(): void {
   const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'))
 
   const npcIds = new Set(Object.keys(readJson(join(root, 'content', 'npcs.json')) as object))
+  const buildingsRaw = readJson(join(root, 'content', 'buildings.json'))
+  const buildingIds = new Set(Array.isArray(buildingsRaw) ? buildingsRaw.map((b: { id?: unknown }) => String(b?.id)) : [])
   const sceneFiles = listFiles(join(root, 'content', 'scenes'), (n) => n.endsWith('.json'))
   for (const file of sceneFiles) {
     let scene: unknown
@@ -390,7 +411,9 @@ function main(): void {
       problems.push(`${relative(root, file)}: not valid JSON (${(error as Error).message})`)
       continue
     }
-    for (const p of [...validateScene(scene), ...validatePeople(scene, npcIds)]) problems.push(`${relative(root, file)}: ${p}`)
+    for (const p of [...validateScene(scene), ...validatePeople(scene, npcIds), ...validateHubLinks(scene, buildingIds)]) {
+      problems.push(`${relative(root, file)}: ${p}`)
+    }
   }
 
   const sourceFiles = listFiles(join(root, 'src'), (n) => /\.tsx?$/.test(n) && !n.includes('.test.'))

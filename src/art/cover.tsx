@@ -43,7 +43,7 @@ export function CoverBackdrop({ dim = false }: { dim?: boolean }) {
         x: b.x + 10 + col * (b.w / 2 - 4),
         y: b.y + 14 + row * 24,
         lit: r() < 0.35 && b.y + 14 + row * 24 < 690,
-        delay: (r() * 6).toFixed(2),
+        delay: r(), // unused now (windows are still), kept so the seeded pattern stays the same
       })),
     ),
   )
@@ -52,7 +52,7 @@ export function CoverBackdrop({ dim = false }: { dim?: boolean }) {
   const bulbs = Array.from({ length: 23 }, (_, i) => {
     const x = 520 + i * 48
     const t = (x - 520) / (1600 - 520)
-    return { i, x, y: 70 + Math.sin(t * Math.PI * 2.2) * 26 + t * 30, d: (i * 0.37).toFixed(2) }
+    return { i, x, y: 70 + Math.sin(t * Math.PI * 2.2) * 26 + t * 30 }
   })
 
   return (
@@ -98,7 +98,7 @@ export function CoverBackdrop({ dim = false }: { dim?: boolean }) {
 
         <rect width={W} height={H} fill="url(#cv-sky)" />
         {stars.map((s) => (
-          <circle key={s.i} className="cover-star" cx={s.x} cy={s.y} r={s.s} fill="#fff" style={{ animationDelay: `${s.i * 0.21}s` }} />
+          <circle key={s.i} className="cover-star" cx={s.x} cy={s.y} r={s.s} fill="#fff" />
         ))}
 
         {/* Long lit clouds. */}
@@ -160,7 +160,7 @@ export function CoverBackdrop({ dim = false }: { dim?: boolean }) {
         {windows.map(
           (w) =>
             w.lit && (
-              <rect key={w.key} className="cover-window" x={w.x} y={w.y} width="9" height="12" rx="1" fill="#ffcf7a" style={{ animationDelay: `${w.delay}s` }} />
+              <rect key={w.key} x={w.x} y={w.y} width="9" height="12" rx="1" fill="#ffcf7a" />
             ),
         )}
 
@@ -215,7 +215,7 @@ export function CoverBackdrop({ dim = false }: { dim?: boolean }) {
         <path d={`M520 70 ${bulbs.map((b) => `L${b.x} ${b.y}`).join(' ')}`} stroke="#2b1630" strokeWidth="2" fill="none" opacity="0.8" />
         {bulbs.map((b) => (
           <g key={b.i}>
-            <circle className="cover-bulb-glow" cx={b.x} cy={b.y + 8} r="14" fill="#ffcf7a" opacity="0.25" style={{ animationDelay: `${b.d}s` }} />
+            <circle cx={b.x} cy={b.y + 8} r="14" fill="#ffcf7a" opacity="0.25" />
             <circle cx={b.x} cy={b.y + 8} r={b.i % 3 === 0 ? 7 : 5} fill={b.i % 3 === 0 ? '#e8a33d' : '#ffdf8a'} />
           </g>
         ))}

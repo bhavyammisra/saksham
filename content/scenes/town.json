@@ -1,0 +1,84 @@
+{
+  "id": "town",
+  "title": "The Town",
+  "right": "Every place teaches a right",
+  "tagline": "Walk down the street and visit the places that are open.",
+  "tone": "normal",
+  "hub": true,
+  "width": 6200,
+  "layers": [
+    { "id": "sky", "art": "school.sky", "speed": 0.05 },
+    { "id": "far", "art": "school.far", "speed": 0.15 },
+    { "id": "houses", "art": "school.town", "speed": 0.4 },
+    { "id": "trees", "art": "school.trees", "speed": 0.65 },
+    { "id": "street", "art": "town.street", "speed": 1 },
+    { "id": "light", "art": "school.light", "speed": 0, "front": true },
+    { "id": "foreground", "art": "school.foreground", "speed": 1.35 }
+  ],
+  "walkable": { "minX": 150, "maxX": 6050 },
+  "spawn": { "x": 380 },
+  "ambience": "town",
+  "hotspots": [
+    { "id": "school", "x": 700, "label": "Go into the School", "kind": "exit", "to": "school", "lockedNode": "school-closed" },
+    { "id": "dhaba", "x": 1550, "label": "Go into the Dhaba", "kind": "exit", "to": "dhaba", "lockedNode": "dhaba-closed" },
+    { "id": "home", "x": 2400, "label": "Go into the Home", "kind": "exit", "to": "home", "lockedNode": "home-closed" },
+    { "id": "panchayat", "x": 3250, "label": "Go into the Panchayat", "kind": "exit", "to": "panchayat", "lockedNode": "panchayat-closed" },
+    { "id": "playground", "x": 4100, "label": "Go to the Playground", "kind": "exit", "to": "playground", "lockedNode": "playground-soon" },
+    { "id": "cyber-adda", "x": 4900, "label": "Go into Cyber Adda", "kind": "exit", "to": "cyber-adda", "lockedNode": "cyber-adda-soon" },
+    { "id": "help", "x": 5650, "label": "Go into the Help Centre", "kind": "exit", "to": "help" }
+  ],
+  "objectives": [],
+  "startNode": "intro",
+  "intro": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Welcome to the town! Walk down the street and go into any place that's open. The teal door at the end is the Help Centre, whenever you need it.",
+      "end": "good"
+    },
+    "school-closed": {
+      "id": "school-closed",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "The school gate is shut right now. Let's try again in a little while.",
+      "end": "good"
+    },
+    "dhaba-closed": {
+      "id": "dhaba-closed",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "The Dhaba isn't open to us yet. Let's help at the places with open doors first, then come back.",
+      "end": "good"
+    },
+    "home-closed": {
+      "id": "home-closed",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Nobody is expecting us at this house yet. We'll visit when it's time.",
+      "end": "good"
+    },
+    "panchayat-closed": {
+      "id": "panchayat-closed",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "The Panchayat isn't meeting yet. We'll come back when its doors open.",
+      "end": "good"
+    },
+    "playground-soon": {
+      "id": "playground-soon",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "The playground is being fixed up. Coming soon!",
+      "end": "good"
+    },
+    "cyber-adda-soon": {
+      "id": "cyber-adda-soon",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Cyber Adda's shutter is still half down. Coming soon!",
+      "end": "good"
+    }
+  }
+}

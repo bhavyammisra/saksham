@@ -1,58 +1,94 @@
-import { Link } from 'react-router'
-import type { BuildingInfo } from '@content/types'
+import { useCallback, useMemo } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router'
+import type { BuildingInfo, Hotspot } from '@content/types'
 import { Mitthu } from '@/character/Mitthu'
 import { Page } from '@/components/Page'
+import { Scene } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
 import { isUnlocked, recommendedBuilding, type BuildingProgress } from '@/lib/rules'
-import { buildings, getScene } from '@/lib/scenes'
+import { buildings, getScene, townScene } from '@/lib/scenes'
 import { selectActiveData, useStore } from '@/lib/store'
 
+/** The exit that leads to the Help Centre (any other `to` is a building id). */
+const HELP = 'help'
+
 /**
- * The town, for now a simple list of buildings (BUILD_PLAN P3, temporary hub).
- * Phase 4 replaces it with a walkable town scene. Each building shows its lock state,
- * stars, and Mitthu's suggestion. Everything comes from content/buildings.json and rules.ts.
+ * The town (Phase 4): a walkable street played by the same scene engine. Each building is an
+ * exit hotspot whose `to` is the building id. This screen decides which doors are locked
+ * (rules.ts and saved progress) and where each door leads; the engine only plays the scene.
+ * Below the street, a card per building shows stars and lock states at a glance.
  */
 export function Town() {
   const data = useStore(selectActiveData)
   const demo = useStore((s) => s.demo)
-  const progress = data?.progress ?? {}
+  const navigate = useNavigate()
+  const location = useLocation()
+  const progress = useMemo(() => data?.progress ?? {}, [data])
   const playable = buildings.filter((b) => !b.teaser)
+
+  // A door is open when its building is unlocked and its story has been written. Help is always open.
+  const locked = useMemo(
+    () =>
+      new Set(
+        townScene.hotspots
+          .filter((h) => h.kind === 'exit' && h.to !== HELP && !(h.to && isUnlocked(h.to, buildings, progress, demo) && getScene(h.to)))
+          .map((h) => h.id),
+      ),
+    [progress, demo],
+  )
+
+  // Coming back from a building: start outside its door.
+  const from = (location.state as { from?: string } | null)?.from
+  const startX = townScene.hotspots.find((h) => h.to !== undefined && h.to === from)?.x
+
+  const onExit = useCallback(
+    (h: Hotspot) => {
+      if (h.to === HELP) navigate('/help', { state: { from: '/town' } })
+      else if (h.to) navigate(`/play/${h.to}`)
+    },
+    [navigate],
+  )
+  const onComplete = useCallback(() => {}, []) // the town never "completes"
+
   // Mitthu only suggests a place that can actually be played right now.
   const suggested = recommendedBuilding(buildings, progress, demo)
   const suggestion = suggested && getScene(suggested) ? buildings.find((b) => b.id === suggested) : undefined
 
   return (
     <Page title={t('town.title')} wide>
-      <div className="flex flex-wrap items-center gap-4">
-        <p className="text-lg">{t('town.intro')}</p>
-        {demo && <span className="rounded-pill bg-peacock px-3 py-1 text-sm font-semibold text-white">{t('town.demo')}</span>}
-      </div>
+      {demo && <p className="mb-3 inline-block rounded-pill bg-peacock px-3 py-1 text-sm font-semibold text-white">{t('town.demo')}</p>}
+      <Scene scene={townScene} locked={locked} startX={startX} onExit={onExit} onComplete={onComplete} />
 
-      <div className="mt-4 flex items-center gap-3 rounded-card bg-plaster-deep p-3">
-        <div className="size-14 shrink-0 rounded-full bg-gradient-to-b from-marigold-soft to-leaf/40 p-1">
-          <Mitthu view="portrait" className="size-full" />
+      <section aria-labelledby="places-title" className="mt-6">
+        <h2 id="places-title" className="text-xl font-semibold">
+          {t('town.places')}
+        </h2>
+        <div className="mt-3 flex items-center gap-3 rounded-card bg-plaster-deep p-3">
+          <div className="size-14 shrink-0 rounded-full bg-gradient-to-b from-marigold-soft to-leaf/40 p-1">
+            <Mitthu view="portrait" className="size-full" />
+          </div>
+          <p className="font-semibold">{suggestion ? t('town.mitthuNext', { name: suggestion.name }) : t('town.mitthuAllDone')}</p>
         </div>
-        <p className="font-semibold">{suggestion ? t('town.mitthuNext', { name: suggestion.name }) : t('town.mitthuAllDone')}</p>
-      </div>
 
-      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {buildings.map((b) => {
-          const index = playable.findIndex((p) => p.id === b.id)
-          const previous = index > 0 ? playable[index - 1] : undefined
-          return (
-            <li key={b.id}>
-              <BuildingCard
-                building={b}
-                progress={progress[b.id]}
-                unlocked={isUnlocked(b.id, buildings, progress, demo)}
-                ready={getScene(b.id) !== null}
-                suggested={b.id === suggestion?.id}
-                previousName={previous?.name}
-              />
-            </li>
-          )
-        })}
-      </ul>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {buildings.map((b) => {
+            const index = playable.findIndex((p) => p.id === b.id)
+            const previous = index > 0 ? playable[index - 1] : undefined
+            return (
+              <li key={b.id}>
+                <BuildingCard
+                  building={b}
+                  progress={progress[b.id]}
+                  unlocked={isUnlocked(b.id, buildings, progress, demo)}
+                  ready={getScene(b.id) !== null}
+                  suggested={b.id === suggestion?.id}
+                  previousName={previous?.name}
+                />
+              </li>
+            )
+          })}
+        </ul>
+      </section>
     </Page>
   )
 }
@@ -81,7 +117,7 @@ function BuildingCard(props: {
       <div className="flex items-start gap-3">
         <BuildingIcon locked={!unlocked} />
         <div>
-          <h2 className="text-xl font-semibold text-ink">{b.name}</h2>
+          <h3 className="text-xl font-semibold text-ink">{b.name}</h3>
           <p className="text-sm">{b.right}</p>
         </div>
       </div>

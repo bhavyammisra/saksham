@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validateHubLinks, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -163,7 +163,7 @@ describe('NFR-07 content validation: scenes', () => {
   })
 
   it('requires a fact-check record on every card', () => {
-    expect(validateScene(broken((s) => delete (s.card as Partial<SceneDef['card']>).review))).toContain(
+    expect(validateScene(broken((s) => delete (s.card as Partial<NonNullable<SceneDef['card']>>).review))).toContain(
       'card.review is missing (add { status: "unverified", ... } for the owner to fact-check)',
     )
   })
@@ -176,6 +176,27 @@ describe('NFR-07 content validation: scenes', () => {
   it('accepts a verified card with a name and date', () => {
     const scene = broken((s) => (s.card.review = { status: 'verified', checkedBy: 'Owner', checkedOn: '2026-10-20', note: 'Checked.' }))
     expect(validateScene(scene)).toEqual([])
+  })
+
+  it('accepts a hub with no card or games, and rejects a hub that has them', () => {
+    const hub = broken((s) => {
+      s.hub = true
+      delete s.card
+      delete s.games
+    })
+    expect(validateScene(hub)).toEqual([])
+    expect(validateScene(broken((s) => (s.hub = true)))).toContain('a hub has no "card" or "games"')
+  })
+
+  it("checks an exit's lockedNode", () => {
+    const errors = validateScene(
+      broken((s) => {
+        s.hotspots.push({ id: 'door', x: 600, label: 'Door', kind: 'exit', to: 'park', lockedNode: 'nope' })
+        s.hotspots[0].lockedNode = 'hello'
+      }),
+    )
+    expect(errors).toContain('hotspot "door".lockedNode points to missing node "nope"')
+    expect(errors.some((e) => e.endsWith('has a lockedNode but is not an exit'))).toBe(true)
   })
 
   it('rejects a quiz answer outside the options', () => {
@@ -270,5 +291,17 @@ describe('buildings list', () => {
     expect(errors).toContain('building "park" is duplicated')
     expect(errors).toContain('building "park" needs a "name" and a "right"')
     expect(errors).toContain('the first building must be playable (it is always unlocked)')
+  })
+})
+
+describe('hub doors', () => {
+  const hub = { hub: true, hotspots: [{ id: 'a', kind: 'exit', to: 'school' }, { id: 'b', kind: 'exit', to: 'help' }, { id: 'c', kind: 'exit', to: 'moon' }] }
+
+  it('accept buildings and "help", and reject anything else', () => {
+    expect(validateHubLinks(hub, new Set(['school']))).toEqual(['hub door "c" leads to "moon", which is not a building or "help"'])
+  })
+
+  it('ignore scenes that are not hubs', () => {
+    expect(validateHubLinks({ ...hub, hub: false }, new Set())).toEqual([])
   })
 })

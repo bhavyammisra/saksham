@@ -8,6 +8,9 @@ export default defineConfig({
   testDir: 'tests/e2e',
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // Locally, at most 3 browsers at once: scenes animate continuously, and on a shared laptop
+  // more parallel browsers starved the machine into timeouts (BUILD_PLAN P4 notes). CI keeps its default.
+  workers: process.env.CI ? undefined : 3,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: `http://localhost:${PORT}`,

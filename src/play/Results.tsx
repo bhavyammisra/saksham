@@ -33,12 +33,14 @@ const STAR_REASONS: StringKey[] = ['results.starFinish', 'results.starQuiz', 're
  * A `gentle` scene adds a quiet note linking to Need help? (safety rule).
  */
 export function Results({
+  from,
   name,
   avatar,
   summary,
   tone,
   onAgain,
 }: {
+  from: string // the building just played: the town puts the player back outside its door
   name: string
   avatar: CharacterSpec
   summary: Summary
@@ -104,7 +106,7 @@ export function Results({
       )}
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link to="/town" className="inline-flex min-h-tap items-center rounded-button bg-terracotta px-5 font-semibold text-white hover:bg-terracotta-deep">
+        <Link to="/town" state={{ from }} className="inline-flex min-h-tap items-center rounded-button bg-terracotta px-5 font-semibold text-white hover:bg-terracotta-deep">
           {t('play.backToTown')}
         </Link>
         <Button look="secondary" onClick={onAgain}>
