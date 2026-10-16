@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { SchoolYardArt } from '@/art/schoolYard'
 import { Character } from '@/character/Character'
+import { Mitthu } from '@/character/Mitthu'
 import type { CharacterSpec } from '@/character/spec'
 import { CoverScreen } from '@/components/CoverScreen'
 import { SettingsDialog } from '@/components/SettingsDialog'
@@ -33,9 +35,17 @@ export function Title() {
   return (
     <CoverScreen className="grid min-h-dvh items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div>
+        {/* Mitthu, the parrot guide, perched on the title. */}
+        <div aria-hidden="true" className="-mb-3 ml-1 h-20 w-20">
+          <Mitthu className="size-full" />
+        </div>
         <h1 className="cover-wordmark text-5xl uppercase text-espresso md:text-6xl">{t('app.name')}</h1>
-        <div className="mt-5 h-0.5 w-12 bg-rust" aria-hidden="true" />
-        <p className="mt-4 text-lg text-umber">{t('title.tagline')}</p>
+        <div className="mt-5 flex gap-1.5" aria-hidden="true">
+          <span className="h-1 w-10 rounded-pill bg-rust" />
+          <span className="h-1 w-5 rounded-pill bg-peacock" />
+          <span className="h-1 w-2.5 rounded-pill bg-marigold" />
+        </div>
+        <p className="mt-4 text-lg text-peacock">{t('title.tagline')}</p>
 
         <nav aria-label={t('title.menu')} className="mt-12">
           <ul className="space-y-1">
@@ -62,7 +72,11 @@ export function Title() {
           </ul>
         </nav>
 
-        <p className="mt-14 text-sm text-umber">
+        <Link to="/proto" className="mt-8 inline-flex min-h-tap items-center rounded-pill bg-peacock px-5 text-sm font-semibold text-white hover:bg-[#25595c]">
+          {t('title.tryProto')}
+        </Link>
+
+        <p className="mt-8 text-sm text-umber">
           {t('title.footer')} ·{' '}
           <Link to="/credits" className="underline underline-offset-4 hover:text-espresso">
             {t('credits.title')}
@@ -70,10 +84,12 @@ export function Title() {
         </p>
       </div>
 
-      {/* The player's character, or two explorers. Decorative. */}
+      {/* A picture of the School yard, with the player's character (or two explorers) in front. Decorative. */}
       <div aria-hidden="true" className="relative hidden h-[34rem] items-end justify-center md:flex">
-        <div className="absolute left-1/2 top-6 size-[26rem] -translate-x-1/2 rounded-full bg-linen" />
-        <div className="absolute bottom-3 left-1/2 h-5 w-72 -translate-x-1/2 rounded-[50%] bg-oat/60" />
+        <div className="cover-picture absolute inset-x-0 top-0 h-[27rem] overflow-hidden rounded-3xl">
+          <SchoolYardArt viewBox="380 60 1500 760" />
+        </div>
+        <div className="absolute bottom-3 left-1/2 h-5 w-72 -translate-x-1/2 rounded-[50%] bg-espresso/15" />
         {active ? (
           <div className="relative h-[30rem] w-40">
             <Character spec={active.avatar} pose="idle" mood="happy" className="size-full" />

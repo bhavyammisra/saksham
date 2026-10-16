@@ -12,6 +12,7 @@ import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
 import { Placeholder } from '@/screens/Placeholder'
 import { Play } from '@/screens/Play'
+import { GameProto } from '@/proto/GameProto'
 import { Profiles } from '@/screens/Profiles'
 import { Title } from '@/screens/Title'
 import { Town } from '@/screens/Town'
@@ -24,6 +25,8 @@ export default function App() {
       <Routes>
         {/* The Help Centre has no shell: no Help button, nothing that moves or makes sound. */}
         <Route path="/help" element={<HelpCentre />} />
+        {/* Prototype of the new full-screen gameplay (D-035). Its own frame, with Need help? in the corner. */}
+        <Route path="/proto" element={<GameProto />} />
 
         {/* Screens with the top bar only. */}
         {/* The cover screens before the game (title menu, new game, players), under a see-through top bar. */}

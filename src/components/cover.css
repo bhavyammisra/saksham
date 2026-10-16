@@ -1,13 +1,21 @@
 /* The cover screens before the game (title menu, new game, customiser, players).
-   Quiet and minimal (owner feedback, D-034): warm beige, espresso text, one rust accent.
+   Calm beige (owner feedback, D-034) with a little colour: soft teal and peach washes,
+   rust, teal and marigold accents, and a framed picture of the School yard (D-035).
    Nothing moves here; calm mode also stops the menu's small slide. */
 
 .cover {
   background:
-    radial-gradient(ellipse 70% 60% at 78% 42%, #efe6d6 0%, transparent 70%),
+    radial-gradient(ellipse 45% 55% at 8% 12%, rgb(47 111 115 / 0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 60% at 85% 30%, rgb(240 160 110 / 0.18) 0%, transparent 70%),
     linear-gradient(180deg, #f6f1e7 0%, #ece3d3 100%);
   color: var(--color-espresso);
   font-family: var(--font-ui);
+}
+
+/* The picture on the title screen: a white mount and a soft shadow, like a print. */
+.cover-picture {
+  border: 8px solid #fbf8f2;
+  box-shadow: 0 2px 4px rgb(60 40 20 / 0.08), 0 24px 50px rgb(60 40 20 / 0.16);
 }
 
 /* The word "SAKSHAM": the serif, in capitals, spaced wide. */
