@@ -26,36 +26,56 @@
   96% { transform: scaleY(0.1); }
 }
 
-/* idle: breathing and a slow look around */
-.ch[data-pose='idle'] .ch-body { animation: ch-breathe 3.6s ease-in-out infinite; }
-.ch[data-pose='idle'] .ch-head { animation: ch-look 7s ease-in-out infinite; }
+/* idle: breathing, a slow shift of weight, arms that hang loosely, and a look around */
+.ch[data-pose='idle'] .ch-body { animation: ch-breathe 4.2s ease-in-out infinite; }
+.ch[data-pose='idle'] .ch-head { animation: ch-look 8s ease-in-out infinite; }
+.ch[data-pose='idle'] .ch-arm-l { animation: ch-hang 4.2s ease-in-out infinite; }
+.ch[data-pose='idle'] .ch-arm-r { animation: ch-hang 4.2s ease-in-out -2.1s infinite; }
 @keyframes ch-breathe {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1px); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(-1.2px) rotate(0.5deg); }
+  60% { transform: translateY(-0.4px) rotate(0.2deg); }
 }
 @keyframes ch-look {
   0%, 100% { transform: rotate(0deg); }
-  40% { transform: rotate(1.5deg); }
-  70% { transform: rotate(-1deg); }
+  35% { transform: rotate(2deg); }
+  45% { transform: rotate(2deg); }
+  75% { transform: rotate(-1.5deg); }
+}
+@keyframes ch-hang {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.6deg); }
 }
 
-/* walk: legs and arms swing in opposite pairs, with a small bob */
-.ch[data-pose='walk'] .ch-leg-l { animation: ch-stride 0.7s ease-in-out infinite alternate; }
-.ch[data-pose='walk'] .ch-leg-r { animation: ch-stride 0.7s ease-in-out infinite alternate-reverse; }
-.ch[data-pose='walk'] .ch-arm-l { animation: ch-swing 0.7s ease-in-out infinite alternate-reverse; }
-.ch[data-pose='walk'] .ch-arm-r { animation: ch-swing 0.7s ease-in-out infinite alternate; }
-.ch[data-pose='walk'] .ch-body { animation: ch-bob 0.35s ease-in-out infinite alternate; }
-@keyframes ch-stride {
-  from { transform: rotate(14deg); }
-  to { transform: rotate(-14deg); }
+/* walk: a real step cycle (D-035). Each leg reaches forward, takes the weight, pushes off
+   behind, then lifts as it swings through (the lift stands in for a bending knee).
+   The arms swing against the legs, a little after them; the body dips on each step and
+   leans into the walk; the head steadies itself. One cycle = two steps = 0.84 s. */
+.ch[data-pose='walk'] .ch-leg-l { animation: ch-step 0.84s linear infinite; }
+.ch[data-pose='walk'] .ch-leg-r { animation: ch-step 0.84s linear -0.42s infinite; }
+.ch[data-pose='walk'] .ch-arm-l { animation: ch-armswing 0.84s ease-in-out -0.04s infinite; }
+.ch[data-pose='walk'] .ch-arm-r { animation: ch-armswing 0.84s ease-in-out -0.46s infinite; }
+.ch[data-pose='walk'] .ch-body { animation: ch-bob 0.42s ease-in-out infinite; }
+.ch[data-pose='walk'] .ch-head { animation: ch-steady 0.42s ease-in-out infinite; }
+@keyframes ch-step {
+  0% { transform: rotate(-17deg); animation-timing-function: ease-out; }   /* heel down, in front */
+  30% { transform: rotate(-3deg); animation-timing-function: linear; }     /* weight on it */
+  55% { transform: rotate(15deg); animation-timing-function: ease-in; }    /* push off, behind */
+  72% { transform: rotate(6deg) translateY(-7px); animation-timing-function: ease-out; } /* foot lifts */
+  88% { transform: rotate(-12deg) translateY(-3px); }                      /* swings through */
+  100% { transform: rotate(-17deg); }
 }
-@keyframes ch-swing {
-  from { transform: rotate(10deg); }
-  to { transform: rotate(-10deg); }
+@keyframes ch-armswing {
+  0%, 100% { transform: rotate(13deg); }
+  50% { transform: rotate(-15deg); }
 }
 @keyframes ch-bob {
-  from { transform: translateY(0); }
-  to { transform: translateY(-2.5px); }
+  0%, 100% { transform: translateY(1.5px) rotate(-1.8deg); }   /* foot strikes: lowest */
+  50% { transform: translateY(-2.5px) rotate(-1.2deg); }       /* passing: highest */
+}
+@keyframes ch-steady {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(0.5deg); }
 }
 
 /* talk: the mouth opens and closes, the head nods a little */

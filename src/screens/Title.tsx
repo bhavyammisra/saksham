@@ -87,7 +87,7 @@ export function Title() {
       {/* A picture of the School yard, with the player's character (or two explorers) in front. Decorative. */}
       <div aria-hidden="true" className="relative hidden h-[34rem] items-end justify-center md:flex">
         <div className="cover-picture absolute inset-x-0 top-0 h-[27rem] overflow-hidden rounded-3xl">
-          <SchoolYardArt viewBox="380 60 1500 760" />
+          <SchoolYardArt viewBox="440 90 1560 720" clouds />
         </div>
         <div className="absolute bottom-3 left-1/2 h-5 w-72 -translate-x-1/2 rounded-[50%] bg-espresso/15" />
         {active ? (

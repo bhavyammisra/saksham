@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import school from '@content/scenes/school.json'
 import type { StoryNode } from '@content/types'
-import { SchoolYardArt, YARD_H, YARD_W } from '@/art/schoolYard'
+import { Clouds, SchoolYardArt, YARD_H, YARD_W, YardSky } from '@/art/schoolYard'
 import { Character } from '@/character/Character'
 import { defaultSpec, type CharacterSpec } from '@/character/spec'
 import { HelpButton } from '@/components/HelpButton'
@@ -30,8 +30,10 @@ const FEET_FAR = 712
 const FEET_NEAR = 865
 const MIN_X = 120
 const MAX_X = YARD_W - 120
-const SPEED_X = 420 // world units per second
-const SPEED_DEPTH = 0.9 // depth per second
+const SPEED_X = 380 // world units per second
+const SPEED_DEPTH = 0.8 // depth per second
+const VIEW_H = 690 // how much of the world's height fills the screen: less = closer (D-035 zoom)
+const CLOUD_H = 480 // the cloud layer covers the sky down to this world height (behind the school)
 
 interface Person {
   id: string
@@ -53,6 +55,17 @@ const NAME_COLOUR: Record<string, string> = { player: '#f5d76e', mitthu: '#8fd88
 const feetY = (depth: number) => FEET_FAR + (FEET_NEAR - FEET_FAR) * depth
 const height = (depth: number) => 255 + 70 * depth // nearer people look a little bigger
 
+/** How big the world is drawn: VIEW_H world units fill the screen height (or the yard fills the width). */
+function scaleFor(view: { w: number; h: number }) {
+  return Math.max(view.h / VIEW_H, view.w / YARD_W)
+}
+
+/** Where the camera wants to be: the player in the middle, without showing past the yard's ends. */
+function cameraFor(x: number, view: { w: number; h: number }) {
+  const scale = scaleFor(view)
+  return Math.min(Math.max(x * scale - view.w / 2, 0), YARD_W * scale - view.w)
+}
+
 export function GameProto() {
   const profile = useStore(selectActiveProfile)
   const playerSpec = profile?.avatar ?? defaultSpec
@@ -60,7 +73,12 @@ export function GameProto() {
   const navigate = useNavigate()
 
   const [view, setView] = useState({ w: window.innerWidth, h: window.innerHeight })
-  const [me, setMe] = useState({ x: 1650, depth: 0.7, facing: 'left' as 'left' | 'right', moving: false })
+  const viewRef = useRef(view)
+  useEffect(() => {
+    viewRef.current = view
+  }, [view])
+  // Position, speed (it eases in and out instead of starting and stopping at once) and the camera.
+  const [me, setMe] = useState(() => ({ x: 1650, depth: 0.7, vx: 0, vd: 0, facing: 'left' as 'left' | 'right', moving: false, cam: cameraFor(1650, view) }))
   const pos = useRef(me)
   const keys = useRef({ left: false, right: false, up: false, down: false })
   const target = useRef<{ x: number; depth: number } | null>(null)
@@ -164,14 +182,18 @@ export function GameProto() {
         }
       }
       if (busy) dx = dd = 0
-      const moving = dx !== 0 || dd !== 0
-      if (moving || p.moving) {
-        const next = {
-          x: Math.min(MAX_X, Math.max(MIN_X, p.x + dx * SPEED_X * dt)),
-          depth: Math.min(1, Math.max(0, p.depth + dd * SPEED_DEPTH * dt)),
-          facing: dx < 0 ? ('left' as const) : dx > 0 ? ('right' as const) : p.facing,
-          moving,
-        }
+      // Ease the speed towards what the keys ask for, so steps start and stop softly.
+      const ease = Math.min(1, dt * 9)
+      const vx = p.vx + (dx * SPEED_X - p.vx) * ease
+      const vd = p.vd + (dd * SPEED_DEPTH - p.vd) * ease
+      const x = Math.min(MAX_X, Math.max(MIN_X, p.x + vx * dt))
+      const depth = Math.min(1, Math.max(0, p.depth + vd * dt))
+      // The camera glides after the player instead of being fixed to them.
+      const goal = cameraFor(x, viewRef.current)
+      const cam = Math.abs(goal - p.cam) < 0.5 ? goal : p.cam + (goal - p.cam) * Math.min(1, dt * 4)
+      const moving = Math.abs(vx) > 40 || Math.abs(vd) > 0.08
+      if (moving || p.moving || Math.abs(vx) > 1 || Math.abs(vd) > 0.005 || cam !== p.cam) {
+        const next = { x, depth, vx, vd, cam, moving, facing: dx < 0 ? ('left' as const) : dx > 0 ? ('right' as const) : p.facing }
         pos.current = next
         setMe(next)
       }
@@ -181,9 +203,8 @@ export function GameProto() {
     return () => cancelAnimationFrame(frame)
   }, [busy])
 
-  // Camera: the yard fills the screen height (or width, on very wide screens) and follows the player.
-  const scale = Math.max(view.h / YARD_H, view.w / YARD_W)
-  const camX = Math.min(Math.max(me.x * scale - view.w / 2, 0), YARD_W * scale - view.w)
+  const scale = scaleFor(view)
+  const camX = me.cam
   const camY = view.h - YARD_H * scale
 
   const tapGround = (event: React.MouseEvent) => {
@@ -208,16 +229,35 @@ export function GameProto() {
         onClick={tapGround}
         aria-hidden="true"
       >
-        <SchoolYardArt />
+        {/* Back to front: the sky, the clouds (their own layer, sliding slower than the yard because
+            they are far away, and drifting), then the yard and the school. */}
+        <div className="absolute left-0 top-0" style={{ width: YARD_W, height: 640 }}>
+          <YardSky />
+        </div>
+        <div className="absolute left-0 top-0 overflow-hidden" style={{ width: YARD_W, height: CLOUD_H }}>
+          <div className="cloud-drift absolute top-0" style={{ left: camX / scale / 1.6 - 200, width: 3200, height: CLOUD_H }}>
+            <Clouds />
+          </div>
+        </div>
+        <div className="absolute inset-0">
+          <SchoolYardArt sky={false} />
+        </div>
         {everyone.map((p) => {
           const h = height(p.depth)
           return (
-            <div key={p.id} className="absolute" style={{ left: p.x - h / 6, top: feetY(p.depth) - h * 0.97, width: h / 3, height: h }}>
-              <Character spec={p.spec} pose={p.moving ? 'walk' : 'idle'} facing={p.facing} mood="happy" className="size-full" />
+            <div key={p.id}>
+              {/* Each person's shadow, cast to the right by the low sun on the left. */}
+              <div className="proto-shadow absolute" style={{ left: p.x - h * 0.08, top: feetY(p.depth) - h * 0.03, width: h * 0.62, height: h * 0.07 }} />
+              <div className="proto-person absolute" style={{ left: p.x - h / 6, top: feetY(p.depth) - h * 0.97, width: h / 3, height: h, zIndex: Math.round(p.depth * 100) }}>
+                <Character spec={p.spec} pose={p.moving ? 'walk' : 'idle'} facing={p.facing} mood="happy" className="size-full" />
+              </div>
             </div>
           )
         })}
       </div>
+
+      {/* Colour grade: darker edges and a slightly heavier sky, so the eye goes to the middle. */}
+      <div className="proto-grade pointer-events-none absolute inset-0" aria-hidden="true" />
 
       {/* "Talk to …" above the person you are standing next to. */}
       {near && !busy && (
