@@ -1,10 +1,9 @@
 // The scene engine, played end to end in the sandbox (/dev/scene).
 import { expect, test, type Page } from '@playwright/test'
 import sandbox from '../../content/scenes/sandbox.json' with { type: 'json' }
-import { strings } from './helpers.ts'
+import { doThing, strings, thingsToDo } from './helpers.ts'
 
 const live = (page: Page) => page.locator('[aria-live="polite"]').filter({ hasText: ':' }).first()
-const thingsToDo = (page: Page) => page.getByRole('region', { name: strings['scene.thingsToDo'] })
 const next = (page: Page) => page.getByRole('button', { name: strings['scene.next'], exact: true })
 
 /** Moves on by exactly one line (the first press may only finish the typewriter). */
@@ -43,24 +42,22 @@ test('FR-02 / FR-03 keyboard: walk with the arrow keys, see the prompt, press E 
 })
 
 test('FR-03 "Things to do here" lists only visible hotspots and opens them without walking', async ({ page }) => {
-  const list = thingsToDo(page)
-  await expect(list.getByRole('button', { name: 'Read the notice' })).toHaveCount(0) // needs the box first
-  await list.getByRole('button', { name: 'Look at the box' }).click()
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Read the notice' })).toHaveCount(0) // needs the box first
+  await doThing(page, 'Look at the box')
   await expect(live(page)).toContainText('A blue cover')
   await talkThrough(page)
-  await expect(list.getByRole('button', { name: 'Read the notice' })).toBeVisible()
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Read the notice' })).toBeVisible()
 })
 
 test('FR-04 a weaker choice says "let\'s try that again", then the good choice completes the scene', async ({ page }) => {
-  const list = thingsToDo(page)
   for (const label of ['Talk to Ravi', 'Look at the box', 'Read the notice']) {
-    await list.getByRole('button', { name: label }).click()
+    await doThing(page, label)
     await talkThrough(page)
   }
   // Objectives update as flags are set.
   await expect(page.getByRole('region', { name: strings['scene.objectives'] }).getByText(/done\)$/)).toHaveCount(2)
 
-  await list.getByRole('button', { name: 'Talk to Meena Didi' }).click()
+  await doThing(page, 'Talk to Meena Didi')
   await talkThrough(page)
   await page.getByRole('button', { name: 'Never mind, it is not important.' }).click()
   await expect(live(page)).toContainText('Come back if you change your mind') // the consequence
@@ -75,14 +72,14 @@ test('FR-04 a weaker choice says "let\'s try that again", then the good choice c
 })
 
 test('FR-03 an exit hotspot leaves the scene', async ({ page }) => {
-  await thingsToDo(page).getByRole('button', { name: 'Leave the sandbox' }).click()
+  await doThing(page, 'Leave the sandbox')
   await expect(page.getByRole('status')).toHaveText(strings['dev.sceneExit'].replace('{label}', 'Leave the sandbox'))
 })
 
 test('NFR-05 calm mode: no typewriter, the whole line shows at once', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.reload()
-  await thingsToDo(page).getByRole('button', { name: 'Talk to Ravi' }).click()
+  await doThing(page, 'Talk to Ravi')
   const text = page.getByRole('region', { name: strings['scene.conversation'] }).locator('p[aria-hidden="true"]')
   await expect(text).toHaveText(sandbox.nodes['ravi-hello'].text)
   // One press moves on, because there is nothing left to type.
@@ -91,8 +88,32 @@ test('NFR-05 calm mode: no typewriter, the whole line shows at once', async ({ p
 })
 
 test('NFR-05 tap targets in the scene panels are at least 48px tall', async ({ page }) => {
-  const heights = await thingsToDo(page)
+  const heights = await (await thingsToDo(page))
     .getByRole('button')
     .evaluateAll((buttons) => buttons.map((b) => b.getBoundingClientRect().height))
   for (const h of heights) expect(h).toBeGreaterThanOrEqual(48)
+})
+
+test('D-036 W and S walk nearer and further; Back shows the line before; History lists the lines', async ({ page }) => {
+  const player = page.locator('.game-person').last()
+  const before = await player.boundingBox()
+  await page.getByRole('region', { name: /Scene:/ }).focus()
+  await page.keyboard.down('s')
+  await page.waitForTimeout(400)
+  await page.keyboard.up('s')
+  const after = await player.boundingBox()
+  expect(after!.y + after!.height).toBeGreaterThan(before!.y + before!.height) // feet lower on screen: nearer
+
+  await doThing(page, 'Talk to Ravi')
+  const first = await live(page).textContent()
+  await nextLine(page)
+  await expect(live(page)).not.toHaveText(first!)
+  await page.getByRole('navigation', { name: strings['hud.menu'] }).getByRole('button', { name: strings['hud.back'] }).click()
+  await expect(live(page)).toHaveText(first!)
+
+  await page.getByRole('navigation', { name: strings['hud.menu'] }).getByRole('button', { name: strings['hud.history'] }).click()
+  const history = page.getByRole('dialog', { name: strings['hud.history'] })
+  await expect(history).toContainText(sandbox.nodes['ravi-hello'].text)
+  await history.getByRole('button', { name: strings['hud.close'] }).click()
+  await expect(history).toHaveCount(0)
 })

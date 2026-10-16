@@ -1,8 +1,100 @@
-/* Scene engine styles. Every movement here stops in calm mode. */
+/* The full-screen game frame (D-036). Modern and quiet: a dark see-through strip for dialogue,
+   small white words for the menu, the Inter font. Every movement here stops in calm mode.
+   Performance (D-030): no blurs, no blend modes; only plain gradients and opacity. */
 
-/* Mitthu rises to fly beside the player while walking, and lands when they stop. */
-.scene .scene-mitthu {
-  transition: bottom 0.5s ease-out;
+.game {
+  font-family: var(--font-ui);
+}
+
+/* Lighting over the whole picture: darker corners and a heavier sky. */
+.game-grade {
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 55%, transparent 55%, rgb(8 10 16 / 0.5) 100%),
+    linear-gradient(to bottom, rgb(20 26 40 / 0.28) 0%, transparent 35%);
+}
+.game[data-tone='gentle'] .game-grade {
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 55%, transparent 50%, rgb(20 12 10 / 0.55) 100%),
+    linear-gradient(to bottom, rgb(30 24 40 / 0.3) 0%, transparent 40%);
+}
+
+/* People stand in the scene's light: a little darker and less bright than on the menus. */
+.game .game-person {
+  filter: brightness(0.9) saturate(0.88) contrast(1.05);
+}
+.game-shadow {
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 30% 50%, rgb(0 0 0 / 0.42), transparent 70%);
+  pointer-events: none;
+}
+
+/* Clouds slide slowly to and fro (drawn once; the browser only moves them). */
+.game-drift {
+  animation: game-drift 90s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes game-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-6%); }
+}
+
+/* Words over the picture stay readable. */
+.game-hud,
+.game-hint {
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.85);
+}
+
+/* The dialogue strip fades up from the bottom, like a film subtitle band. */
+.game-strip {
+  background: linear-gradient(to top, rgb(0 0 0 / 0.82) 0%, rgb(0 0 0 / 0.64) 60%, transparent 100%);
+}
+
+.game-menu {
+  min-height: 2.25rem;
+  padding: 0 0.6rem;
+  color: rgb(255 255 255 / 0.85);
+  letter-spacing: 0.04em;
+}
+.game-menu:hover,
+.game-menu[aria-expanded='true'] {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.game-menu:disabled {
+  color: rgb(255 255 255 / 0.35);
+  text-decoration: none;
+}
+
+.game-choice {
+  background: rgb(255 255 255 / 0.12);
+  border: 1px solid rgb(255 255 255 / 0.42);
+  color: #ffffff;
+}
+.game-choice:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.24);
+}
+.game-next {
+  background: rgb(255 255 255 / 0.9);
+  color: #111111;
+}
+.game-next:hover {
+  background: #ffffff;
+}
+
+.game-prompt,
+.game-toast {
+  background: rgb(0 0 0 / 0.68);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  color: #ffffff;
+}
+.game-panel {
+  background: rgb(12 14 18 / 0.88);
+  border: 1px solid rgb(255 255 255 / 0.18);
+}
+.game-overlay {
+  background: rgb(0 0 0 / 0.84);
+  color: #ffffff;
 }
 
 /* The "Talk to..." prompt bobs gently so it catches the eye. */
@@ -14,7 +106,7 @@
   50% { translate: 0 -4px; }
 }
 
-/* Mitthu points the way: a gentle bob above the suggested place (still in calm mode). */
+/* Mitthu points the way: a gentle bob above the suggested place. */
 .scene .scene-guide {
   animation: scene-guide-bob 1.8s ease-in-out infinite;
 }
@@ -23,25 +115,28 @@
   50% { translate: 0 -10px; }
 }
 
-/* Objects without art: a soft glow on the ground. */
-.scene .scene-sparkle {
-  background: radial-gradient(circle, rgb(246 215 154 / 0.95), rgb(246 215 154 / 0));
+/* Mitthu rises to fly beside the player while walking, and lands when they stop. */
+.scene .scene-mitthu {
+  transition: top 0.5s ease-out;
 }
 
-/* Hotspot pictures are buttons: show a soft lift on hover and focus. */
+/* Objects and doors without a picture: a soft glow on the ground. */
+.scene .scene-sparkle {
+  background: radial-gradient(circle, rgb(246 215 154 / 0.7), rgb(246 215 154 / 0));
+}
+
+/* Hotspot pictures are buttons: a soft lift on hover and focus. */
 .scene .scene-hotspot {
   border-radius: 1rem;
 }
 .scene .scene-hotspot:hover {
-  filter: drop-shadow(0 0 6px rgb(246 215 154 / 0.95));
+  filter: brightness(1.08) drop-shadow(0 0 6px rgb(246 215 154 / 0.9));
 }
 
-/* Film grain: a tiny static noise texture, made in SVG (no image file). */
-.scene .scene-grain {
-  /* Plain transparency, not a blend mode: a full-screen blend is recombined on every frame
-     that anything moves, which halved the frame rate without a GPU (BUILD_PLAN P4 notes). */
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27160%27 height=%27160%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%272%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27160%27 height=%27160%27 filter=%27url(%23n)%27/%3E%3C/svg%3E");
+.map-pin:hover > span,
+.map-pin:focus-visible > span {
+  outline: 2px solid #c0533a;
+  outline-offset: 2px;
 }
 
 /* Gentle scenes: no bobbing. */

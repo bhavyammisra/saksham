@@ -1,464 +1,172 @@
-// School: look-development backdrop (BUILD_PLAN P2), restyled to match the characters (D-026).
-// Golden hour, sun low on the right. Same rules as the characters:
-//   - an ink outline on every near shape (thinner further back, none on the distant hills),
-//   - "cel" shading: flat lit colours with hard-edged shadow shapes, no soft gradients on objects,
-//   - deeper, richer colours, with distant layers fading into the warm haze.
-//
-// Layers (back to front): sky 0.05 · far hills 0.15 · town 0.4 · trees 0.65 ·
-// school and courtyard 1 (the stage) · light 0 (fixed, in front) · foreground leaves 1.35.
+// The School (D-036): a modern campus in late-afternoon light. Concrete, glass, a dark brick
+// stair tower and a timber wing; a railing and an open gate where Lata waits; bike racks.
+// Positions follow content/scenes/school.json: Lata at the gate (790), Ravi (1450),
+// the notice board (1900), Meena Didi at the entrance (2400), the way out (3350).
 
-import { HAZE, INK, Neem, SHADE, ink, mixHex, seeded, shadow, svgProps } from './style'
-import { GROUND_Y, SCENE_HEIGHT, type LayerArt, type PropArt } from './types'
-import './school.css'
+import {
+  Bike,
+  CastShadow,
+  FacadeLight,
+  FRAME,
+  GROUND,
+  LayerSvg,
+  Paving,
+  Planter,
+  Railing,
+  SignLines,
+  Tree,
+  WindowBand,
+} from './modern'
+import type { LayerArt, PropArt } from './types'
 
-const H = SCENE_HEIGHT
-const TRIM = '#a8401f' // terracotta
+const CONCRETE = '#b9b4ab'
+const CONCRETE_DARK = '#8e8a83'
+const TIMBER = '#9b6b45'
+const TIMBER_DARK = '#6e4a30'
+const BRICK = '#5b4a42'
 
-// ---------------------------------------------------------------- sky
-
-const Sky: LayerArt = ({ width }) => {
-  const sunX = width * 0.82
-  const r = seeded(7)
-  // Moving things live in their own small SVG on an HTML wrapper, so the browser can move
-  // them without repainting the big sky.
+/** The school building: main block, stair tower and timber wing, standing between x0 and x0 + 2070. */
+export function SchoolBuilding({ x0 }: { x0: number }) {
+  const X = (x: number) => x0 + x
+  const top = 490
   return (
-    <div className="relative size-full">
-    <svg {...svgProps(width)} className="absolute inset-0 size-full">
-      <defs>
-        <linearGradient id="sch-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#5f7fa6" />
-          <stop offset="0.32" stopColor="#c99a9a" />
-          <stop offset="0.58" stopColor="#f2a067" />
-          <stop offset="0.8" stopColor="#ffc27a" />
-          <stop offset="1" stopColor="#ffd59a" />
-        </linearGradient>
-        <radialGradient id="sch-sun" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#fff6dc" stopOpacity="1" />
-          <stop offset="0.18" stopColor="#ffe0a0" stopOpacity="0.9" />
-          <stop offset="0.5" stopColor="#ffb866" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#ffa95a" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <rect width={width} height={H} fill="url(#sch-sky)" />
-      <circle cx={sunX} cy="610" r="460" fill="url(#sch-sun)" />
-      <circle cx={sunX} cy="610" r="58" fill="#fff3d4" />
-      {/* Cel clouds: flat shapes with a hard lit edge underneath, facing the sun. */}
-      {Array.from({ length: Math.ceil(width / 500) }, (_, i) => {
-        const x = i * 500 + r() * 300
-        const y = 150 + r() * 220
-        const w = 180 + r() * 220
-        const body = `M${x - w} ${y + 10} C${x - w * 0.8} ${y - 22} ${x - w * 0.4} ${y - 30} ${x - w * 0.15} ${y - 18} C${x} ${y - 46} ${x + w * 0.5} ${y - 40} ${x + w * 0.6} ${y - 16} C${x + w * 0.85} ${y - 22} ${x + w} ${y - 6} ${x + w} ${y + 10} Z`
-        return (
-          <g key={i} opacity="0.9">
-            <path d={body} fill="#f4c7b0" />
-            <path d={`M${x - w} ${y + 10} L${x + w} ${y + 10} C${x + w * 0.7} ${y + 2} ${x - w * 0.5} ${y} ${x - w} ${y + 10} Z`} fill="#ffd79a" />
-            <path d={`M${x - w * 0.7} ${y - 8} C${x - w * 0.3} ${y - 14} ${x + w * 0.2} ${y - 10} ${x + w * 0.5} ${y - 4}`} stroke="#c98f98" strokeWidth="3" fill="none" opacity="0.6" />
-          </g>
-        )
-      })}
-    </svg>
-      {/* Birds crossing the sky (ambient life; stops in calm mode). */}
-      <div className="sch-birds absolute inset-0">
-        <svg {...svgProps(width)} className="size-full">
-          <g fill="none" stroke={INK} strokeWidth="3.5" strokeLinecap="round" opacity="0.75">
-            {[0, 1, 2].map((i) => (
-              <path key={i} d={`M${120 + i * 46} ${260 + (i % 2) * 22} q12 -12 24 0 q12 -12 24 0`} />
-            ))}
-          </g>
-        </svg>
-      </div>
-    </div>
-  )
-}
+    <g>
+      <CastShadow x={X(0)} w={2070} reach={70} />
+      {/* Main block: two storeys of exposed concrete with long window bands. */}
+      <rect x={X(0)} y={top} width="1570" height={GROUND - top} fill={CONCRETE} />
+      {[160, 330, 500, 670, 840, 1010, 1180, 1350].map((x) => (
+        <rect key={x} x={X(x)} y={top + 2} width="2" height={GROUND - top - 4} fill={CONCRETE_DARK} opacity="0.5" />
+      ))}
+      <rect x={X(0)} y={top + 160} width="1570" height="2" fill={CONCRETE_DARK} opacity="0.6" />
+      <WindowBand x={X(50)} y={top + 50} w={1470} h={92} panes={16} />
+      <WindowBand x={X(50)} y={top + 200} w={1080} h={112} panes={12} />
+      {/* The entrance: a glass front set back under a long, thin canopy. */}
+      <rect x={X(1180)} y={top + 190} width="330" height={GROUND - top - 190} fill="#1e2428" />
+      <rect x={X(1194)} y={top + 204} width="302" height={GROUND - top - 204} fill="url(#m-glass)" />
+      <rect x={X(1342)} y={top + 204} width="6" height={GROUND - top - 204} fill={FRAME} />
+      <rect x={X(1300)} y={GROUND - 100} width="4" height="46" fill="#c9c4bb" />
+      <rect x={X(1386)} y={GROUND - 100} width="4" height="46" fill="#c9c4bb" />
+      <rect x={X(1130)} y={top + 176} width="430" height="14" fill="#2b2e31" />
+      <path d={`M${X(1130)} ${top + 190} L${X(1560)} ${top + 190} L${X(1560)} ${top + 224} L${X(1130)} ${top + 206} Z`} fill="#000000" opacity="0.25" />
+      {/* Name lettering on the concrete (shapes: words in pictures can't be translated). */}
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <rect key={i} x={X(1210 + i * 36)} y={top + 14} width="24" height="20" rx="2" fill="#2b2e31" opacity="0.75" />
+      ))}
+      {/* Roof edge, with solar panels just showing above it. */}
+      {Array.from({ length: 11 }, (_, i) => (
+        <path key={i} d={`M${X(40 + i * 140)} ${top - 8} L${X(160 + i * 140)} ${top - 8} L${X(150 + i * 140)} ${top - 24} L${X(50 + i * 140)} ${top - 24} Z`} fill="#2c3a4c" />
+      ))}
+      <rect x={X(-8)} y={top - 8} width="1586" height="14" fill="#2b2e31" />
+      <rect x={X(0)} y={top + 6} width="1570" height="10" fill="#000000" opacity="0.2" />
 
-// ---------------------------------------------------------------- far hills (no outlines: lost in the haze)
-
-const Far: LayerArt = ({ width }) => {
-  const r = seeded(21)
-  const hill = mixHex('#9b6f7c', HAZE, 0.42)
-  const hill2 = mixHex('#86606f', HAZE, 0.3)
-  const points = Array.from({ length: Math.ceil(width / 240) + 2 }, (_, i) => [i * 240, 600 + r() * 60] as const)
-  const ridge = points.map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `Q${x - 120} ${y - 40} ${x} ${y}`)).join(' ')
-  return (
-    <svg {...svgProps(width)}>
-      <path d={`${ridge} L${width} ${H} L0 ${H} Z`} fill={hill} />
-      <path d={`M0 690 ${points.map(([x, y]) => `Q${x + 120} ${y + 30} ${x + 240} ${y + 70}`).join(' ')} L${width} ${H} L0 ${H} Z`} fill={hill2} />
-      {/* A temple spire and a water tank on the horizon. */}
-      <path d={`M${width * 0.28} 680 L${width * 0.28 + 30} 580 L${width * 0.28 + 38} 556 L${width * 0.28 + 46} 580 L${width * 0.28 + 76} 680 Z`} fill={hill2} />
-      <rect x={width * 0.62} y="560" width="70" height="40" rx="6" fill={hill2} />
-      <path d={`M${width * 0.62 + 10} 600 L${width * 0.62} 700 M${width * 0.62 + 60} 600 L${width * 0.62 + 70} 700`} stroke={hill2} strokeWidth="6" />
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------- town houses (thin, hazy outlines)
-
-const PLASTER = ['#e9b678', '#d99c8c', '#b9c3ad', '#e4c08f', '#d08e5f', '#b8a9c6', '#e8cf9f']
-
-const Town: LayerArt = ({ width }) => {
-  const count = Math.ceil(width / 230) + 1
-  const line = ink(1.6, mixHex(INK, HAZE, 0.45))
-  return (
-    <svg {...svgProps(width)}>
-      {Array.from({ length: count }, (_, i) => {
-        const r = seeded(100 + i)
-        const w = 150 + r() * 110
-        const h = 150 + r() * 170
-        const x = i * 230 + r() * 40
-        const base = 780
-        const wall = mixHex(PLASTER[Math.floor(r() * PLASTER.length)] as string, HAZE, 0.28)
-        return (
-          <g key={i}>
-            <rect x={x} y={base - h} width={w} height={h} fill={wall} {...line} />
-            {/* Left face in hard shadow (the sun is on the right). */}
-            <rect x={x} y={base - h} width={w * 0.2} height={h} fill={shadow(wall, 0.28)} {...line} />
-            <rect x={x - 4} y={base - h - 12} width={w + 8} height="14" fill={mixHex(wall, '#fff3d8', 0.3)} {...line} />
-            {r() > 0.4 && <rect x={x + w * 0.6} y={base - h - 48} width="40" height="36" rx="5" fill={mixHex('#46424a', HAZE, 0.35)} {...line} />}
-            {Array.from({ length: Math.floor(w / 55) }, (_, j) => (
-              <rect key={j} x={x + 22 + j * 55} y={base - h + 40} width="22" height="30" rx="10" fill={r() > 0.7 ? '#ffc56e' : mixHex('#5d4650', HAZE, 0.2)} {...line} />
-            ))}
-          </g>
-        )
-      })}
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------- trees
-
-const Trees: LayerArt = ({ width }) => (
-  <svg {...svgProps(width)}>
-    {Array.from({ length: Math.ceil(width / 620) + 1 }, (_, i) => (
-      <Neem key={i} x={i * 620 + 180} base={820} size={230} seed={300 + i} haze={0.2} line={2} />
-    ))}
-  </svg>
-)
-
-// ---------------------------------------------------------------- the school and courtyard (stage, speed 1)
-
-// The building is sized for the characters (a child is 400 units tall): doors are taller than a child.
-const SCHOOL = { left: 900, right: 2700, top: 190, base: 860 }
-const WALL = '#eab36a' // painted plaster, deep ochre
-const DOOR = '#2c6a94' // classic blue doors and window frames
-const LINE = 3
-
-const School: LayerArt = ({ width }) => {
-  const { left, right, top, base } = SCHOOL
-  const arches = 9
-  const bay = (right - left) / arches
-  const o = ink(LINE)
-  const wallLit = mixHex(WALL, '#fff0c8', 0.18)
-  return (
-    <svg {...svgProps(width)}>
-      {/* Courtyard ground: flat earth with a hard band of shadow near the building, and paving strips. */}
-      <rect y={base - 10} width={width} height={H - base + 10} fill="#d49559" />
-      <rect y={base - 10} width={width} height="34" fill={shadow('#d49559', 0.22)} />
-      {Array.from({ length: Math.ceil(width / 120) }, (_, i) => (
-        <rect key={i} x={i * 120} y={GROUND_Y + 26} width="96" height="12" rx="3" fill="#b5703f" {...ink(2, shadow('#b5703f', 0.5))} />
+      {/* Stair tower in dark brick. */}
+      <rect x={X(1570)} y={top - 50} width="110" height={GROUND - top + 50} fill={BRICK} />
+      <rect x={X(1562)} y={top - 60} width="126" height="12" fill="#2b2e31" />
+      {[0, 1, 2, 3].map((i) => (
+        <rect key={i} x={X(1600)} y={top - 10 + i * 82} width="48" height="56" fill="url(#m-glass)" stroke={FRAME} strokeWidth="5" />
       ))}
 
-      {/* Boundary wall with a painted strip and marigold plants, and the gate pillars. */}
-      <rect x="0" y="640" width="700" height={base - 640} fill={WALL} {...o} />
-      <rect x="0" y="640" width="700" height="40" fill={shadow(WALL, 0.25)} />
-      <rect x="-4" y="626" width="708" height="18" fill={TRIM} {...o} />
-      {Array.from({ length: 7 }, (_, i) => (
-        <g key={i}>
-          <path d={`M${60 + i * 95} 780 L${60 + i * 95} 842`} stroke="#4f7a3c" strokeWidth="7" />
-          <circle cx={60 + i * 95} cy="770" r="22" fill="#e8962d" {...o} />
-          <path d={`M${50 + i * 95} 760 a14 14 0 0 1 22 2`} stroke="#ffd27a" strokeWidth="5" fill="none" />
-        </g>
+      {/* Wing clad in vertical timber slats, with square windows. */}
+      <rect x={X(1680)} y={top + 80} width="390" height={GROUND - top - 80} fill={TIMBER} />
+      {Array.from({ length: 39 }, (_, i) => (
+        <rect key={i} x={X(1682 + i * 10)} y={top + 82} width="3" height={GROUND - top - 84} fill={TIMBER_DARK} opacity="0.55" />
       ))}
-      {[700, 845].map((x) => (
+      {[1730, 1860, 1990].map((x) => (
         <g key={x}>
-          <rect x={x} y="540" width="64" height={base - 540} fill={wallLit} {...o} />
-          <rect x={x} y="540" width="22" height={base - 540} fill={shadow(WALL, 0.3)} />
-          <rect x={x - 8} y="524" width="80" height="22" fill={TRIM} {...o} />
-          <path d={`M${x + 8} 524 L${x + 32} 496 L${x + 56} 524 Z`} fill={TRIM} {...o} />
+          <rect x={X(x - 6)} y={top + 140} width="72" height="84" fill={FRAME} />
+          <rect x={X(x)} y={top + 146} width="60" height="72" fill="url(#m-glass)" />
+          <rect x={X(x - 6)} y={top + 224} width="72" height="6" fill="#000000" opacity="0.2" />
         </g>
       ))}
+      <rect x={X(1672)} y={top + 70} width="406" height="12" fill="#2b2e31" />
 
-      {/* The school building: an arched veranda under a parapet. */}
-      <rect x={left} y={top} width={right - left} height={base - top} fill={WALL} {...o} />
-      {/* The shaded left end and the band of shade under the roof edge (hard cel shadows). */}
-      <rect x={left} y={top} width="70" height={base - top} fill={shadow(WALL, 0.3)} />
-      <rect x={left} y={top + 22} width={right - left} height="40" fill={shadow(WALL, 0.22)} />
-      <rect x={left - 14} y={top - 22} width={right - left + 28} height="26" fill={mixHex(WALL, '#fff6e0', 0.35)} {...o} />
-      <rect x={left} y={top + 4} width={right - left} height="16" fill={TRIM} {...o} />
-      {/* Jaali lattice along the parapet. */}
-      {Array.from({ length: Math.floor((right - left) / 40) }, (_, i) => (
-        <rect key={i} x={left + 14 + i * 40} y={top + 32} width="16" height="16" rx="3" fill={shadow(WALL, 0.55)} />
-      ))}
-      {Array.from({ length: arches }, (_, i) => {
-        const x = left + i * bay
-        const ax = x + bay * 0.14
-        const aw = bay * 0.72
-        const atop = top + 130
-        const archPath = `M${ax} ${base - 22} L${ax} ${atop + aw / 2} A${aw / 2} ${aw / 2} 0 0 1 ${ax + aw} ${atop + aw / 2} L${ax + aw} ${base - 22} Z`
-        const doorTop = atop + aw * 0.62
-        return (
-          <g key={i}>
-            <path d={archPath} fill="#4a3530" {...o} />
-            {/* Low sun from the right lights the back wall inside the arch, past the left pillar's shadow. */}
-            <path d={`M${ax + aw * 0.45} ${base - 22} L${ax + aw * 0.62} ${atop + aw * 0.2} A${aw / 2} ${aw / 2} 0 0 1 ${ax + aw} ${atop + aw / 2} L${ax + aw} ${base - 22} Z`} fill="#7a5544" />
-            {/* A blue classroom door or window inside every other arch. */}
-            {i % 2 === 0 ? (
-              <g>
-                <rect x={ax + aw * 0.2} y={doorTop} width={aw * 0.6} height={base - 22 - doorTop} rx="4" fill={DOOR} {...o} />
-                <rect x={ax + aw * 0.2} y={doorTop} width={aw * 0.22} height={base - 22 - doorTop} fill={shadow(DOOR, 0.35)} />
-                <path d={`M${ax + aw * 0.5} ${doorTop} L${ax + aw * 0.5} ${base - 22}`} {...ink(2)} />
-                <circle cx={ax + aw * 0.56} cy={(doorTop + base) / 2} r="4" fill="#e8c26a" />
-              </g>
-            ) : (
-              <g>
-                <rect x={ax + aw * 0.16} y={doorTop} width={aw * 0.68} height={aw * 0.8} rx="4" fill={DOOR} {...o} />
-                <rect x={ax + aw * 0.24} y={doorTop + 10} width={aw * 0.52} height={aw * 0.8 - 20} fill="#ffcc7e" {...ink(2)} />
-                <path d={`M${ax + aw * 0.5} ${doorTop + 10} L${ax + aw * 0.5} ${doorTop + aw * 0.8 - 10} M${ax + aw * 0.24} ${doorTop + aw * 0.4} L${ax + aw * 0.76} ${doorTop + aw * 0.4}`} {...ink(3, DOOR)} />
-                <rect x={ax + aw * 0.1} y={doorTop + aw * 0.8} width={aw * 0.8} height="10" fill={mixHex(WALL, '#fff6e0', 0.3)} {...ink(2)} />
-              </g>
-            )}
-            {/* Pillar: lit right face, hard shadow on the left face. */}
-            <rect x={x + bay * 0.86} y={atop - 20} width={bay * 0.07} height={base - atop - 2} fill={mixHex(WALL, '#fff3cf', 0.45)} />
-          </g>
-        )
-      })}
-      {/* Plinth and veranda step. */}
-      <rect x={left - 20} y={base - 22} width={right - left + 40} height="26" fill="#c99a68" {...o} />
-      <rect x={left - 30} y={base} width={right - left + 60} height="12" fill={shadow('#c99a68', 0.3)} {...o} />
-
-      {/* Name board (the words on it are just strokes: no text in art). */}
-      <rect x={(left + right) / 2 - 220} y={top + 56} width="440" height="70" rx="6" fill="#2e6a4c" {...o} />
-      <rect x={(left + right) / 2 - 220} y={top + 106} width="440" height="20" fill={shadow('#2e6a4c', 0.35)} />
-      {[0, 1].map((row) => (
-        <rect key={row} x={(left + right) / 2 - 170 + row * 30} y={top + 72 + row * 22} width={340 - row * 60} height="9" rx="4" fill="#f1e8d2" />
-      ))}
-
-      {/* A marigold garland across the front. */}
-      {Array.from({ length: 4 }, (_, k) => {
-        const x0 = left + 120 + k * 420
-        return (
-          <g key={k}>
-            {Array.from({ length: 15 }, (_, j) => {
-              const t = j / 14
-              const gx = x0 + t * 380
-              const gy = top + 170 + Math.sin(t * Math.PI) * 70
-              return (
-                <g key={j}>
-                  <circle cx={gx} cy={gy} r="13" fill={j % 3 === 0 ? '#c9501a' : '#f0a12a'} {...ink(2)} />
-                  <circle cx={gx + 3} cy={gy - 4} r="5" fill={j % 3 === 0 ? '#ec7a3a' : '#ffd36a'} />
-                </g>
-              )
-            })}
-          </g>
-        )
-      })}
-
-      {/* Tulsi planters at both ends of the veranda. */}
-      {[left + 30, right - 150].map((x) => (
-        <g key={x}>
-          <path d={`M${x} ${base - 22} L${x + 14} ${base - 150} L${x + 106} ${base - 150} L${x + 120} ${base - 22} Z`} fill={TRIM} {...o} />
-          <path d={`M${x} ${base - 22} L${x + 14} ${base - 150} L${x + 44} ${base - 150} L${x + 36} ${base - 22} Z`} fill={shadow(TRIM, 0.35)} />
-          <rect x={x + 6} y={base - 164} width="108" height="18" rx="4" fill={mixHex(TRIM, '#ffffff', 0.2)} {...o} />
-          <circle cx={x + 60} cy={base - 205} r="50" fill="#3f6a33" {...o} />
-          <circle cx={x + 76} cy={base - 218} r="24" fill="#93a64f" />
-        </g>
-      ))}
-
-      {/* A big neem with a stone bench on the right. */}
-      <Neem x={3080} base={base} size={290} seed={777} line={LINE} />
-      <rect x="3150" y={base - 110} width="260" height="28" rx="6" fill="#b9a585" {...o} />
-      <rect x="3150" y={base - 90} width="260" height="8" fill={shadow('#b9a585', 0.3)} />
-      <rect x="3170" y={base - 82} width="26" height="82" fill={shadow('#b9a585', 0.25)} {...o} />
-      <rect x="3364" y={base - 82} width="26" height="82" fill={shadow('#b9a585', 0.25)} {...o} />
-
-      {/* Long evening shadows with hard edges, cast to the left (the sun is low on the right). */}
-      <g fill={SHADE} opacity="0.22">
-        {Array.from({ length: arches + 1 }, (_, i) => {
-          const x = left + i * (right - left) / arches
-          return <path key={i} d={`M${x} ${base + 12} L${x + 22} ${base + 12} L${x - 160} ${H} L${x - 214} ${H} Z`} />
-        })}
-        <path d={`M3050 ${base + 8} L3110 ${base + 8} L2840 ${H} L2700 ${H} Z`} />
-      </g>
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------- light (fixed to the screen, in front)
-
-const Light: LayerArt = ({ width }) => {
-  const shafts = 3
-  // Four stacked SVGs: the still colour grade, the blurred shafts (their slow glow animates the
-  // HTML wrapper's opacity, which the browser does cheaply), the drifting dust, and the vignette.
-  // Keeping moving parts out of the blurred SVG avoids re-blurring it every frame.
-  // The shafts use plain transparency, not a "screen" blend: full-screen blends cost about
-  // half the frame rate without a GPU (measured in P4).
-  const layer = 'absolute inset-0 size-full'
-  return (
-    <div className="relative size-full">
-      <svg {...svgProps(width)} className={layer}>
-        <defs>
-          <linearGradient id="sch-grade" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="#4a3a7a" stopOpacity="0.18" />
-            <stop offset="0.55" stopColor="#ffb766" stopOpacity="0" />
-            <stop offset="1" stopColor="#ffa850" stopOpacity="0.2" />
-          </linearGradient>
-        </defs>
-        <rect width={width} height={H} fill="url(#sch-grade)" />
-      </svg>
-      <div className={`sch-shafts ${layer}`}>
-        <svg {...svgProps(width)} className="size-full">
-          <defs>
-            <linearGradient id="sch-shaft" x1="1" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#fff2cf" stopOpacity="0.5" />
-              <stop offset="1" stopColor="#fff2cf" stopOpacity="0" />
-            </linearGradient>
-            <filter id="sch-shaft-blur" x="-10%" y="-10%" width="120%" height="120%">
-              <feGaussianBlur stdDeviation="18" />
-            </filter>
-          </defs>
-          {/* Beams fan out from beyond the top-right corner, where the low sun is. */}
-          {Array.from({ length: shafts }, (_, i) => {
-            const top = width * (0.62 + i * 0.13)
-            const spread = 140 + i * 60
-            return (
-              <path
-                key={i}
-                d={`M${top} -40 L${top + spread} -40 L${top - width * 0.42 + spread * 2} ${H} L${top - width * 0.42} ${H} Z`}
-                fill="url(#sch-shaft)"
-                opacity={0.26 + i * 0.07}
-                filter="url(#sch-shaft-blur)"
-              />
-            )
-          })}
-        </svg>
-      </div>
-      {/* Dust drifting in the light (ambient life; stops in calm mode). */}
-      <svg {...svgProps(width)} className={layer}>
-        <g className="sch-dust" fill="#fff4d6">
-          {Array.from({ length: 18 }, (_, i) => {
-            const r = seeded(900 + i)
-            return <circle key={i} cx={r() * width} cy={200 + r() * 650} r={1.5 + r() * 2.5} opacity={0.4 + r() * 0.4} style={{ animationDelay: `${-r() * 12}s` }} />
-          })}
-        </g>
-      </svg>
-      <svg {...svgProps(width)} className={layer}>
-        <defs>
-          <radialGradient id="sch-vignette" cx="0.5" cy="0.45" r="0.75">
-            <stop offset="0.6" stopColor="#2a160c" stopOpacity="0" />
-            <stop offset="1" stopColor="#2a160c" stopOpacity="0.3" />
-          </radialGradient>
-        </defs>
-        <rect width={width} height={H} fill="url(#sch-vignette)" />
-      </svg>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------- foreground leaves (nearest, out of focus)
-
-const Foreground: LayerArt = ({ width }) => (
-  <svg {...svgProps(width)}>
-    <defs>
-      <filter id="sch-blur-near">
-        <feGaussianBlur stdDeviation="4" />
-      </filter>
-    </defs>
-    <g filter="url(#sch-blur-near)" opacity="0.95">
-      {Array.from({ length: Math.ceil(width / 1700) + 1 }, (_, i) => {
-        const r = seeded(500 + i)
-        const x = i * 1700 + 200
-        return (
-          <g key={i}>
-            <path d={`M${x - 260} -20 Q${x} 60 ${x + 220} 20`} stroke="#2e1e1e" strokeWidth="16" fill="none" />
-            {Array.from({ length: 14 }, (_, j) => (
-              <ellipse
-                key={j}
-                cx={x - 240 + j * 34 + r() * 20}
-                cy={30 + Math.sin(j) * 30 + r() * 40}
-                rx={34}
-                ry={14}
-                transform={`rotate(${-30 + r() * 60} ${x - 240 + j * 34} ${40 + Math.sin(j) * 30})`}
-                fill={j % 3 ? '#243b22' : '#3d5e2a'}
-                {...ink(3, '#1a1416')}
-              />
-            ))}
-          </g>
-        )
-      })}
+      <FacadeLight x={X(-8)} y={top - 8} w={1578} h={GROUND - top + 8} />
+      <FacadeLight x={X(1570)} y={top - 60} w={110} h={GROUND - top + 60} />
+      <FacadeLight x={X(1672)} y={top + 70} w={406} h={GROUND - top - 70} />
     </g>
-  </svg>
+  )
+}
+
+/** The stage: everything standing on the ground behind the people, across the whole School. */
+const Yard: LayerArt = ({ width }) => (
+  <LayerSvg width={width}>
+    <Paving width={width} />
+    {/* Outside the school: the pavement, trees and the railing with the open gate. */}
+    <Tree x={180} s={1.15} />
+    <Railing x={0} w={600} />
+    <rect x="600" y={GROUND - 210} width="44" height="220" fill="#7f7a72" />
+    <rect x="600" y={GROUND - 210} width="14" height="220" fill="#a9a49b" />
+    <rect x="900" y={GROUND - 210} width="44" height="220" fill="#7f7a72" />
+    <rect x="900" y={GROUND - 210} width="14" height="220" fill="#a9a49b" />
+    {/* The sliding gate, pushed open behind the right-hand post. */}
+    {Array.from({ length: 6 }, (_, i) => (
+      <rect key={i} x={950 + i * 20} y={GROUND - 170} width="5" height="160" fill="#2b2e31" />
+    ))}
+    <rect x="944" y={GROUND - 172} width="120" height="6" fill="#2b2e31" />
+    <rect x="610" y={GROUND - 260} width="324" height="44" rx="4" fill="#2f6f73" />
+    <SignLines x={650} y={GROUND - 248} w={240} />
+    <Railing x={1064} w={60} />
+
+    <SchoolBuilding x0={1150} />
+    <Planter x={1300} />
+    <Planter x={2050} />
+
+    {/* Bike racks and trees on the right, then the way out. */}
+    <rect x="3260" y={GROUND - 190} width="300" height="12" fill="#2b2e31" />
+    <rect x="3270" y={GROUND - 180} width="6" height="180" fill="#2b2e31" />
+    <rect x="3546" y={GROUND - 180} width="6" height="180" fill="#2b2e31" />
+    <path d={`M3260 ${GROUND} L3560 ${GROUND} L3640 ${GROUND + 40} L3330 ${GROUND + 40} Z`} fill="#000000" opacity="0.18" />
+    <Bike x={3290} />
+    <Bike x={3390} />
+    <Tree x={3500} s={1.2} />
+  </LayerSvg>
 )
+
+// ---------------------------------------------------------------- props
+
+/** A notice board on two legs: an aluminium frame, a glass front and pinned papers. */
+function Notice() {
+  return (
+    <svg viewBox="0 0 220 280" className="size-full" aria-hidden="true">
+      <ellipse cx="150" cy="276" rx="110" ry="8" fill="#000000" opacity="0.3" />
+      <rect x="30" y="140" width="10" height="140" fill="#3a3d40" />
+      <rect x="180" y="140" width="10" height="140" fill="#3a3d40" />
+      <rect x="6" y="10" width="208" height="160" rx="4" fill="#3a3d40" />
+      <rect x="14" y="18" width="192" height="144" fill="#e7e1d6" />
+      <rect x="26" y="30" width="70" height="88" fill="#ffffff" />
+      <rect x="36" y="44" width="50" height="5" fill="#9aa3ab" />
+      <rect x="36" y="56" width="42" height="4" fill="#c4c9cd" />
+      <rect x="36" y="66" width="46" height="4" fill="#c4c9cd" />
+      <rect x="108" y="30" width="86" height="54" fill="#f4d58d" />
+      <rect x="116" y="42" width="60" height="5" fill="#a07a2f" />
+      <rect x="108" y="94" width="86" height="56" fill="#cfe3e6" />
+      <rect x="116" y="106" width="64" height="5" fill="#2f6f73" />
+      {[61, 151, 151].map((x, i) => (
+        <circle key={i} cx={x} cy={[34, 34, 98][i]} r="4" fill="#b5532f" />
+      ))}
+      <path d="M14 18 L80 18 L30 162 L14 162 Z" fill="#ffffff" opacity="0.12" />
+    </svg>
+  )
+}
+
+/** The way out: a slim wayfinding pole with an arrow sign. */
+function Signpost() {
+  return (
+    <svg viewBox="0 0 160 300" className="size-full" aria-hidden="true">
+      <ellipse cx="110" cy="296" rx="80" ry="7" fill="#000000" opacity="0.3" />
+      <rect x="72" y="40" width="12" height="260" fill="#2b2e31" />
+      <path d="M20 50 L120 50 L148 76 L120 102 L20 102 Z" fill="#2f6f73" />
+      <path d="M40 76 L96 76 M80 62 L96 76 L80 90" stroke="#ffffff" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 export const schoolLayers: Record<string, LayerArt> = {
-  'school.sky': Sky,
-  'school.far': Far,
-  'school.town': Town,
-  'school.trees': Trees,
-  'school.building': School,
-  'school.light': Light,
-  'school.foreground': Foreground,
-}
-
-// ---------------------------------------------------------------- props (hotspot objects, same style as the stage)
-
-/** The school notice board: a wooden board on two legs with pinned papers (strokes stand in for words). */
-const NoticeBoard: PropArt = {
-  width: 240,
-  height: 340,
-  Art: () => (
-    <svg viewBox="0 0 240 340" className="size-full">
-      <g {...ink(3)}>
-        <rect x="40" y="170" width="16" height="168" fill="#5a3f30" />
-        <rect x="184" y="170" width="16" height="168" fill="#5a3f30" />
-        <rect x="8" y="10" width="224" height="190" rx="6" fill="#7a4f34" />
-        <rect x="22" y="24" width="196" height="162" rx="3" fill="#c79a6a" />
-      </g>
-      {/* Hard cel shadow under the top edge of the frame and on the left leg. */}
-      <rect x="22" y="24" width="196" height="16" fill={shadow('#c79a6a', 0.3)} />
-      <rect x="40" y="200" width="7" height="136" fill={shadow('#5a3f30', 0.4)} />
-      {/* Pinned papers. The big one is the admissions notice, with a drawing of children at a school door. */}
-      <g {...ink(2)}>
-        <rect x="36" y="40" width="100" height="132" fill="#fbf3e2" />
-        <rect x="148" y="48" width="58" height="62" fill="#e8f0f4" transform="rotate(4 177 79)" />
-        <rect x="150" y="122" width="54" height="50" fill="#f6dfa8" transform="rotate(-3 177 147)" />
-      </g>
-      <rect x="48" y="52" width="76" height="9" rx="3" fill="#a8401f" />
-      {[72, 84, 96].map((y) => (
-        <rect key={y} x="48" y={y} width={y === 96 ? 52 : 76} height="5" rx="2" fill="#8d7a66" />
-      ))}
-      <path d="M58 160 L58 128 Q72 114 86 128 L86 160 Z" fill={DOOR} {...ink(2)} />
-      <circle cx="100" cy="136" r="6" fill="#d6956a" {...ink(1.5)} />
-      <path d="M94 160 L95 144 L105 144 L106 160 Z" fill="#e8962d" {...ink(1.5)} />
-      <circle cx="116" cy="140" r="5" fill="#a86f4c" {...ink(1.5)} />
-      <path d="M111 160 L112 147 L120 147 L121 160 Z" fill="#2c6a94" {...ink(1.5)} />
-      {[160, 172, 184].map((y) => (
-        <rect key={y} x="156" y={y - 96} width="40" height="4" rx="2" fill="#8d9aa4" />
-      ))}
-      {[48, 136, 178, 176].map((x, i) => (
-        <circle key={i} cx={x} cy={i < 2 ? 46 : i === 2 ? 52 : 126} r="5" fill={i % 2 ? '#c9501a' : '#2e6a4c'} {...ink(1.5)} />
-      ))}
-    </svg>
-  ),
-}
-
-/** A signpost pointing back to the town: an arrow and a little house (no words in the art). */
-const Signpost: PropArt = {
-  width: 180,
-  height: 380,
-  Art: () => (
-    <svg viewBox="0 0 180 380" className="size-full">
-      <rect x="82" y="60" width="18" height="318" fill="#6a4632" {...ink(3)} />
-      <rect x="82" y="60" width="7" height="318" fill={shadow('#6a4632', 0.4)} />
-      <path d="M150 60 L40 60 L8 98 L40 136 L150 136 Z" fill="#2e6a4c" {...ink(3)} />
-      <path d="M150 120 L40 120 L32 128 L40 136 L150 136 Z" fill={shadow('#2e6a4c', 0.35)} />
-      <path d="M62 112 L62 90 L84 74 L106 90 L106 112 Z" fill="#f1e8d2" {...ink(2)} />
-      <rect x="78" y="96" width="12" height="16" fill={TRIM} {...ink(1.5)} />
-      <path d="M112 98 L138 98" stroke="#f1e8d2" strokeWidth="6" strokeLinecap="round" />
-      <ellipse cx="91" cy="376" rx="40" ry="6" fill={SHADE} opacity="0.25" />
-    </svg>
-  ),
+  'school.yard': Yard,
 }
 
 export const schoolProps: Record<string, PropArt> = {
-  'school.notice': NoticeBoard,
-  'school.signpost': Signpost,
+  'school.notice': { width: 220, height: 280, Art: Notice },
+  'school.signpost': { width: 160, height: 300, Art: Signpost },
 }
+

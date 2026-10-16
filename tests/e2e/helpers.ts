@@ -17,7 +17,28 @@ export async function createPlayer(page: Page, name: string, band: 'young' | 'te
 
 // ---------------------------------------------------------------- playing the School
 
-export const thingsToDo = (page: Page) => page.getByRole('region', { name: strings['scene.thingsToDo'] })
+// ---------------------------------------------------------------- the game frame (D-036)
+
+const menu = (page: Page) => page.getByRole('navigation', { name: strings['hud.menu'] })
+
+/** "Things to do here": opens it from the menu words if it isn't open, and returns it. */
+export async function thingsToDo(page: Page) {
+  const panel = page.getByRole('region', { name: strings['scene.thingsToDo'] })
+  if (!(await panel.isVisible())) await menu(page).getByRole('button', { name: strings['hud.things'], exact: true }).click()
+  return panel
+}
+
+/** Goes straight to a hotspot through "Things to do here" (which closes again). */
+export async function doThing(page: Page, name: string | RegExp) {
+  await (await thingsToDo(page)).getByRole('button', { name }).click()
+}
+
+/** Opens the area map (if it isn't open) and returns it. Each place is a button named after it. */
+export async function openMap(page: Page) {
+  const map = page.getByRole('dialog', { name: strings['map.title'] })
+  if (!(await map.isVisible())) await menu(page).getByRole('button', { name: strings['hud.map'], exact: true }).click()
+  return map
+}
 const next = (page: Page) => page.getByRole('button', { name: strings['scene.next'], exact: true })
 
 /** Presses Next until a choice appears or the conversation closes. */
@@ -37,12 +58,11 @@ export async function playStory(page: Page, alreadyThere = false) {
   // Arriving: Mitthu's intro line opens by itself.
   await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(school.nodes.intro.text)
   await talkThrough(page)
-  const list = thingsToDo(page)
   for (const label of ['Talk to Ravi', 'Talk to the girl at the gate', 'Read the notice board']) {
-    await list.getByRole('button', { name: label }).click()
+    await doThing(page, label)
     await talkThrough(page)
   }
-  await list.getByRole('button', { name: 'Ask Meena Didi for help' }).click()
+  await doThing(page, 'Ask Meena Didi for help')
   await talkThrough(page)
   await page.getByRole('button', { name: /^Never mind/ }).click()
   await talkThrough(page)

@@ -35,7 +35,9 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | --- | --- |
 | Character look (P2) | ✅ approved 2026-10-14; reopened on feedback; ✅ re-approved 2026-10-15 after the redesign (D-024) |
 | Cover screens (owner feedback, P2) | ✅ approved 2026-10-15 (D-025) |
-| Title menu, new game and customiser redesign (owner feedback, P4) | 🛑 waiting for the owner's review (D-034). The owner will give gameplay changes next |
+| Title menu, new game and customiser redesign (owner feedback, P4) | ✅ owner moved on to gameplay 2026-10-16 (D-034) |
+| New gameplay frame: prototype (owner feedback, P4) | ✅ approved 2026-10-16 after one revision (D-035) |
+| New gameplay frame and modern scenes, built (P4) | 🛑 waiting for the owner's review (D-036) |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
 | Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
 
@@ -523,3 +525,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: spec unit tests (modern lists, gender, older saves), e2e updated for the new flow (title menu, age required, gender and bottoms in the customiser, Continue after reload). Me's "Switch player" no longer clears the player first (the screen's guard jumped to `/` before the list opened).
 - Watch: the game screens (town, scenes, Me, Book) still use the old warm serif look; the owner reviews them next. The Me › character page is narrower than the new-game one.
 - Next task: wait for the owner's review of these screens and their gameplay changes (🛑). Then, unless they say otherwise, the Home scene.
+
+**P4: the full-screen game and the modern scenes (2026-10-16)**
+- Done: the owner approved the prototype (D-035), and the real game now plays full screen (D-036): W A S D walking (with depth), the dialogue strip, the menu words (Back, History, Things to do, Map, Book, Settings, Exit), the area map with travel, and the School, Dhaba and town redrawn in the modern look (`src/art/modern.tsx` kit). Card, quiz and results sit in `GameFrame`. The title picture is the real School.
+- Tests: reducer tests for depth, Back and History; e2e helpers `thingsToDo` (opens the panel), `doThing` and `openMap`; town and play tests now check places on the map; a new test for W/S, Back and History. 202 unit and 55 e2e tests green.
+- Watch: the sandbox (`/dev/scene`) still uses its old flat art. People in the stories keep their traditional clothes (the owner only asked about the player). The Book, Me and Credits pages still have the old warm look; the owner may want them restyled next.
+- Next task: 🛑 the owner reviews the new game. Then, unless they say otherwise, the Home scene (gentle tone), drawn with the modern kit.

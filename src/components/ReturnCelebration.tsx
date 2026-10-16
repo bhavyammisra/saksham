@@ -37,7 +37,7 @@ export function ReturnCelebration({ name, celebration, onClose }: { name: string
   }))
 
   return (
-    <div className="celebration pointer-events-none absolute inset-0 z-30 overflow-hidden" data-tone={celebration.tone}>
+    <div className="celebration pointer-events-none fixed inset-0 z-50 overflow-hidden" data-tone={celebration.tone}>
       <div aria-hidden="true">
         {pieces.map((p) => (
           <span
@@ -47,7 +47,7 @@ export function ReturnCelebration({ name, celebration, onClose }: { name: string
           />
         ))}
       </div>
-      <div className="flex h-full items-start justify-center px-4 pt-6">
+      <div className="flex h-full items-start justify-center px-4 pt-20">
         <div role="status" className="celebration-card pointer-events-auto flex max-w-lg items-start gap-4 rounded-card bg-plaster p-5 shadow-lifted">
           <span className="block size-16 shrink-0 rounded-full bg-gradient-to-b from-marigold-soft to-leaf/40 p-1">
             <Mitthu view="portrait" className="size-full" />

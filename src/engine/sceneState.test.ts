@@ -156,3 +156,56 @@ describe('FR-04 Mitthu', () => {
     expect(s.hint).toBe(false)
   })
 })
+
+describe('D-036 walking nearer and further (W and S)', () => {
+  const tickDepth = (dirDepth: -1 | 0 | 1): SceneAction => {
+    clock += 1000 / 60
+    return { type: 'tick', now: clock, dt: 1 / 60, dir: 0, dirDepth, viewWidth: VIEW, calm: false }
+  }
+
+  it('S walks nearer and W walks further, staying on the walkway', () => {
+    const start = initialSceneState(scene)
+    const nearer = run(start, Array.from({ length: 30 }, () => tickDepth(1)))
+    expect(nearer.depth).toBeGreaterThan(start.depth)
+    expect(nearer.walking).toBe(true)
+    const edge = run(start, Array.from({ length: 300 }, () => tickDepth(-1)))
+    expect(edge.depth).toBe(0)
+    expect(edge.x).toBe(start.x)
+  })
+
+  it('tap-to-walk goes to the tapped depth too', () => {
+    const s = run(initialSceneState(scene), [{ type: 'walkTo', x: 600, depth: 0.1 }, ...ticks(120)])
+    expect(s.x).toBe(600)
+    expect(s.depth).toBeCloseTo(0.1)
+    expect(s.targetDepth).toBeNull()
+  })
+
+  it('using a person walks beside them, at about their depth, then opens the conversation', () => {
+    const s = run(initialSceneState(scene), [{ type: 'use', hotspotId: 'ravi' }, ...ticks(200)])
+    expect(s.dialogue?.nodeId).toBe('ravi-hello')
+    expect(s.depth).toBeCloseTo(0.5)
+  })
+})
+
+describe('D-036 Back in a conversation', () => {
+  it('shows the line before again, and does nothing on the first line', () => {
+    let s = reduce(initialSceneState(scene), { type: 'jumpTo', hotspotId: 'ravi' })
+    const first = s.dialogue!.nodeId
+    expect(reduce(s, { type: 'back' })).toBe(s)
+    s = reduce(s, { type: 'next' })
+    expect(s.dialogue!.nodeId).not.toBe(first)
+    s = reduce(s, { type: 'back' })
+    expect(s.dialogue!.nodeId).toBe(first)
+  })
+})
+
+describe('D-036 History', () => {
+  it('records each line shown, once, and not again when going Back', () => {
+    let s = reduce(initialSceneState(scene), { type: 'jumpTo', hotspotId: 'ravi' })
+    s = reduce(s, { type: 'next' })
+    const two = s.seen.length
+    s = reduce(s, { type: 'back' })
+    expect(s.seen).toHaveLength(two)
+    expect(s.seen[0]).toBe('ravi-hello')
+  })
+})

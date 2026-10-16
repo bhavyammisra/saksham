@@ -36,6 +36,7 @@ export function nearbyHotspot(scene: SceneDef, playerX: number, flags: Flags): H
 export interface DialogueState {
   nodeId: string
   lastChoice: string | null
+  trail?: string[] // the lines shown before this one in this conversation, for "Back"
 }
 
 export interface StoryState {
@@ -93,9 +94,22 @@ export function choose(scene: SceneDef, dialogue: DialogueState, index: number, 
 function goTo(scene: SceneDef, nodeId: string, dialogue: DialogueState, story: StoryState) {
   const node = getNode(scene, nodeId)
   return {
-    dialogue: { nodeId, lastChoice: node.choices ? nodeId : dialogue.lastChoice },
+    dialogue: { nodeId, lastChoice: node.choices ? nodeId : dialogue.lastChoice, trail: [...(dialogue.trail ?? []), dialogue.nodeId] },
     story: enterNode(scene, nodeId, story),
   }
+}
+
+/**
+ * "Back": shows the line before this one again. Flags already set stay set (they only record
+ * what the player has seen), so going back can never undo progress or unlock anything new.
+ * Returns the same dialogue when there is nothing to go back to.
+ */
+export function goBack(scene: SceneDef, dialogue: DialogueState): DialogueState {
+  const trail = dialogue.trail ?? []
+  const previous = trail[trail.length - 1]
+  if (!previous) return dialogue
+  const lastChoice = getNode(scene, previous).choices ? previous : dialogue.lastChoice
+  return { nodeId: previous, lastChoice, trail: trail.slice(0, -1) }
 }
 
 // ---------------------------------------------------------------- objectives

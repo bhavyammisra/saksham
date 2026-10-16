@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { SchoolYardArt } from '@/art/schoolYard'
 import { Character } from '@/character/Character'
 import { Mitthu } from '@/character/Mitthu'
 import type { CharacterSpec } from '@/character/spec'
 import { CoverScreen } from '@/components/CoverScreen'
+import { ScenePicture } from '@/engine/Scene'
+import { getScene } from '@/lib/scenes'
 import { SettingsDialog } from '@/components/SettingsDialog'
 import { t } from '@/lib/i18n'
 import { sound } from '@/lib/sound'
@@ -72,11 +73,7 @@ export function Title() {
           </ul>
         </nav>
 
-        <Link to="/proto" className="mt-8 inline-flex min-h-tap items-center rounded-pill bg-peacock px-5 text-sm font-semibold text-white hover:bg-[#25595c]">
-          {t('title.tryProto')}
-        </Link>
-
-        <p className="mt-8 text-sm text-umber">
+        <p className="mt-14 text-sm text-umber">
           {t('title.footer')} ·{' '}
           <Link to="/credits" className="underline underline-offset-4 hover:text-espresso">
             {t('credits.title')}
@@ -87,7 +84,7 @@ export function Title() {
       {/* A picture of the School yard, with the player's character (or two explorers) in front. Decorative. */}
       <div aria-hidden="true" className="relative hidden h-[34rem] items-end justify-center md:flex">
         <div className="cover-picture absolute inset-x-0 top-0 h-[27rem] overflow-hidden rounded-3xl">
-          <SchoolYardArt viewBox="440 90 1560 720" clouds />
+          <ScenePicture scene={getScene('school')!} focusX={2450} viewHeight={620} />
         </div>
         <div className="absolute bottom-3 left-1/2 h-5 w-72 -translate-x-1/2 rounded-[50%] bg-espresso/15" />
         {active ? (

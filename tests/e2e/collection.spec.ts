@@ -1,7 +1,7 @@
 // The Book, Me, Credits and demo mode (BUILD_PLAN P4).
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { seedPlayer, strings } from './helpers.ts'
+import { openMap, seedPlayer, strings } from './helpers.ts'
 
 test('FR-05 the Book shows collected cards, and each reads exactly as written', async ({ page }) => {
   await seedPlayer(page, '/book', { school: true })
@@ -46,15 +46,19 @@ test('Credits lists the fonts and the legal source of every card, exactly as wri
 
 test('FR-17 typing "demo" opens every playable place, and the chip turns it off', async ({ page }) => {
   await seedPlayer(page, '/town')
-  const home = page.locator('article').filter({ has: page.getByRole('heading', { name: 'Home', exact: true }) })
-  await expect(home).toContainText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))
-  await page.locator('h1').click()
-  await page.keyboard.type('demo')
+  const home = (map: Locator) => map.getByRole('button', { name: /^Home: / })
+  let map = await openMap(page)
+  await expect(home(map)).toHaveAccessibleName(new RegExp(strings['town.lockedAfter'].replace('{name}', 'The Dhaba')))
+  await page.keyboard.press('Escape')
+  await page.keyboard.type('demo') // (the "m" also opens the map)
   await expect(page.getByRole('button', { name: new RegExp(strings['demo.chip']) })).toBeVisible()
-  await expect(home).toContainText(strings['town.beingBuilt'])
+  map = await openMap(page)
+  await expect(home(map)).toHaveAccessibleName(new RegExp(strings['town.beingBuilt']))
+  await page.keyboard.press('Escape')
   await page.getByRole('button', { name: new RegExp(strings['demo.chip']) }).click()
   await expect(page.getByRole('button', { name: new RegExp(strings['demo.chip']) })).toHaveCount(0)
-  await expect(home).toContainText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))
+  map = await openMap(page)
+  await expect(home(map)).toHaveAccessibleName(new RegExp(strings['town.lockedAfter'].replace('{name}', 'The Dhaba')))
 })
 
 test('FR-17 holding the logo for 2 seconds turns demo mode on (and doesn\'t follow the link)', async ({ page }) => {

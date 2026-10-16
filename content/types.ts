@@ -37,6 +37,7 @@ export interface Layer {
   art: string
   speed: number // parallax factor, 1 = foreground; 0 = fixed to the screen (light, haze)
   front?: boolean // drawn in front of the characters (default: only layers faster than 1)
+  drift?: boolean // slides slowly to and fro by itself (clouds); still in calm mode
 }
 
 export interface Hotspot {
@@ -51,6 +52,7 @@ export interface Hotspot {
   hideIf?: string[] // flags
   to?: string // exits: where the door leads. The screen hosting the scene decides what this means.
   lockedNode?: string // exits: node opened instead of leaving, while the host says this exit is locked
+  depth?: number // 0 = the far edge of the walkway (against the wall) to 1 = nearest the viewer. Default: npc 0.35, others 0
 }
 
 export interface Objective {
@@ -124,6 +126,7 @@ export interface BuildingInfo {
   name: string // shown in the town
   right: string // the right it teaches, shown in the town
   teaser?: boolean // locked "Coming soon" building, never playable
+  map: { x: number; y: number } // where its pin sits on the area map (1600 x 1000 drawing)
 }
 
 // The Help Centre (content/help.json). Every word shown comes from this file, exactly as written.

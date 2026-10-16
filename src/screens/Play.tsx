@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
+import { GameFrame } from '@/components/GameFrame'
 import { Page } from '@/components/Page'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
@@ -10,16 +11,22 @@ import { CardReveal } from '@/play/CardReveal'
 import { Quiz } from '@/play/Quiz'
 import type { Celebration } from '@/components/ReturnCelebration'
 import { Results, type Summary } from '@/play/Results'
+import { useMap } from '@/play/useMap'
 
 type Stage = 'scene' | 'card' | 'quiz' | 'results'
 
-/**
- * Playing one building (/play/:id), the core loop from BUILD_PLAN §2:
- * the scene, then its rights card, the quiz, and the results, which are saved.
- * Leaving through the scene's exit before finishing goes back to the town without saving.
- */
+/** /play/:id. Travelling from one building to another (the map) starts the new one afresh. */
 export function Play() {
   const { id = '' } = useParams()
+  return <PlayBuilding key={id} id={id} />
+}
+
+/**
+ * Playing one building, the core loop from BUILD_PLAN §2: the scene (full screen, D-036),
+ * then its rights card, the quiz, and the results, which are saved.
+ * Leaving through the scene's exit before finishing goes back to the town without saving.
+ */
+function PlayBuilding({ id }: { id: string }) {
   const scene = getScene(id)
   // A building needs its card; a hub scene (the town) has none and isn't played here.
   const card = scene?.card
@@ -27,6 +34,7 @@ export function Play() {
   const data = useStore(selectActiveData)
   const demo = useStore((s) => s.demo)
   const navigate = useNavigate()
+  const map = useMap(id)
 
   const [stage, setStage] = useState<Stage>('scene')
   const [run, setRun] = useState(0) // bumping this restarts the scene ("Play again")
@@ -86,14 +94,18 @@ export function Play() {
     setRun((n) => n + 1)
   }
 
+  if (stage === 'scene') return <Scene key={run} scene={scene} onComplete={onComplete} onExit={onExit} map={map} />
+
+  // The card, quiz and results sit in front of the scene's picture.
   return (
-    <Page title={scene.title} wide={stage === 'scene'}>
-      {stage === 'scene' && <Scene key={run} scene={scene} onComplete={onComplete} onExit={onExit} />}
-      {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
-      {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games?.[0]?.questions ?? [], profile.band)} onDone={finish} />}
-      {stage === 'results' && summary && (
-        <Results from={id} celebration={celebration} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
-      )}
-    </Page>
+    <GameFrame scene={scene} focusX={scene.width / 2}>
+      <div className="mx-auto max-w-3xl rounded-2xl bg-plaster p-5 text-ink shadow-2xl md:p-8">
+        {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
+        {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games?.[0]?.questions ?? [], profile.band)} onDone={finish} />}
+        {stage === 'results' && summary && (
+          <Results from={id} celebration={celebration} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
+        )}
+      </div>
+    </GameFrame>
   )
 }

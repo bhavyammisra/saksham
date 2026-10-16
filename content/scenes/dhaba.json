@@ -6,13 +6,11 @@
   "tone": "gentle",
   "width": 3400,
   "layers": [
-    { "id": "sky", "art": "school.sky", "speed": 0.05 },
-    { "id": "far", "art": "school.far", "speed": 0.15 },
-    { "id": "houses", "art": "school.town", "speed": 0.4 },
-    { "id": "trees", "art": "school.trees", "speed": 0.65 },
-    { "id": "dhaba", "art": "dhaba.stage", "speed": 1 },
-    { "id": "light", "art": "school.light", "speed": 0, "front": true },
-    { "id": "foreground", "art": "school.foreground", "speed": 1.35 }
+    { "id": "sky", "art": "modern.skyEvening", "speed": 0 },
+    { "id": "clouds", "art": "modern.clouds", "speed": 0.08, "drift": true },
+    { "id": "far", "art": "modern.far", "speed": 0.3 },
+    { "id": "stage", "art": "dhaba.stage", "speed": 1 },
+    { "id": "front", "art": "modern.front", "speed": 1.25, "front": true }
   ],
   "walkable": { "minX": 150, "maxX": 3250 },
   "spawn": { "x": 420 },

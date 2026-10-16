@@ -2,7 +2,8 @@
 import { expect, test } from '@playwright/test'
 import dhaba from '../../content/scenes/dhaba.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, createPlayer, playStory, seedPlayer, strings, talkThrough, thingsToDo } from './helpers.ts'
+import town from '../../content/scenes/town.json' with { type: 'json' }
+import { answerQuiz, createPlayer, doThing, openMap, playStory, seedPlayer, strings, talkThrough, thingsToDo } from './helpers.ts'
 
 // These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
 test.describe.configure({ timeout: 60_000 })
@@ -36,20 +37,23 @@ test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results th
   // Back in the town: Mitthu celebrates once; School shows its stars, the Dhaba is now open, Home is still locked.
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()
   await expect(page).toHaveURL(/#\/town$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['town.title'])
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(town.title)
   const celebration = page.getByRole('status').filter({ hasText: strings['town.welcomeBack'].replace('{name}', 'Asha') })
   await expect(celebration).toContainText(strings['town.earned'].replace('{n}', '2').replace('{place}', 'The School'))
   await expect(celebration).toContainText(strings['town.nowOpen'].replace('{place}', 'The Dhaba'))
   await page.getByRole('button', { name: strings['town.celebrateClose'] }).click()
   await expect(celebration).toHaveCount(0)
   // Lata now stands outside the School, and the town has changed.
-  await expect(thingsToDo(page).getByRole('button', { name: 'Talk to Lata' })).toBeVisible()
-  await expect(page.getByText(strings['town.stars'].replace('{n}', '2'))).toBeAttached()
-  await expect(page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The Dhaba') })).toBeVisible()
-  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))).toBeVisible()
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Talk to Lata' })).toBeVisible()
+  // The map: the School has its stars, the Dhaba is open, Home is still locked.
+  let map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.stars'].replace('{n}', '2')))
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The Dhaba')}`) })).toBeVisible()
+  await expect(map.getByRole('button', { name: /^Home: / })).toHaveAccessibleName(new RegExp(strings['town.lockedAfter'].replace('{name}', 'The Dhaba')))
 
   await page.reload()
-  await expect(page.getByRole('link', { name: strings['town.playAgain'].replace('{name}', 'The School') })).toBeVisible()
+  map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.stars'].replace('{n}', '2')))
   await expect(page.getByRole('button', { name: strings['town.celebrateClose'] })).toHaveCount(0) // only once
   const saved = await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('saksham') ?? '{}').state
@@ -97,10 +101,11 @@ test('FR-07 a locked building cannot be played', async ({ page }) => {
 
 test('FR-07 the town starts with only the School open, and links to it', async ({ page }) => {
   await createPlayer(page, 'Asha')
-  await expect(page.getByText(strings['town.suggest'])).toBeVisible()
-  await expect(page.getByText(strings['town.comingSoon'])).toHaveCount(2)
-  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The School'))).toBeVisible()
-  await page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The School') }).click()
+  const map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.suggest']))
+  await expect(map.getByRole('button', { name: new RegExp(strings['town.comingSoon']) })).toHaveCount(2)
+  await expect(map.getByRole('button', { name: /^The Dhaba: / })).toHaveAccessibleName(new RegExp(strings['town.lockedAfter'].replace('{name}', 'The School')))
+  await map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) }).click()
   await expect(page).toHaveURL(/#\/play\/school$/)
 })
 
@@ -108,12 +113,11 @@ test('FR-04 / FR-07 the Dhaba (after the School) plays in the gentle tone, and i
   await seedPlayer(page, '/play/dhaba', { school: true })
   await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(dhaba.nodes.intro.text)
   await talkThrough(page)
-  const list = thingsToDo(page)
   for (const label of ['Talk to the boy washing glasses', 'Look at the notebook on the shelf']) {
-    await list.getByRole('button', { name: label }).click()
+    await doThing(page, label)
     await talkThrough(page)
   }
-  await list.getByRole('button', { name: 'Ask Sunita Didi for help' }).click()
+  await doThing(page, 'Ask Sunita Didi for help')
   await talkThrough(page)
   await page.getByRole('button', { name: /^Raju is twelve/ }).click()
   await talkThrough(page)

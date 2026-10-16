@@ -1,15 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SceneDef } from '@content/types'
-import { Mitthu } from '@/character/Mitthu'
-import { Portrait } from '@/character/Portrait'
 import type { CharacterSpec } from '@/character/spec'
 import { t } from '@/lib/i18n'
 import { sound } from '@/lib/sound'
-import { getNpc, npcSpec } from './people'
+import { getNpc } from './people'
 import { canSpeak, speak, stopSpeaking } from './speech'
 import type { DialogueState } from './story'
 
 const CHARS_PER_SECOND = 45
+
+// Name colours, so you can tell who is speaking at a glance (D-036). The player is gold,
+// Mitthu green, and everyone else gets one of these, always the same for the same person.
+const PLAYER_COLOUR = '#f5d76e'
+const PARROT_COLOUR = '#8fd88a'
+const COLOURS = ['#5cc8e0', '#f2a65a', '#e58fb0', '#a8b8ff', '#7fd6b5', '#e0c07a']
+
+export function speakerColour(speaker: string): string {
+  if (speaker === 'player') return PLAYER_COLOUR
+  if (getNpc(speaker)?.kind === 'parrot') return PARROT_COLOUR
+  let sum = 0
+  for (const ch of speaker) sum += ch.charCodeAt(0)
+  return COLOURS[sum % COLOURS.length]!
+}
 
 interface Props {
   scene: SceneDef
@@ -22,51 +34,27 @@ interface Props {
 }
 
 /**
- * The conversation panel: portrait, name, typewriter text, Next and choices.
- * Screen readers get each full line once through an aria-live region
- * (the letter-by-letter text is hidden from them).
+ * The dialogue strip (D-036): a see-through band across the bottom of the scene, like film
+ * subtitles. The speaker's name in their colour, the line below it (typed out, except in calm
+ * mode), then Next or the choices. Clicking anywhere on the strip also goes on.
+ * Screen readers get each full line once through an aria-live region.
  */
 export function Dialogue(props: Props) {
   const node = props.scene.nodes[props.dialogue.nodeId]
-  const box = useRef<HTMLElement>(null)
-  // Bring the conversation into view when it opens (it sits below the scene).
-  useEffect(() => {
-    box.current?.scrollIntoView({ block: 'nearest', behavior: props.calm ? 'auto' : 'smooth' })
-  }, [props.calm])
   if (!node) return null
   const npc = node.speaker === 'player' ? null : getNpc(node.speaker)
   const name = node.speaker === 'player' ? props.player.name : (npc?.name ?? node.speaker)
 
   return (
-    <section
-      ref={box}
-      aria-label={t('scene.conversation')}
-      className="scene-dialogue mt-3 rounded-card border-2 border-sand bg-plaster p-3 shadow-soft sm:p-4"
-    >
+    <section aria-label={t('scene.conversation')} className="game-strip px-4 pb-3 pt-12 text-center">
       <p className="sr-only" aria-live="polite">
         {name}: {node.text}
       </p>
-      <div className="flex items-start gap-3">
-        <div className="shrink-0">
-          {npc?.kind === 'parrot' ? (
-            <div className="size-16 overflow-hidden rounded-full bg-gradient-to-b from-marigold-soft to-plaster-deep shadow-soft sm:size-20">
-              <Mitthu view="portrait" className="size-full" />
-            </div>
-          ) : (
-            <Portrait
-              spec={node.speaker === 'player' ? props.player.spec : npc ? npcSpec(npc) : props.player.spec}
-              mood={node.mood}
-              talking
-              className="size-16 sm:size-20"
-            />
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-terracotta-deep">{name}</p>
-          {/* key: a new line restarts the typewriter */}
-          <Line key={props.dialogue.nodeId} {...props} text={node.text} choices={node.choices} />
-        </div>
-      </div>
+      <span className="block text-lg font-semibold drop-shadow" style={{ color: speakerColour(node.speaker) }} aria-hidden="true">
+        {name}
+      </span>
+      {/* key: a new line restarts the typewriter */}
+      <Line key={props.dialogue.nodeId} {...props} text={node.text} choices={node.choices} />
     </section>
   )
 }
@@ -91,24 +79,31 @@ function Line(props: Props & { text: string; choices?: { label: string }[] }) {
     return () => stopSpeaking()
   }, [narration, text])
 
-  // Keyboard users land on the next thing to press.
+  // Keyboard users land on the next thing to press (Enter or Space then goes on).
   useEffect(() => {
-    firstButton.current?.focus()
+    firstButton.current?.focus({ preventScroll: true })
   }, [done])
+
+  const next = () => {
+    sound.play('tap')
+    if (done) props.onNext()
+    else setShown(parts.length) // first press shows the whole line
+  }
 
   return (
     <>
-      <p className="mt-1 min-h-[2lh] text-lg" aria-hidden="true">
+      {/* Clicking the line itself also goes on (the Next button below does the same for keyboards). */}
+      <p className="mx-auto mt-1 min-h-[2lh] max-w-3xl cursor-pointer text-lg leading-snug drop-shadow" aria-hidden="true" onClick={props.choices && done ? undefined : next}>
         {parts.slice(0, shown).join('')}
-        {/* Reserve the space of the hidden rest, so the box doesn't jump. */}
+        {/* Reserve the space of the hidden rest, so the strip doesn't jump. */}
         <span className="invisible">{parts.slice(shown).join('')}</span>
       </p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mx-auto mt-2 flex max-w-3xl flex-wrap items-center justify-center gap-2">
         {done && props.choices ? (
-          <ul className="flex w-full flex-col gap-2">
+          <ul className="flex w-full flex-col items-center gap-2">
             {props.choices.map((choice, i) => (
-              <li key={choice.label}>
+              <li key={choice.label} className="w-full max-w-xl">
                 <button
                   ref={i === 0 ? firstButton : undefined}
                   type="button"
@@ -116,7 +111,7 @@ function Line(props: Props & { text: string; choices?: { label: string }[] }) {
                     sound.play('tap')
                     props.onChoose(i)
                   }}
-                  className="min-h-tap w-full rounded-button border-2 border-sand bg-white px-4 py-2 text-left font-semibold hover:border-ink hover:bg-marigold-soft"
+                  className="game-choice min-h-tap w-full rounded-pill px-5 py-2 text-base"
                 >
                   {choice.label}
                 </button>
@@ -124,25 +119,12 @@ function Line(props: Props & { text: string; choices?: { label: string }[] }) {
             ))}
           </ul>
         ) : (
-          <button
-            ref={firstButton}
-            type="button"
-            onClick={() => {
-              sound.play('tap')
-              if (done) props.onNext()
-              else setShown(parts.length) // first press shows the whole line
-            }}
-            className="min-h-tap rounded-button bg-terracotta px-6 font-semibold text-white hover:bg-terracotta-deep"
-          >
+          <button ref={firstButton} type="button" onClick={next} className="game-next min-h-tap rounded-pill px-5 text-sm font-semibold">
             {t('scene.next')}
           </button>
         )}
         {canSpeak() && (
-          <button
-            type="button"
-            onClick={() => speak(text)}
-            className="ml-auto min-h-tap rounded-button px-3 font-semibold text-peacock underline underline-offset-4"
-          >
+          <button type="button" onClick={() => speak(text)} className="game-menu min-h-tap text-sm">
             {t('scene.readAloud')}
           </button>
         )}

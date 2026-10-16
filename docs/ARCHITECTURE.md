@@ -15,11 +15,11 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 | --- | --- | --- |
 | `content/` | Typed JSON: UI strings, scenes, help copy, people; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1); `npcs.json`, `scenes/sandbox.json` (P2) |
 | `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, `scenes.ts` (content registry: building id → scene, `cardsInTown()`), later `sync.ts`, `supabase.ts` | P1, P3, P4 |
-| `src/engine/` | Pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts`) and the scene player (`Scene.tsx`, `Dialogue.tsx`, `WalkPad.tsx`, `hooks.ts`, `people.ts`, `speech.ts`) | P2 |
+| `src/engine/` | Pure scene logic (`movement.ts`: walking, depth, feet and heights; `story.ts`: hotspots, dialogue with Back; `sceneState.ts`: the reducer, with History) and the full-screen scene player (`Scene.tsx` with `ScenePicture`, `Dialogue.tsx` the strip, `WalkPad.tsx`, `hooks.ts`, `people.ts`, `speech.ts`) | P2, redone in P4 (D-036) |
 | `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), game-style `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (redesigned, D-024/D-025) |
 | `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Results`; `RightsCard` (card front, back and details, shared with the Book) and `badgeText` | P3, P4 |
 | `src/art/` | Scene art registry by key (`index.ts`), `style.tsx` (shared drawing rules), `sandbox.tsx`, `school.tsx`, `town.tsx` (the walkable town), `dhaba.tsx` (the cover screens use plain CSS, `src/components/cover.css`, D-034) | P2 to P4 |
-| `src/screens/` | One component per route: Onboarding, Profiles, Town (the walkable town scene), Play, Book, Me (+ character), Credits, HelpCentre, guards, Placeholder (still used by `/community`, `/teacher`, `/reviewer`); dev pages DevCharacters, DevScene, DevLook | P1 to P4 |
+| `src/screens/` | One component per route: Onboarding, Profiles, Title (the main menu at `/`), Town (the walkable town, full screen), Play (a building, full screen), Book, Me (+ character), Credits, HelpCentre, guards, Placeholder (still used by `/community`, `/teacher`, `/reviewer`); dev pages DevCharacters, DevScene | P1 to P4 |
 | `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
 | `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |
@@ -54,17 +54,21 @@ flowchart TD
   Root["/ (Title: main menu)"] -->|New game| Onb[/onboarding/]
   Root -->|Switch player| Prof[/profiles/]
   Root -->|Continue| Town[/town/]
+  Town -->|door or map| Play["/play/:id"]
   subgraph "Shell (top bar + Need help? + Settings)"
     Root
     Onb
     Prof
-    Play["/play/:id"]
     Teacher[/teacher/]
     Reviewer[/reviewer/]
-    Dev["/dev/characters · /dev/scene · /dev/look"]
+    Dev["/dev/characters"]
+  end
+  subgraph "Full screen game frame (its own Need help?, menu words, map; D-036)"
+    Town
+    Play
+    DevScene["/dev/scene"]
   end
   subgraph "Shell nav (adds Town · Book · Community · Me)"
-    Town
     Book[/book/]
     Community[/community/]
     Me["/me · /me/character"]

@@ -4,7 +4,7 @@
 import { expect, test } from '@playwright/test'
 import help from '../../content/help.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, playStory, strings } from './helpers.ts'
+import { answerQuiz, openMap, playStory, strings } from './helpers.ts'
 
 // These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
 test.describe.configure({ timeout: 60_000 })
@@ -33,8 +33,9 @@ test('Demo path: profile, character, School, card flip, quiz, results, Help Cent
 
   // 3. The town: only the School is open, and Mitthu suggests it.
   await expect(page).toHaveURL(/#\/town$/)
-  await expect(page.getByText(strings['town.suggest'])).toBeVisible()
-  await page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The School') }).click()
+  const map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.suggest']))
+  await map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) }).click()
 
   // 4. The School story, with one weaker choice and a retry, to the good ending.
   await expect(page).toHaveURL(/#\/play\/school$/)
@@ -57,8 +58,10 @@ test('Demo path: profile, character, School, card flip, quiz, results, Help Cent
   // 8. Back in the town, the progress shows and survives a reload.
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()
   await page.reload()
-  await expect(page.getByRole('link', { name: strings['town.playAgain'].replace('{name}', 'The School') })).toBeVisible()
-  await expect(page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The Dhaba') })).toBeVisible() // the Dhaba is open now
+  const after = await openMap(page)
+  await expect(after.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.stars'].replace('{n}', '2')))
+  await expect(after.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The Dhaba')}`) })).toBeVisible() // the Dhaba is open now
+  await after.getByRole('button', { name: strings['hud.close'] }).click()
 
   // 9. Help is one tap away, and the Help Centre is calm (no Help button of its own).
   await page.getByTestId('help-button').click()
