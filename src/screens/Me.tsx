@@ -17,7 +17,6 @@ import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 export function Me() {
   const profile = useStore(selectActiveProfile)
   const data = useStore(selectActiveData)
-  const setActiveProfile = useStore((s) => s.setActiveProfile)
   const navigate = useNavigate()
   if (!profile) return null
 
@@ -74,10 +73,9 @@ export function Me() {
 
       <button
         type="button"
-        onClick={() => {
-          setActiveProfile(null)
-          navigate('/profiles')
-        }}
+        // The player list sets the new player when one is picked. (Clearing the player here would
+        // make this screen's guard jump to the title menu first.)
+        onClick={() => navigate('/profiles')}
         className="mt-10 min-h-tap rounded-button border-2 border-sand bg-plaster px-5 font-semibold hover:bg-marigold-soft"
       >
         {t('me.switchPlayer')}

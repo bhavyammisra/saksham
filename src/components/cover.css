@@ -1,0 +1,79 @@
+/* The cover screens before the game (title menu, new game, customiser, players).
+   Quiet and minimal (owner feedback, D-034): warm beige, espresso text, one rust accent.
+   Nothing moves here; calm mode also stops the menu's small slide. */
+
+.cover {
+  background:
+    radial-gradient(ellipse 70% 60% at 78% 42%, #efe6d6 0%, transparent 70%),
+    linear-gradient(180deg, #f6f1e7 0%, #ece3d3 100%);
+  color: var(--color-espresso);
+  font-family: var(--font-ui);
+}
+
+/* The word "SAKSHAM": the serif, in capitals, spaced wide. */
+.cover-wordmark {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  line-height: 1;
+}
+
+/* Forms sit on a light card with a hairline border. */
+.cover-card {
+  background: #fbf8f2;
+  border: 1px solid #e2d6c3;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgb(60 40 20 / 0.05), 0 16px 40px rgb(60 40 20 / 0.08);
+}
+
+.cover-primary {
+  background: var(--color-espresso);
+  color: #f6efe3;
+}
+.cover-primary:hover {
+  background: #46372b;
+}
+.cover-secondary {
+  border: 1px solid var(--color-oat);
+  color: var(--color-espresso);
+}
+.cover-secondary:hover {
+  background: var(--color-linen);
+}
+
+/* Main menu: plain words; a short rust rule slides in beside the one you point at. */
+.menu-item {
+  position: relative;
+  transition: padding-left 0.2s ease, color 0.2s ease;
+}
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-rust);
+  transition: width 0.2s ease;
+}
+.menu-item:hover,
+.menu-item:focus-visible {
+  padding-left: 2rem;
+  color: var(--color-espresso);
+}
+.menu-item:hover::before,
+.menu-item:focus-visible::before {
+  width: 1.25rem;
+}
+
+/* Choice chips (age, gender, styles): selected = dark fill AND a tick, never colour alone. */
+.chip[aria-pressed='true'] {
+  background: var(--color-espresso);
+  border-color: var(--color-espresso);
+  color: #f6efe3;
+}
+
+html[data-calm] .menu-item,
+html[data-calm] .menu-item::before {
+  transition: none;
+}

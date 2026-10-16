@@ -70,7 +70,6 @@ test('FR-17 holding the logo for 2 seconds turns demo mode on (and doesn\'t foll
 
 test('FR-17 typing "demo" in a text box does not turn demo mode on', async ({ page }) => {
   await page.goto('/#/onboarding')
-  await page.getByRole('button', { name: strings['onboarding.start'] }).click()
   await page.getByLabel(strings['onboarding.nameLabel']).fill('')
   await page.getByLabel(strings['onboarding.nameLabel']).pressSequentially('demo')
   await expect(page.getByRole('button', { name: new RegExp(strings['demo.chip']) })).toHaveCount(0)

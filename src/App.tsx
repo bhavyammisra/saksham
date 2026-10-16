@@ -6,13 +6,14 @@ import { Credits } from '@/screens/Credits'
 import { DevCharacters } from '@/screens/DevCharacters'
 import { DevLook } from '@/screens/DevLook'
 import { DevScene } from '@/screens/DevScene'
-import { RequireProfile, StartRedirect } from '@/screens/guards'
+import { RequireProfile } from '@/screens/guards'
 import { HelpCentre } from '@/screens/HelpCentre'
 import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
 import { Placeholder } from '@/screens/Placeholder'
 import { Play } from '@/screens/Play'
 import { Profiles } from '@/screens/Profiles'
+import { Title } from '@/screens/Title'
 import { Town } from '@/screens/Town'
 
 // Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
@@ -21,13 +22,13 @@ export default function App() {
     <>
       <SoundRouteSync />
       <Routes>
-        <Route path="/" element={<StartRedirect />} />
         {/* The Help Centre has no shell: no Help button, nothing that moves or makes sound. */}
         <Route path="/help" element={<HelpCentre />} />
 
         {/* Screens with the top bar only. */}
-        {/* The cover screens before the game: full-screen art under a see-through top bar. */}
+        {/* The cover screens before the game (title menu, new game, players), under a see-through top bar. */}
         <Route element={<Shell immersive />}>
+          <Route path="/" element={<Title />} />
           <Route path="/profiles" element={<Profiles />} />
           <Route path="/onboarding" element={<Onboarding />} />
         </Route>

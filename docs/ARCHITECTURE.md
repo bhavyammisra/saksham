@@ -18,7 +18,7 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 | `src/engine/` | Pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts`) and the scene player (`Scene.tsx`, `Dialogue.tsx`, `WalkPad.tsx`, `hooks.ts`, `people.ts`, `speech.ts`) | P2 |
 | `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), game-style `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (redesigned, D-024/D-025) |
 | `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Results`; `RightsCard` (card front, back and details, shared with the Book) and `badgeText` | P3, P4 |
-| `src/art/` | Scene art registry by key (`index.ts`), `style.tsx` (shared drawing rules), `sandbox.tsx`, `school.tsx`, `town.tsx` (the walkable town), `dhaba.tsx`, `cover.tsx` (cover backdrop) | P2 to P4 |
+| `src/art/` | Scene art registry by key (`index.ts`), `style.tsx` (shared drawing rules), `sandbox.tsx`, `school.tsx`, `town.tsx` (the walkable town), `dhaba.tsx` (the cover screens use plain CSS, `src/components/cover.css`, D-034) | P2 to P4 |
 | `src/screens/` | One component per route: Onboarding, Profiles, Town (the walkable town scene), Play, Book, Me (+ character), Credits, HelpCentre, guards, Placeholder (still used by `/community`, `/teacher`, `/reviewer`); dev pages DevCharacters, DevScene, DevLook | P1 to P4 |
 | `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
@@ -51,10 +51,11 @@ The Phase 5 sync sequence and join-class sequence will be added here as Mermaid 
 
 ```mermaid
 flowchart TD
-  Root["/ (StartRedirect)"] -->|no players| Onb[/onboarding/]
-  Root -->|players, none active| Prof[/profiles/]
-  Root -->|active player| Town[/town/]
+  Root["/ (Title: main menu)"] -->|New game| Onb[/onboarding/]
+  Root -->|Switch player| Prof[/profiles/]
+  Root -->|Continue| Town[/town/]
   subgraph "Shell (top bar + Need help? + Settings)"
+    Root
     Onb
     Prof
     Play["/play/:id"]

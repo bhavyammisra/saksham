@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import { t, type StringKey } from '@/lib/i18n'
 import { DemoChip, useDemoMode } from './DemoMode'
 import { HelpButton } from './HelpButton'
@@ -18,6 +18,8 @@ const navItems: { to: string; label: StringKey }[] = [
  */
 export function Shell({ nav = false, immersive = false }: { nav?: boolean; immersive?: boolean }) {
   const logoDemo = useDemoMode() // type "demo", or hold the logo for 2 seconds
+  // The title menu shows the big logo itself, so the small one in the bar is left out there.
+  const onTitle = useLocation().pathname === '/'
   return (
     <div className="relative flex min-h-dvh flex-col">
       <a
@@ -32,28 +34,29 @@ export function Shell({ nav = false, immersive = false }: { nav?: boolean; immer
         {t('shell.skip')}
       </a>
 
-      {/* Immersive screens (the cover) draw their art under a see-through top bar. */}
+      {/* Immersive screens (the cover screens) sit under a see-through top bar. */}
       <header
         className={
           immersive
-            ? 'absolute inset-x-0 top-0 z-20 bg-gradient-to-b from-black/45 to-transparent'
+            ? 'absolute inset-x-0 top-0 z-20 font-ui'
             : 'sticky top-0 z-10 border-b border-sand bg-plaster/95'
         }
       >
-        <div className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-2">
-          <Link
+        <div className={`mx-auto flex items-center gap-2 px-4 py-2 ${immersive ? 'max-w-6xl' : 'max-w-5xl'}`}>
+          {!onTitle && <Link
             to="/"
             {...logoDemo}
             aria-label={t('shell.home')}
-            className={`inline-flex min-h-tap items-center text-xl font-semibold ${immersive ? 'text-white/90' : 'text-terracotta-deep'}`}
+            className={`inline-flex min-h-tap items-center ${immersive ? 'cover-wordmark text-base uppercase text-espresso' : 'text-xl font-semibold text-terracotta-deep'}`}
           >
             {t('app.name')}
-          </Link>
+          </Link>}
           {nav && <NavLinks className="ml-6 hidden gap-1 md:flex" />}
           <div className="ml-auto flex items-center gap-2">
             <DemoChip />
             <HelpButton />
-            <SettingsDialog />
+            {/* The title menu has its own Settings item. */}
+            {!onTitle && <SettingsDialog />}
           </div>
         </div>
       </header>

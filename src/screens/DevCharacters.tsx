@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Mood } from '@content/types'
 import { Character, type Pose } from '@/character/Character'
-import { defaultSpec, hairStyles, headwears, outfits, skinTones, type CharacterSpec } from '@/character/spec'
+import { bottoms, defaultSpec, genders, hairFor, hairStyles, headwears, outfits, playerTops, skinTones, type CharacterSpec } from '@/character/spec'
 import { Page } from '@/components/Page'
 import { t } from '@/lib/i18n'
 
@@ -9,7 +9,7 @@ const POSES: Pose[] = ['idle', 'walk', 'talk', 'wave', 'gasp', 'cheer']
 const MOODS: Mood[] = ['neutral', 'happy', 'worried', 'surprised', 'sad']
 
 /**
- * Developer check page (/dev/characters): every outfit x headwear combination,
+ * Developer check page (/dev/characters): the player's choices (D-034), every outfit x headwear combination,
  * every pose, mood, skin tone and hairstyle, for spotting alignment problems.
  */
 export function DevCharacters() {
@@ -17,6 +17,26 @@ export function DevCharacters() {
 
   return (
     <Page title={t('dev.characters')}>
+      {genders.map((g) => (
+        <Section key={g.id} title={`${t('builder.hair')}: ${t(g.label)}`}>
+          {hairFor(g.id).map((h) => (
+            <Cell key={h.id} caption={t(h.label)}>
+              <Character spec={with_({ gender: g.id, hair: h.id })} />
+            </Cell>
+          ))}
+        </Section>
+      ))}
+
+      <Section title={`${t('builder.top')} · ${t('builder.bottom')}`}>
+        {playerTops.flatMap((o, i) =>
+          bottoms.map((b) => (
+            <Cell key={`${o.id}-${b.id}`} caption={`${t(o.label)} · ${t(b.label)}`}>
+              <Character spec={with_({ outfit: o.id, bottom: b.id, outfitColor: ['rust', 'sage', 'navy', 'mustard'][i]! })} />
+            </Cell>
+          )),
+        )}
+      </Section>
+
       <Section title={t('dev.combinations')}>
         {outfits.flatMap((o) =>
           headwears.map((h) => (

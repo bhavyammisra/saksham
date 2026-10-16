@@ -1,21 +1,24 @@
 import { expect, test } from '@playwright/test'
 import strings from '../../content/strings.en.json' with { type: 'json' }
 
-test('the app loads, takes a new player to onboarding, and uses the strings file', async ({ page }) => {
+test('the app opens on the title menu, and uses the strings file', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveURL(/#\/onboarding$/)
   await expect(page).toHaveTitle(strings['app.name'])
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['onboarding.title'])
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['app.name'])
+  const menu = page.getByRole('navigation', { name: strings['title.menu'] })
+  await expect(menu.getByRole('button', { name: strings['title.newGame'] })).toBeVisible()
+  // With no player yet there is nothing to continue.
+  await expect(menu.getByRole('button', { name: strings['title.continue'] })).toHaveCount(0)
 })
 
 test('screens that need a player send a new visitor back to the start', async ({ page }) => {
   await page.goto('/#/town')
-  await expect(page).toHaveURL(/#\/onboarding$/)
+  await expect(page).toHaveURL(/#\/$/)
 })
 
 test('unknown routes go back to the start', async ({ page }) => {
   await page.goto('/#/no-such-page')
-  await expect(page).toHaveURL(/#\/onboarding$/)
+  await expect(page).toHaveURL(/#\/$/)
 })
 
 test('calm mode follows the system "reduce motion" setting', async ({ page }) => {

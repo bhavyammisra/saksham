@@ -17,14 +17,21 @@ const languages: { lang: Lang; label: StringKey }[] = [{ lang: 'en', label: 'lan
 /**
  * The settings button and its dialog. Uses the browser's <dialog>, which
  * traps focus, closes on Escape and returns focus to the button by itself.
+ * `menuItem` draws it as a plain word instead of the gear button (the title menu's "Settings").
  */
-export function SettingsDialog() {
+export function SettingsDialog({ menuItem }: { menuItem?: { label: string; className: string } }) {
   const dialog = useRef<HTMLDialogElement>(null)
 
   return (
     <>
+      {menuItem && (
+        <button type="button" onClick={() => dialog.current?.showModal()} className={menuItem.className}>
+          {menuItem.label}
+        </button>
+      )}
       <button
         type="button"
+        hidden={!!menuItem}
         onClick={() => dialog.current?.showModal()}
         className="inline-flex min-h-tap min-w-tap shrink-0 items-center justify-center gap-2 rounded-pill border-2 border-sand bg-plaster px-3 font-semibold text-ink hover:bg-marigold-soft sm:px-4"
       >

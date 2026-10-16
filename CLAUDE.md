@@ -6,10 +6,10 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town` (pushed, no PR yet). Done in P4: the walkable town (D-030), its guidance, celebration and decorations (D-031), the Book, Me, Credits and demo mode (D-032), and the Dhaba scene (D-033). **Next task: the Home scene (gentle tone), then the Panchayat.**
+- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town` (pushed, no PR yet). Done in P4: the walkable town (D-030), its guidance, celebration and decorations (D-031), the Book, Me, Credits and demo mode (D-032), and the Dhaba scene (D-033). Then, from owner feedback, a new title menu, new-game flow and modern customiser (D-034). **Next: the owner reviews those screens and gives gameplay changes (🛑); after that, the Home scene (gentle tone), then the Panchayat.**
 - **Checkpoints:** the table at the top of `docs/BUILD_PLAN.md` shows every phase, 🛑 gate and owner-only task at a glance. All gates so far are approved. Owner still to do: fact-check the School and Dhaba cards (SETUP.md §6) and the Help Centre (§5), confirm the font licences.
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2), P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026) and P3 (PR #4, School end to end, MILESTONE A; D-027 to D-029).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md` (the "Handoff" note has the exact next task and the rules learned so far). **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-033).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md` (the "Handoff" note has the exact next task and the rules learned so far). **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-034).
 
 ## Start of every session
 
@@ -24,9 +24,9 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 - `src/lib/`: `rules.ts` (pure game rules), `store.ts` (persisted zustand, version 2), `i18n.ts`, `calm.ts`, `sound.ts`.
 - `src/character/`: the SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu`.
 - `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`), plus `Scene.tsx` (draws it), `Dialogue.tsx` and `WalkPad.tsx`. The hosting screen can pass `locked` exits, `startX`, `startFlags`, `skipIntro` and a Mitthu `guide`; the engine never knows why.
-- `src/art/`: scene art by key (`index.ts` registry, `style.tsx` shared drawing rules, `sandbox.tsx`, `school.tsx`, `dhaba.tsx`, `town.tsx`, `cover.tsx`).
+- `src/art/`: scene art by key (`index.ts` registry, `style.tsx` shared drawing rules, `sandbox.tsx`, `school.tsx`, `dhaba.tsx`, `town.tsx`). The cover screens are plain CSS (`src/components/cover.css`).
 - `src/play/`: `CardReveal`, `Quiz`, `Results` (the end of a building), `RightsCard` (card front, back and details, shared with the Book), `badgeText`. `src/lib/scenes.ts`: building id → scene, `cardsInTown()`.
-- `src/screens/` (Onboarding, Profiles, Town, Play, Book, Me, Credits, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog + SettingsControls, DemoMode, Button, Page, CoverScreen, ReturnCelebration).
+- `src/screens/` (Title (the main menu at `/`), Onboarding, Profiles, Town, Play, Book, Me, Credits, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog + SettingsControls, DemoMode, Button, Page, CoverScreen, ReturnCelebration).
 - `scripts/validate-content.ts`: `npm run validate`, also run in CI.
 - Dev pages: `/#/dev/characters` (every character combination), `/#/dev/scene` (engine sandbox), `/#/dev/look` (School look-dev).
 

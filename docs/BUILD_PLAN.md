@@ -35,6 +35,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | --- | --- |
 | Character look (P2) | ✅ approved 2026-10-14; reopened on feedback; ✅ re-approved 2026-10-15 after the redesign (D-024) |
 | Cover screens (owner feedback, P2) | ✅ approved 2026-10-15 (D-025) |
+| Title menu, new game and customiser redesign (owner feedback, P4) | 🛑 waiting for the owner's review (D-034). The owner will give gameplay changes next |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
 | Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
 
@@ -45,7 +46,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Fact-check the School rights card (Article 21A matched the Ministry of Education page; the rest is unverified) | SETUP.md §6, `content/scenes/school.json` › `card.review` |
 | Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
 | Fact-check the Help Centre numbers and sentences | SETUP.md §5, `content/help.json` › `review` |
-| Confirm the two font licences | `docs/ASSET_LICENSES.md` |
+| Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
 
 **Phase 4 tasks** (detail in §9)
@@ -516,3 +517,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `src/engine/dhaba.test.ts` (6), a Dhaba play-through e2e in `play.spec.ts` (gentle note links to Help), and updated expectations now that the Dhaba exists (Book shows 2 cards, the Dhaba is "Visit", not "Being built").
 - Owner: fact-check the Dhaba card (SETUP.md §6). The official PDFs did not open from Claude's tools; the quotes match secondary sources only.
 - Next task: P4 › the Home scene (`gentle` tone, safety at home; handled only through conversation and witnessing, never by showing harm). Then the Panchayat.
+
+**P4: owner feedback, title menu and customiser (2026-10-16)**
+- Done: `/` is now a title menu (`src/screens/Title.tsx`): logo, one line, and Continue / New game / Change character / Switch player / Settings on the left, the character on the right. New game is two steps: name with age under it, then the customiser. The customiser is rebuilt with Boy / Girl, modern hair, tops (T-shirt, shirt, hoodie, jacket) and bottoms (jeans, trousers, joggers). Beige look with Inter for menus; the dusk cover art is deleted. D-034.
+- Tests: spec unit tests (modern lists, gender, older saves), e2e updated for the new flow (title menu, age required, gender and bottoms in the customiser, Continue after reload). Me's "Switch player" no longer clears the player first (the screen's guard jumped to `/` before the list opened).
+- Watch: the game screens (town, scenes, Me, Book) still use the old warm serif look; the owner reviews them next. The Me › character page is narrower than the new-game one.
+- Next task: wait for the owner's review of these screens and their gameplay changes (🛑). Then, unless they say otherwise, the Home scene.

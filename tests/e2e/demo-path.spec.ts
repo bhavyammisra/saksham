@@ -14,20 +14,21 @@ test.describe.configure({ timeout: 60_000 })
 test.use({ reducedMotion: 'reduce' })
 
 test('Demo path: profile, character, School, card flip, quiz, results, Help Centre', async ({ page }) => {
-  // 1. A new player: welcome, first name, age band.
+  // 1. A new player: the title menu, then first name and age.
   await page.goto('/')
+  await page.getByRole('button', { name: strings['title.newGame'] }).click()
   await expect(page).toHaveURL(/#\/onboarding$/)
-  await page.getByRole('button', { name: strings['onboarding.start'] }).click()
   await page.getByLabel(strings['onboarding.nameLabel']).fill('Asha')
-  await page.getByRole('button', { name: strings['onboarding.next'] }).click()
   await page.getByRole('button', { name: strings['onboarding.bandYoung'] }).click()
+  await page.getByRole('button', { name: strings['onboarding.next'] }).click()
 
-  // 2. The character: pick a hairstyle and an outfit in the customiser.
+  // 2. The character: boy or girl, a hairstyle and a top in the customiser.
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['builder.title'])
+  await page.getByRole('button', { name: strings['gender.girl'] }).click()
   await page.getByRole('tab', { name: strings['builder.hair'] }).click()
-  await page.getByRole('button', { name: strings['hair.twoPlaits'] }).click()
-  await page.getByRole('tab', { name: strings['builder.outfit'] }).click()
-  await page.getByRole('button', { name: strings['outfit.salwar'] }).click()
+  await page.getByRole('button', { name: strings['hair.ponytail'] }).click()
+  await page.getByRole('tab', { name: strings['builder.top'] }).click()
+  await page.getByRole('button', { name: strings['outfit.hoodie'] }).click()
   await page.getByRole('button', { name: strings['builder.done'] }).click()
 
   // 3. The town: only the School is open, and Mitthu suggests it.
