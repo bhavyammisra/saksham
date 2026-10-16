@@ -4,7 +4,6 @@ import type { CharacterSpec } from '@/character/spec'
 import { t } from '@/lib/i18n'
 import { sound } from '@/lib/sound'
 import { getNpc } from './people'
-import { canSpeak, speak, stopSpeaking } from './speech'
 import type { DialogueState } from './story'
 
 const CHARS_PER_SECOND = 45
@@ -27,7 +26,6 @@ interface Props {
   scene: SceneDef
   dialogue: DialogueState
   player: { name: string; spec: CharacterSpec }
-  narration: boolean // the "Read aloud" setting: read each line automatically
   calm: boolean
   onNext: () => void
   onChoose: (index: number) => void
@@ -60,7 +58,7 @@ export function Dialogue(props: Props) {
 }
 
 function Line(props: Props & { text: string; choices?: { label: string }[] }) {
-  const { text, calm, narration } = props
+  const { text, calm } = props
   const parts = splitGraphemes(text)
   const [shown, setShown] = useState(calm ? parts.length : 0)
   const done = shown >= parts.length
@@ -72,12 +70,6 @@ function Line(props: Props & { text: string; choices?: { label: string }[] }) {
     const timer = window.setInterval(() => setShown((n) => Math.min(parts.length, n + 1)), 1000 / CHARS_PER_SECOND)
     return () => window.clearInterval(timer)
   }, [done, parts.length])
-
-  // Read the line aloud automatically when the setting is on.
-  useEffect(() => {
-    if (narration) speak(text)
-    return () => stopSpeaking()
-  }, [narration, text])
 
   // Keyboard users land on the next thing to press (Enter or Space then goes on).
   useEffect(() => {
@@ -121,11 +113,6 @@ function Line(props: Props & { text: string; choices?: { label: string }[] }) {
         ) : (
           <button ref={firstButton} type="button" onClick={next} className="game-next min-h-tap rounded-pill px-5 text-sm font-semibold">
             {t('scene.next')}
-          </button>
-        )}
-        {canSpeak() && (
-          <button type="button" onClick={() => speak(text)} className="game-menu min-h-tap text-sm">
-            {t('scene.readAloud')}
           </button>
         )}
       </div>

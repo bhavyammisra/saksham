@@ -538,3 +538,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `src/engine/home.test.ts` (6), a Home play-through in `play.spec.ts` (with a new `dhaba` option for `seedPlayer`), and the Book now counts 3 written cards.
 - Owner: fact-check the Home card (SETUP.md §6), and read the story once for tone.
 - Next task: P4 › the Panchayat (child marriage, `gentle` tone), the same way.
+
+**P4: owner feedback after playing (2026-10-16)**
+- Done: true scale (children 300 units, doors 400, every scene and the town redrawn; camera closer), a walk with bending knees (and walking still animates in calm mode), a new ponytail, and the read-aloud voice removed. D-038.
+- Tests: all 208 unit and 56 e2e tests green; no test needed changing.
+- Next task: P4 › the Panchayat (child marriage, `gentle` tone), drawn at true scale with the modern kit.

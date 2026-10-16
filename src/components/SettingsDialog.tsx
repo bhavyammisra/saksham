@@ -2,12 +2,11 @@ import { useRef } from 'react'
 import { t, type Lang, type StringKey } from '@/lib/i18n'
 import { useStore, type Settings } from '@/lib/store'
 
-type Toggle = 'sound' | 'music' | 'narration' | 'calmMotion'
+type Toggle = 'sound' | 'music' | 'calmMotion'
 
 const toggles: { key: Toggle; label: StringKey; hint?: StringKey }[] = [
   { key: 'sound', label: 'settings.sound' },
   { key: 'music', label: 'settings.music' },
-  { key: 'narration', label: 'settings.narration' },
   { key: 'calmMotion', label: 'settings.calmMotion', hint: 'settings.calmMotionHint' },
 ]
 

@@ -16,6 +16,8 @@
 .ch .ch-arm-r { transform-origin: 87px 101px; }
 .ch .ch-leg-l { transform-origin: 50px 190px; }
 .ch .ch-leg-r { transform-origin: 70px 190px; }
+.ch .ch-shin-l { transform-origin: 49px 268px; }
+.ch .ch-shin-r { transform-origin: 71px 268px; }
 .ch .ch-eyes { transform-origin: 60px 46px; }
 .ch .ch-mouth-talk { transform-origin: 60px 62.8px; }
 
@@ -47,12 +49,14 @@
   50% { transform: rotate(1.6deg); }
 }
 
-/* walk: a real step cycle (D-035). Each leg reaches forward, takes the weight, pushes off
-   behind, then lifts as it swings through (the lift stands in for a bending knee).
+/* walk: a real step cycle (D-035, knees since D-038). Each leg reaches forward, takes the weight,
+   pushes off behind, then bends at the knee and swings through.
    The arms swing against the legs, a little after them; the body dips on each step and
    leans into the walk; the head steadies itself. One cycle = two steps = 0.84 s. */
 .ch[data-pose='walk'] .ch-leg-l { animation: ch-step 0.84s linear infinite; }
 .ch[data-pose='walk'] .ch-leg-r { animation: ch-step 0.84s linear -0.42s infinite; }
+.ch[data-pose='walk'] .ch-shin-l { animation: ch-knee 0.84s linear infinite; }
+.ch[data-pose='walk'] .ch-shin-r { animation: ch-knee 0.84s linear -0.42s infinite; }
 .ch[data-pose='walk'] .ch-arm-l { animation: ch-armswing 0.84s ease-in-out -0.04s infinite; }
 .ch[data-pose='walk'] .ch-arm-r { animation: ch-armswing 0.84s ease-in-out -0.46s infinite; }
 .ch[data-pose='walk'] .ch-body { animation: ch-bob 0.42s ease-in-out infinite; }
@@ -61,13 +65,22 @@
   0% { transform: rotate(-17deg); animation-timing-function: ease-out; }   /* heel down, in front */
   30% { transform: rotate(-3deg); animation-timing-function: linear; }     /* weight on it */
   55% { transform: rotate(15deg); animation-timing-function: ease-in; }    /* push off, behind */
-  72% { transform: rotate(6deg) translateY(-7px); animation-timing-function: ease-out; } /* foot lifts */
-  88% { transform: rotate(-12deg) translateY(-3px); }                      /* swings through */
+  72% { transform: rotate(1deg); animation-timing-function: ease-out; }   /* swings through */
+  88% { transform: rotate(-15deg); }                                       /* reaches forward */
   100% { transform: rotate(-17deg); }
 }
+/* The knee: nearly straight when the foot lands, bending most while the leg swings through. */
+@keyframes ch-knee {
+  0% { transform: rotate(0deg); animation-timing-function: ease-out; }
+  30% { transform: rotate(7deg); }
+  55% { transform: rotate(16deg); animation-timing-function: ease-in; }
+  72% { transform: rotate(50deg); animation-timing-function: ease-out; }
+  88% { transform: rotate(14deg); }
+  100% { transform: rotate(0deg); }
+}
 @keyframes ch-armswing {
-  0%, 100% { transform: rotate(13deg); }
-  50% { transform: rotate(-15deg); }
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(-9deg); }
 }
 @keyframes ch-bob {
   0%, 100% { transform: translateY(1.5px) rotate(-1.8deg); }   /* foot strikes: lowest */
@@ -119,8 +132,10 @@
   40% { transform: translateY(-10px); }
 }
 
-/* Calm mode: no movement at all, poses stay as still pictures. */
-html[data-calm] .ch,
-html[data-calm] .ch * {
+/* Calm mode: no ambient movement; poses stay as still pictures. Walking is the one exception
+   (D-038): the child moves the character themselves, and a character gliding along with
+   still legs looked like sliding. */
+html[data-calm] .ch:not([data-pose='walk']),
+html[data-calm] .ch:not([data-pose='walk']) * {
   animation: none !important;
 }

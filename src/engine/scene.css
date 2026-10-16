@@ -144,7 +144,8 @@
   animation: none;
 }
 
-html[data-calm] .scene *,
+/* Calm mode: nothing moves by itself. A walking character's legs still move (D-038). */
+html[data-calm] .scene *:not(.ch[data-pose='walk'] *),
 html[data-calm] .scene *::before {
   animation: none !important;
   transition: none !important;

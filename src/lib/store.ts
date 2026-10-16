@@ -31,7 +31,6 @@ export interface Profile {
 export interface Settings {
   sound: boolean
   music: boolean
-  narration: boolean
   calmMotion: boolean
   lang: Lang
 }
@@ -68,7 +67,6 @@ export interface SakshamState {
 export const defaultSettings: Settings = {
   sound: true,
   music: true,
-  narration: true,
   calmMotion: false,
   lang: 'en',
 }

@@ -31,11 +31,12 @@ import { isObjectiveDone, nearbyHotspot, nextObjective, visibleHotspots } from '
 import { WalkPad } from './WalkPad'
 import './scene.css'
 
-const PLAYER_HEIGHT = 400 // design units at mid depth (the scene is 1000 tall)
-const ADULT_HEIGHT = 470
-const MITTHU_SIZE = 80
+// True scale (D-038): a child is about 300 units tall, so a 400-unit door is taller than them.
+const PLAYER_HEIGHT = 300 // design units at mid depth (the scene is 1000 tall)
+const ADULT_HEIGHT = 350
+const MITTHU_SIZE = 64
 /** How much of the scene's height fills the screen: less than 1000 = the camera is closer. */
-const VIEW_HEIGHT = 780
+const VIEW_HEIGHT = 660
 
 export interface SceneResult {
   retries: number
@@ -64,7 +65,6 @@ const NO_FLAGS: ReadonlySet<string> = new Set()
 
 export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, startX, startFlags, skipIntro, guide, map }: Props) {
   const profile = useStore(selectActiveProfile)
-  const narration = useStore((s) => s.settings.narration)
   const player = { name: profile?.firstName ?? t('scene.you'), spec: profile?.avatar ?? defaultSpec }
   const calm = useCalm()
   const coarse = useCoarsePointer()
@@ -218,7 +218,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
                 className="scene-mitthu absolute"
                 style={{
                   left: px(state.mitthuX),
-                  top: px(feetY(state.depth) - MITTHU_SIZE - (state.walking ? 300 : 0)),
+                  top: px(feetY(state.depth) - MITTHU_SIZE - (state.walking ? 230 : 0)),
                   width: px(MITTHU_SIZE),
                   height: px(MITTHU_SIZE),
                   transform: 'translateX(-50%)',
@@ -368,7 +368,6 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
             scene={scene}
             dialogue={state.dialogue}
             player={player}
-            narration={narration}
             calm={calm}
             onNext={() => dispatch({ type: 'next' })}
             onChoose={(index) => dispatch({ type: 'choose', index })}
@@ -550,8 +549,9 @@ function HotspotView(props: { hotspot: Hotspot; px: (units: number) => number; p
     )
   } else {
     const art = h.art ? propArt[h.art] : undefined
-    width = art?.width ?? 90
-    height = art?.height ?? 90
+    // Without a picture (a door in the street): a soft, flat glow on the ground in front of it.
+    width = art?.width ?? 220
+    height = art?.height ?? 50
     picture = art ? <art.Art /> : <span className="scene-sparkle block size-full rounded-full" />
   }
 

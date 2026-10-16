@@ -31,6 +31,9 @@ export type Pose = 'idle' | 'walk' | 'talk' | 'wave' | 'gasp' | 'cheer'
 export type Facing = 'left' | 'right'
 export type View = 'full' | 'portrait'
 
+/** Where the knee bends (y, in design units). */
+const KNEE = 268
+
 const VIEW_BOX: Record<View, string> = {
   full: '0 0 120 360',
   portrait: '24 4 72 100', // head and shoulders
@@ -126,6 +129,13 @@ export function Character({
         <clipPath id={`${uid}-neckclip`}>
           <path d={NECK} />
         </clipPath>
+        {/* The leg above and below the knee (they overlap a little, so no gap shows as it bends). */}
+        <clipPath id={`${uid}-thigh`}>
+          <rect x="-40" y="0" width="200" height={KNEE + 5} />
+        </clipPath>
+        <clipPath id={`${uid}-shin`}>
+          <rect x="-40" y={KNEE - 5} width="200" height="200" />
+        </clipPath>
         <radialGradient id={`${uid}-ground`}>
           <stop offset="0" stopColor="#1c1016" stopOpacity="0.42" />
           <stop offset="1" stopColor="#1c1016" stopOpacity="0" />
@@ -138,9 +148,18 @@ export function Character({
         {!hidesHair && <HairBehind style={spec.hair} paint={paint} hair={hair} />}
         {spec.bag && <BagBehind paint={paint} />}
 
+        {/* Each leg is drawn twice and cut at the knee (D-038): the thigh swings from the hip,
+            and the shin, inside it, bends at the knee, so walking looks like stepping, not sliding. */}
         {(['l', 'r'] as const).map((side) => (
           <g key={side} className={`ch-part ch-leg-${side}`}>
-            <Leg side={side} outfit={look.bottom ?? spec.outfit} paint={paint} look={look} skin={skin} />
+            <g clipPath={`url(#${uid}-thigh)`}>
+              <Leg side={side} outfit={look.bottom ?? spec.outfit} paint={paint} look={look} skin={skin} />
+            </g>
+            <g className={`ch-part ch-shin-${side}`}>
+              <g clipPath={`url(#${uid}-shin)`}>
+                <Leg side={side} outfit={look.bottom ?? spec.outfit} paint={paint} look={look} skin={skin} />
+              </g>
+            </g>
           </g>
         ))}
 
@@ -897,8 +916,8 @@ function HairBehind({ style, paint, hair }: HairProps) {
   if (style === 'ponytail') {
     return (
       <g>
-        <path d="M70 24 C88 26 93 44 91 64 C90 82 86 96 82 104 C82 88 81 72 78 58 C76 46 73 36 68 30 Z" fill={paint('hair')} {...line(hair)} />
-        {strands(hair, 'M80 40 Q86 60 84 92 M76 46 Q81 66 81 90', 'M84 36 Q89 50 88 66')}
+        <path d="M58 8 C76 3 95 17 94 42 C93 62 91 80 87 97 C85 107 80 114 75 110 C78 96 80 80 79 64 C78 50 73 36 63 26 Z" fill={paint('hair')} {...line(hair)} />
+        {strands(hair, 'M84 30 Q90 52 86 92 M79 40 Q84 62 81 100', 'M80 18 Q90 30 90 50')}
       </g>
     )
   }
@@ -963,9 +982,17 @@ function HairBack({ style, paint, hair }: HairProps) {
           ))}
         </g>
       )
+    case 'ponytail':
+      // Pulled back: a little shows behind the ears, with volume at the crown and a hair tie.
+      return (
+        <g>
+          <path d="M39 44 C37 24 83 24 81 44 L80 62 L40 62 Z" fill={shade(hair, 0.25)} {...outline} />
+          <ellipse cx="63" cy="11" rx="12" ry="8.5" fill={paint('hair')} {...outline} />
+          <rect x="70" y="7.5" width="5" height="7" rx="2" fill="#c0533a" transform="rotate(-20 72.5 11)" />
+        </g>
+      )
     case 'plait':
     case 'two-plaits':
-    case 'ponytail':
       // Long hair pulled back: a little shows behind the ears.
       return <path d="M39 44 C37 24 83 24 81 44 L80 62 L40 62 Z" fill={shade(hair, 0.25)} {...outline} />
     default:
@@ -1092,7 +1119,17 @@ function HairFront({ style, paint, hair }: HairProps) {
           {strands(hair, 'M48 15 Q46 24 46 33 M56 13 Q55 23 55.5 33 M64 13 Q65 23 64.5 33 M72 15 Q74 24 74 33', 'M46 18 Q60 12.5 74 18')}
         </g>
       )
-    default: // ponytail, plait, two plaits, bun: hair pulled back, with a middle parting
+    case 'ponytail':
+      // Sleek and pulled back, with a side parting, a sweep across the forehead and loose strands by the face.
+      return (
+        <g>
+          <path d="M39.6 46 C36 20 50 12 61 12 C72 12 84 20 80.4 46 C79.2 38 76.6 32.4 72 29.8 C66 27.6 55 27.6 48.6 29.6 C43.8 32 40.8 38 39.6 46 Z" fill={fill} {...outline} />
+          <path d="M67 13 Q58 21 45 33" stroke={shade(hair, 0.55)} strokeWidth="0.9" fill="none" strokeLinecap="round" />
+          <path d="M41.2 40 Q39.4 50 41.6 60 M78.8 40 Q80.6 49 78.6 57" stroke={hair} strokeWidth="1.6" fill="none" strokeLinecap="round" />
+          {strands(hair, 'M64 14 Q56 20 47 30 M70 15 Q76 20 78 32 M58 15 Q50 22 43.5 36', 'M54 16 Q48 20 45.5 26 M71 17 Q75 21 76.5 27')}
+        </g>
+      )
+    default: // plait, two plaits, bun: hair pulled back, with a middle parting
       return (
         <g>
           <path d="M39.6 46 C36 20 50 12 60 12 C70 12 84 20 80.4 46 C79.2 38 76.2 32 71.4 29.6 C65.6 28 54.4 28 48.6 29.6 C43.8 32 40.8 38 39.6 46 Z" fill={fill} {...outline} />

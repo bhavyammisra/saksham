@@ -6,10 +6,10 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town` (pushed, no PR yet). Done in P4: the walkable town (D-030), its guidance, celebration and decorations (D-031), the Book, Me, Credits and demo mode (D-032), and the Dhaba scene (D-033). Then, from owner feedback, a new title menu, new-game flow and modern customiser (D-034), and the full-screen game with modern scenes (prototype D-035, built D-036). The owner approved it, and the Home scene is done (D-037). **Next: the Panchayat (child marriage, gentle tone, drawn with `src/art/modern.tsx`), the same way as Home.**
+- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town` (pushed, no PR yet). Done in P4: the walkable town (D-030), its guidance, celebration and decorations (D-031), the Book, Me, Credits and demo mode (D-032), and the Dhaba scene (D-033). Then, from owner feedback, a new title menu, new-game flow and modern customiser (D-034), and the full-screen game with modern scenes (prototype D-035, built D-036). The owner approved it, the Home scene is done (D-037), and the world is now at true scale with a knee-bending walk and no voice (D-038). **Next: the Panchayat (child marriage, gentle tone, drawn with `src/art/modern.tsx`), the same way as Home.**
 - **Checkpoints:** the table at the top of `docs/BUILD_PLAN.md` shows every phase, 🛑 gate and owner-only task at a glance. All gates so far are approved. Owner still to do: fact-check the School, Dhaba and Home cards (SETUP.md §6) and the Help Centre (§5), confirm the font licences.
 - **Merged to `main`:** P0 (PR #1), P1 (PR #2), P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026) and P3 (PR #4, School end to end, MILESTONE A; D-027 to D-029).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md` (the "Handoff" note has the exact next task and the rules learned so far). **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-037).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md` (the "Handoff" note has the exact next task and the rules learned so far). **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-038).
 
 ## Start of every session
 
@@ -36,6 +36,7 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 - In Git Bash, arguments that start with `/` (such as `/dev/characters`) are rewritten into Windows paths. Prefix the command with `MSYS_NO_PATHCONV=1`, and pass Windows paths (`cygpath -w`) for output files.
 - The browser pane's screenshots can be stale or time out. For reliable visual checks, take screenshots with a small throwaway Playwright script against `npm run dev` (keep such scripts out of the repo).
 - Vite's file watcher can miss two writes to the same file in quick succession. If the page shows old code, restart the dev server.
+- Scale rule (D-038): a child is 300 units tall, a door 400 (`DOOR_TOP` in `src/art/modern.tsx`). Draw everything new at that scale.
 - Performance rule (D-030): no full-screen `mix-blend-mode`, no `backdrop-filter`, no `filter: blur` on animated pictures, and no animations inside very wide SVG layers. Without a GPU each one halves the frame rate.
 
 ## Owner and ownership
