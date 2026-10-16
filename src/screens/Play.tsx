@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { GameFrame } from '@/components/GameFrame'
-import { Page } from '@/components/Page'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
 import { badgesFor, isUnlocked, questionsForBand, starsFor, type BuildingResult, type Score } from '@/lib/rules'
-import { buildings, getScene, nextBuilding } from '@/lib/scenes'
+import { buildings, getScene, nextBuilding, townScene } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { CardReveal } from '@/play/CardReveal'
 import { Quiz } from '@/play/Quiz'
@@ -51,13 +50,20 @@ function PlayBuilding({ id }: { id: string }) {
   if (!profile) return null
   const unlocked = isUnlocked(id, buildings, data?.progress ?? {}, demo)
   if (!scene || !card || !unlocked) {
+    // Still locked (or not written): say which place to finish first, over the town's picture,
+    // with Need help? in the corner like every game screen.
+    const playable = buildings.filter((b) => !b.teaser)
+    const before = playable[playable.findIndex((b) => b.id === id) - 1]
     return (
-      <Page title={t('play.title')}>
-        <p>{unlocked ? t('play.notFound') : t('play.locked')}</p>
-        <Link to="/town" className="mt-4 inline-flex min-h-tap items-center font-semibold text-peacock underline">
-          {t('play.backToTown')}
-        </Link>
-      </Page>
+      <GameFrame scene={townScene} focusX={townScene.spawn.x}>
+        <div className="mx-auto max-w-xl rounded-2xl bg-plaster p-6 text-ink shadow-2xl">
+          <h2 className="text-xl font-semibold">{scene?.title ?? t('play.title')}</h2>
+          <p className="mt-2">{!unlocked && before ? t('town.lockedAfter', { name: before.name }) : unlocked ? t('play.notFound') : t('play.locked')}</p>
+          <Link to="/town" className="mt-4 inline-flex min-h-tap items-center font-semibold text-peacock underline">
+            {t('play.backToTown')}
+          </Link>
+        </div>
+      </GameFrame>
     )
   }
 

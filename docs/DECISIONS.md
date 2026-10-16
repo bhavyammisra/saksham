@@ -315,3 +315,14 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
   - Doors without a picture now show a flat glow on the ground in front of them instead of a ball in mid-air.
 - **Why:** The owner's feedback. Real proportions make the places feel like places; knees are what makes a walk read as a walk.
 - **Alternatives:** Keeping the art and only shrinking the people (the doors would still be smaller than the children unless the people became tiny); recorded voices (would need a voice actor and licences, and Hindi later; can be added in Phase 6 if wanted).
+
+## D-039 Back to the earlier scale; going in through doors; the walk fixed for reduced motion
+
+- **Context:** The owner preferred the scale before D-038: with whole buildings in view you can tell at a glance which place is the School and which the Dhaba. They asked instead that choosing a door makes the player walk to it, turn and go in. They also still saw the player sliding.
+- **Choice:**
+  - The scene art, people's sizes and the camera are back to D-036 (`school.tsx`, `dhaba.tsx`, `home.tsx`, `town.tsx`, `modern.tsx` and the constants in `Scene.tsx`). The knees, the new ponytail and the removed voice from D-038 stay.
+  - **Going in** (in the pure reducer): opening an unlocked exit no longer leaves at once. It sets `entering`; the player walks to the door's x, then turns and walks up to it (depth 0), and after `ENTER_SECONDS` (0.6 s) the scene sets `exit`. While going in, the walking keys, taps and other hotspots are ignored. `Character` has a `back` view (the back of the head, hair or head covering, and the bag and ponytail over the back), used for the player once they reach the door, and the player fades into the doorway.
+  - **The sliding:** with the system's "reduce motion" on (Windows turns it on when animation effects are off), a global calm rule in `index.css` shortened every animation to 0.01 ms, which overrode the D-038 exception. The walk is now excluded there too, and an e2e test checks that the legs move while walking with reduced motion.
+  - The "still locked" page for a building (e.g. `/play/dhaba` before the School is finished) now sits in the game frame, so Need help? is there, and it names the place to finish first. The Dhaba is written and opens as soon as the School is finished (or in demo mode).
+- **Why:** The owner's feedback; and Need help? must be on every screen.
+- **Alternatives:** A cut to black on entering (no sense of going in); drawing a full back view of every outfit (the front of the clothes shows from behind, which is hardly noticeable at game size).

@@ -1,37 +1,38 @@
-// Home (D-037, at true scale since D-038): the courtyard of a modern block of flats at dusk.
+// Home (D-037): the courtyard of a modern block of flats at dusk, in the modern look (modern.tsx).
 // A gentle scene: warm windows, lit lamps, plants, cricket stumps where children play.
 // Positions follow content/scenes/home.json: the way out (220), Kabir by the stumps (900),
 // Farida Aunty in her garden (1500), the letterboxes with Anu's drawing (2250), the stairs (2800).
 // Nothing in the picture shows harm: the story is only told, in words.
 
-import { Bench, CastShadow, DOOR_TOP, FacadeLight, GROUND, Lamp, LayerSvg, Paving, Planter, scaleAt, SLAB, Tree, WindowBand } from './modern'
+import { Bench, CastShadow, FacadeLight, GROUND, Lamp, LayerSvg, Paving, Planter, Tree, WindowBand } from './modern'
 import type { LayerArt, PropArt } from './types'
 
 const WALL = '#cfc3b1'
 const WALL_DARK = '#b3a691'
+const TOP = 250 // the roof line of the block
 
-/** The first floor: window bays with balconies, some windows lit warm from inside. */
-function FirstFloor({ x0, x1 }: { x0: number; x1: number }) {
-  const bays = Math.floor((x1 - x0) / 420)
+/** One floor of the block: window bands, some lit warm from inside, and a balcony rail. */
+function Floor({ y, x0, x1, seed }: { y: number; x0: number; x1: number; seed: number }) {
+  const bays = Math.floor((x1 - x0) / 300)
   return (
     <g>
       {Array.from({ length: bays }, (_, i) => {
-        const x = x0 + 60 + i * 420
-        const warm = i % 3 !== 1
+        const x = x0 + 40 + i * 300
+        const warm = (i * 7 + seed * 3) % 5 < 2
         return (
           <g key={i}>
-            <WindowBand x={x} y={70} w={300} h={210} panes={3} warm={warm} />
-            {warm && <rect x={x} y={70} width="300" height="210" fill="#ffcf8a" opacity="0.15" />}
+            <WindowBand x={x} y={y} w={220} h={86} panes={3} warm={warm} />
+            {warm && <rect x={x} y={y} width="220" height="86" fill="#ffcf8a" opacity="0.18" />}
             {/* Balcony: a slab and a thin rail, its shadow on the wall below. */}
-            <rect x={x - 24} y={SLAB - 40} width="348" height="16" fill="#8f877c" />
-            <rect x={x - 24} y={SLAB - 110} width="348" height="6" fill="#3a3d40" />
-            {Array.from({ length: 14 }, (_, j) => (
-              <rect key={j} x={x - 20 + j * 25} y={SLAB - 106} width="4" height="68" fill="#3a3d40" />
+            <rect x={x - 16} y={y + 100} width="252" height="10" fill="#8f877c" />
+            <rect x={x - 16} y={y + 70} width="252" height="4" fill="#3a3d40" />
+            {Array.from({ length: 12 }, (_, j) => (
+              <rect key={j} x={x - 12 + j * 21} y={y + 72} width="3" height="30" fill="#3a3d40" />
             ))}
-            <rect x={x - 24} y={SLAB - 24} width="348" height="20" fill="#000000" opacity="0.14" />
+            <rect x={x - 16} y={y + 110} width="252" height="14" fill="#000000" opacity="0.14" />
             {/* Plants and washing on some balconies: people live here. */}
-            {i % 2 === 0 && <circle cx={x + 40} cy={SLAB - 70} r="30" fill="#46623f" />}
-            {i % 3 === 1 && <path d={`M${x + 140} ${SLAB - 150} L${x + 290} ${SLAB - 150} M${x + 160} ${SLAB - 150} l0 44 l26 0 l0 -44 M${x + 220} ${SLAB - 150} l0 36 l30 0 l0 -36`} stroke="#d9d4c6" strokeWidth="5" fill="#e9e2d4" />}
+            {i % 3 === seed % 3 && <circle cx={x + 30} cy={y + 64} r="16" fill="#46623f" />}
+            {i % 4 === seed % 4 && <path d={`M${x + 120} ${y + 40} L${x + 210} ${y + 40} M${x + 136} ${y + 40} l0 26 l14 0 l0 -26 M${x + 170} ${y + 40} l0 20 l18 0 l0 -20`} stroke="#d9d4c6" strokeWidth="4" fill="#e9e2d4" />}
           </g>
         )
       })}
@@ -39,10 +40,9 @@ function FirstFloor({ x0, x1 }: { x0: number; x1: number }) {
   )
 }
 
-/** Cricket stumps (about 0.7 m), and their shadow. */
 function Stumps({ x }: { x: number }) {
   return (
-    <g transform={scaleAt(x + 18, GROUND, 1.5)}>
+    <g>
       <path d={`M${x} ${GROUND + 6} L${x + 60} ${GROUND + 34}`} stroke="#000000" strokeWidth="8" opacity="0.2" />
       {[0, 14, 28].map((d) => (
         <rect key={d} x={x + d} y={GROUND - 100} width="6" height="104" fill="#d9c9a3" />
@@ -55,46 +55,47 @@ function Stumps({ x }: { x: number }) {
 const Courtyard: LayerArt = ({ width }) => (
   <LayerSvg width={width}>
     <Paving width={width} />
-    <Tree x={140} s={1} />
-    <Lamp x={420} lit />
-    <Tree x={700} s={0.9} />
+    <Tree x={120} s={1.15} />
+    <Lamp x={360} lit />
+    <Tree x={640} s={1.05} />
     <Stumps x={1040} />
 
-    {/* The block of flats: the ground floor, and the first floor above (more floors above the camera). */}
-    <CastShadow x={1250} w={2150} reach={90} opacity={0.26} />
-    <rect x="1250" y="0" width="2150" height={GROUND} fill={WALL} />
-    <FirstFloor x0={1250} x1={3400} />
-    <rect x="1250" y={SLAB - 6} width="2150" height="12" fill={WALL_DARK} />
+    {/* The block of flats: ground floor and three floors above. */}
+    <CastShadow x={1250} w={2150} reach={80} opacity={0.26} />
+    <rect x="1250" y={TOP} width="2150" height={GROUND - TOP} fill={WALL} />
+    <rect x="1242" y={TOP - 12} width="2166" height="14" fill="#2b2e31" />
+    <rect x="1250" y={TOP + 2} width="2150" height="10" fill="#000000" opacity="0.18" />
+    {[TOP + 40, TOP + 180, TOP + 320].map((y, i) => (
+      <Floor key={y} y={y} x0={1250} x1={3400} seed={i} />
+    ))}
+    <rect x="1250" y="680" width="2150" height="6" fill={WALL_DARK} />
 
-    {/* Ground floor: Farida Aunty's window and garden behind a low wall. */}
-    <WindowBand x={1290} y={DOOR_TOP} w={460} h={230} panes={4} warm />
-    <rect x="1270" y={GROUND - 120} width="520" height="120" fill="#a9a49b" />
-    <rect x="1270" y={GROUND - 126} width="520" height="10" fill="#bdb8af" />
-    {[1320, 1440, 1590, 1720].map((x, i) => (
+    {/* Ground floor: Farida Aunty's garden behind a low wall, the letterboxes, the stairwell. */}
+    <WindowBand x={1300} y={700} w={420} h={110} panes={4} warm />
+    <rect x="1290" y={GROUND - 50} width="460" height="50" fill="#a9a49b" />
+    <rect x="1290" y={GROUND - 54} width="460" height="6" fill="#bdb8af" />
+    {[1320, 1420, 1560, 1660].map((x, i) => (
       <g key={x}>
-        <circle cx={x} cy={GROUND - 150} r={40 + (i % 2) * 12} fill={i % 2 ? '#46623f' : '#2f4630'} />
-        <circle cx={x - 10} cy={GROUND - 166} r="12" fill={['#e3b341', '#c0533a', '#e58fb0', '#e3b341'][i]} />
+        <circle cx={x} cy={GROUND - 64} r={22 + (i % 2) * 8} fill={i % 2 ? '#46623f' : '#2f4630'} />
+        <circle cx={x - 6} cy={GROUND - 72} r="8" fill={['#e3b341', '#c0533a', '#e58fb0', '#e3b341'][i]} />
       </g>
     ))}
-
-    {/* The letterbox wall, darker, beside the entrance. */}
-    <rect x="2020" y={SLAB + 40} width="460" height={GROUND - SLAB - 40} fill={WALL_DARK} />
-
-    {/* The stairwell: an open doorway, and stairs going up inside, lit warm. */}
-    <rect x="2620" y={DOOR_TOP - 20} width="360" height={GROUND - DOOR_TOP + 20} fill="#1e2428" />
-    <rect x="2635" y={DOOR_TOP - 5} width="330" height={GROUND - DOOR_TOP + 5} fill="url(#m-glass-warm)" opacity="0.7" />
-    {Array.from({ length: 8 }, (_, i) => (
-      <rect key={i} x={2650 + i * 24} y={GROUND - 48 - i * 48} width="140" height="14" fill="#6d5f52" />
+    <rect x="2050" y="700" width="420" height={GROUND - 700} fill={WALL_DARK} />
+    <rect x="2640" y="640" width="320" height={GROUND - 640} fill="#1e2428" />
+    {/* Stairs going up inside the stairwell, lit warm. */}
+    <rect x="2650" y="650" width="300" height={GROUND - 650} fill="url(#m-glass-warm)" opacity="0.7" />
+    {Array.from({ length: 7 }, (_, i) => (
+      <rect key={i} x={2660 + i * 22} y={GROUND - 24 - i * 24} width="140" height="8" fill="#6d5f52" />
     ))}
-    <rect x="2600" y={DOOR_TOP - 44} width="400" height="24" fill="#2b2e31" />
-    <path d={`M2600 ${DOOR_TOP - 20} L3000 ${DOOR_TOP - 20} L3000 ${DOOR_TOP + 16} L2600 ${DOOR_TOP} Z`} fill="#000000" opacity="0.25" />
-    <rect x="2770" y={DOOR_TOP - 100} width="60" height="44" rx="6" fill="#ffe2a8" />
-    <rect x="2660" y={DOOR_TOP - 92} width="90" height="26" rx="4" fill="#2f6f73" />
-    <rect x="2676" y={DOOR_TOP - 82} width="58" height="6" fill="#ffffff" />
+    <rect x="2620" y="626" width="360" height="14" fill="#2b2e31" />
+    <path d="M2620 640 L2980 640 L2980 668 L2620 652 Z" fill="#000000" opacity="0.25" />
+    <rect x="2780" y="590" width="40" height="30" rx="4" fill="#ffe2a8" />
+    <rect x="2700" y="600" width="60" height="16" rx="3" fill="#2f6f73" />
+    <rect x="2712" y="606" width="36" height="4" fill="#ffffff" />
 
-    <FacadeLight x={1250} y={0} w={2150} h={GROUND} />
-    <Planter x={3040} />
-    <Bench x={3200} />
+    <FacadeLight x={1242} y={TOP - 12} w={2166} h={GROUND - TOP + 12} />
+    <Planter x={3060} />
+    <Bench x={3150} />
   </LayerSvg>
 )
 
@@ -135,7 +136,6 @@ export const homeLayers: Record<string, LayerArt> = {
   'home.courtyard': Courtyard,
 }
 
-// The letterbox stand is about 1.7 m tall.
 export const homeProps: Record<string, PropArt> = {
-  'home.drawing': { width: 330, height: 360, Art: Drawing },
+  'home.drawing': { width: 240, height: 260, Art: Drawing },
 }

@@ -8,23 +8,13 @@
 //   - colours are a little dark and muted; the grade over the whole picture is in scene.css.
 //
 // Scene units: 1000 tall. Buildings stand on y = GROUND (830); people walk between 850 and 962.
-//
-// Scale (D-038): a child is about 300 units tall, so 1 metre is roughly 215 units. A door is
-// 400 tall (its top at DOOR_TOP), the ground floor ends at SLAB, and furniture, bikes and lamps
-// are drawn at the same scale. The camera shows about the lowest 660 units, so upper floors
-// are mostly out of view, as when you stand in a street.
 
 import type { ReactNode } from 'react'
 import { seeded } from './style'
 import { SCENE_HEIGHT } from './types'
 
 export const GROUND = 830
-export const DOOR_TOP = 430 // a door is 400 units tall
-export const SLAB = 360 // where the ground floor ends and the first floor begins
 const H = SCENE_HEIGHT
-
-/** Scales a piece by `k` around a point on its base, so it stays standing where it was. */
-export const scaleAt = (x: number, y: number, k: number) => `translate(${x} ${y}) scale(${k}) translate(${-x} ${-y})`
 
 export const FRAME = '#26292c'
 export const LEAF_DARK = '#2f4630'
@@ -264,7 +254,7 @@ export function Tree({ x, y = GROUND + 10, s = 1 }: { x: number; y?: number; s?:
     [0, -230, 80], [-62, -190, 62], [62, -186, 66], [-30, -150, 60], [40, -140, 58], [-82, -140, 44], [88, -132, 42], [5, -290, 54],
   ]
   return (
-    <g transform={`translate(${x} ${y}) scale(${s * 1.75})`}>
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
       <ellipse cx="80" cy="8" rx="140" ry="20" fill="#000000" opacity="0.24" />
       <path d="M-10 0 L-7 -150 L7 -150 L10 0 Z" fill="#4a3627" />
       <path d="M-2 -120 L-40 -170 M3 -140 L36 -190" stroke="#4a3627" strokeWidth="6" />
@@ -283,7 +273,7 @@ export function Tree({ x, y = GROUND + 10, s = 1 }: { x: number; y?: number; s?:
 
 export function Bike({ x, y = GROUND - 2 }: { x: number; y?: number }) {
   return (
-    <g stroke="#1d2023" strokeWidth="4" fill="none" strokeLinecap="round" transform={scaleAt(x + 31, y, 2.4)}>
+    <g stroke="#1d2023" strokeWidth="4" fill="none" strokeLinecap="round">
       <circle cx={x} cy={y - 20} r="20" />
       <circle cx={x + 62} cy={y - 20} r="20" />
       <path d={`M${x} ${y - 20} L${x + 22} ${y - 48} L${x + 52} ${y - 48} L${x + 62} ${y - 20} M${x + 22} ${y - 48} L${x + 32} ${y - 20} L${x + 52} ${y - 48} M${x + 18} ${y - 56} L${x + 28} ${y - 56} M${x + 50} ${y - 48} L${x + 54} ${y - 60}`} />
@@ -293,7 +283,7 @@ export function Bike({ x, y = GROUND - 2 }: { x: number; y?: number }) {
 
 export function Bench({ x, y = GROUND + 30 }: { x: number; y?: number }) {
   return (
-    <g transform={scaleAt(x + 100, y + 42, 2.2)}>
+    <g>
       <ellipse cx={x + 120} cy={y + 42} rx="120" ry="12" fill="#000000" opacity="0.28" />
       <rect x={x} y={y} width="200" height="12" rx="3" fill="#a77a52" />
       <rect x={x} y={y + 12} width="200" height="6" fill="#6e4a30" />
@@ -305,7 +295,7 @@ export function Bench({ x, y = GROUND + 30 }: { x: number; y?: number }) {
 
 export function Planter({ x }: { x: number }) {
   return (
-    <g transform={scaleAt(x + 60, GROUND + 18, 2.2)}>
+    <g>
       <ellipse cx={x + 90} cy={GROUND + 18} rx="80" ry="10" fill="#000000" opacity="0.25" />
       <rect x={x} y={GROUND - 22} width="120" height="40" fill="#6d6a64" />
       <rect x={x} y={GROUND - 22} width="120" height="8" fill="#85827b" />
@@ -319,7 +309,7 @@ export function Planter({ x }: { x: number }) {
 /** A slim modern street lamp. `lit` adds a warm pool of light (for evening scenes). */
 export function Lamp({ x, lit = false }: { x: number; lit?: boolean }) {
   return (
-    <g transform={scaleAt(x, GROUND + 10, 2.3)}>
+    <g>
       {lit && <ellipse cx={x + 10} cy={GROUND + 60} rx="190" ry="60" fill="url(#m-lamp)" />}
       <rect x={x - 4} y={GROUND - 330} width="8" height="340" fill="#2b2e31" />
       <rect x={x - 4} y={GROUND - 336} width="60" height="10" rx="3" fill="#2b2e31" />
@@ -332,7 +322,7 @@ export function Lamp({ x, lit = false }: { x: number; lit?: boolean }) {
 /** A fence of thin dark bars on a low concrete wall. */
 export function Railing({ x, w }: { x: number; w: number }) {
   return (
-    <g transform={`translate(0 ${GROUND}) scale(1 1.6) translate(0 ${-GROUND})`}>
+    <g>
       <rect x={x} y={GROUND - 40} width={w} height="40" fill="#a9a49b" />
       <rect x={x} y={GROUND - 44} width={w} height="6" fill="#bdb8af" />
       <rect x={x} y={GROUND - 170} width={w} height="5" fill="#2b2e31" />

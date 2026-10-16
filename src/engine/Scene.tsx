@@ -26,17 +26,16 @@ import { Dialogue, speakerColour } from './Dialogue'
 import { useCalm, useCoarsePointer, useElementSize } from './hooks'
 import { FEET_FAR, FEET_NEAR, feetY, layerOffset, layerWidth, personHeight } from './movement'
 import { getNpc, npcSpec } from './people'
-import { hotspotDepth, initialSceneState, sceneReducer } from './sceneState'
+import { ENTER_SECONDS, hotspotDepth, initialSceneState, sceneReducer } from './sceneState'
 import { isObjectiveDone, nearbyHotspot, nextObjective, visibleHotspots } from './story'
 import { WalkPad } from './WalkPad'
 import './scene.css'
 
-// True scale (D-038): a child is about 300 units tall, so a 400-unit door is taller than them.
-const PLAYER_HEIGHT = 300 // design units at mid depth (the scene is 1000 tall)
-const ADULT_HEIGHT = 350
-const MITTHU_SIZE = 64
+const PLAYER_HEIGHT = 400 // design units at mid depth (the scene is 1000 tall)
+const ADULT_HEIGHT = 470
+const MITTHU_SIZE = 80
 /** How much of the scene's height fills the screen: less than 1000 = the camera is closer. */
-const VIEW_HEIGHT = 660
+const VIEW_HEIGHT = 780
 
 export interface SceneResult {
   retries: number
@@ -163,7 +162,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
   const flags = state.story.flags
   const hotspots = visibleHotspots(scene, flags)
   const node = state.dialogue ? scene.nodes[state.dialogue.nodeId] : undefined
-  const near = state.dialogue ? null : nearbyHotspot(scene, state.x, flags)
+  const near = state.dialogue || state.entering ? null : nearbyHotspot(scene, state.x, flags)
   const objective = nextObjective(scene, flags)
   const guided = guide ? hotspots.find((h) => h.id === guide.hotspotId) : undefined
   const px = (units: number) => units * scale
@@ -171,6 +170,9 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
 
   const playerPose: Pose = state.fx?.pose ?? (node?.speaker === 'player' ? 'talk' : state.walking ? 'walk' : 'idle')
   const playerH = personHeight(PLAYER_HEIGHT, state.depth)
+  // Going in through a door (D-039): once at the door, the player turns their back and fades into it.
+  const turned = state.entering !== null && state.target === null
+  const goneIn = state.entering !== null && state.targetDepth === null ? Math.min(1, state.enterTime / ENTER_SECONDS) : 0
 
   // Tapping the ground walks there: along the street, and nearer or further.
   const tapToWalk = (event: PointerEvent<HTMLDivElement>) => {
@@ -218,7 +220,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
                 className="scene-mitthu absolute"
                 style={{
                   left: px(state.mitthuX),
-                  top: px(feetY(state.depth) - MITTHU_SIZE - (state.walking ? 230 : 0)),
+                  top: px(feetY(state.depth) - MITTHU_SIZE - (state.walking ? 300 : 0)),
                   width: px(MITTHU_SIZE),
                   height: px(MITTHU_SIZE),
                   transform: 'translateX(-50%)',
@@ -234,9 +236,9 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
                 <Shadow x={state.x} depth={state.depth} height={playerH} px={px} />
                 <div
                   className="game-person absolute"
-                  style={{ left: px(state.x), top: px(feetY(state.depth) - playerH * 0.975), height: px(playerH), width: px(playerH / 3), transform: 'translateX(-50%)', zIndex: depthZ(state.depth) }}
+                  style={{ left: px(state.x), top: px(feetY(state.depth) - playerH * 0.975), height: px(playerH), width: px(playerH / 3), transform: `translateX(-50%) scale(${1 - goneIn * 0.06})`, transformOrigin: 'bottom', opacity: 1 - goneIn, zIndex: depthZ(state.depth) }}
                 >
-                  <Character spec={player.spec} pose={playerPose} mood={node?.speaker === 'player' ? node.mood : 'neutral'} facing={state.facing} className="size-full" />
+                  <Character spec={player.spec} pose={playerPose} mood={node?.speaker === 'player' ? node.mood : 'neutral'} facing={state.facing} back={turned} className="size-full" />
                 </div>
               </>
             )}

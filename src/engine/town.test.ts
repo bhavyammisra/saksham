@@ -31,7 +31,9 @@ describe('FR-07 the town hub', () => {
 
   it('an open door leaves through that exit', () => {
     const reduce = sceneReducer(town, new Set(['dhaba']))
-    const s = reduce(arrived(initialSceneState(town), reduce), { type: 'jumpTo', hotspotId: 'school' })
+    let s = reduce(arrived(initialSceneState(town), reduce), { type: 'jumpTo', hotspotId: 'school' })
+    expect(s.entering).toBe('school') // walking to the door and going in first
+    for (let i = 0; i < 300; i++) s = reduce(s, { type: 'tick', now: i * 16, dt: 1 / 60, dir: 0, viewWidth: 1200, calm: false })
     expect(s.exit).toBe('school')
   })
 

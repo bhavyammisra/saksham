@@ -543,3 +543,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: true scale (children 300 units, doors 400, every scene and the town redrawn; camera closer), a walk with bending knees (and walking still animates in calm mode), a new ponytail, and the read-aloud voice removed. D-038.
 - Tests: all 208 unit and 56 e2e tests green; no test needed changing.
 - Next task: P4 › the Panchayat (child marriage, `gentle` tone), drawn at true scale with the modern kit.
+
+**P4: owner feedback, round 2 (2026-10-16)**
+- Done: scale back to D-036; the player walks to a door, turns (new back view) and goes in; the walk now steps with "reduce motion" on (a global calm rule was stopping it); the locked-building page has Need help? and says which place to finish first. D-039.
+- Tests: reducer tests for going in, town and sandbox tests wait for the player to go in, an e2e test for the walk with reduced motion, and the locked page shows Need help?. 210 unit and 57 e2e tests green.
+- Next task: P4 › the Panchayat (child marriage, `gentle` tone).

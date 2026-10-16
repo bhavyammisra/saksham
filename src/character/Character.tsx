@@ -60,6 +60,8 @@ interface Props {
   view?: View
   /** Adults (teachers, shopkeepers) get a slightly smaller head for their height. */
   adult?: boolean
+  /** Seen from behind (D-039): the back of the head instead of a face, e.g. going in through a door. */
+  back?: boolean
   /** Accessible description. Without it the drawing is hidden from screen readers (decorative). */
   label?: string
   className?: string
@@ -75,6 +77,7 @@ export function Character({
   facing = 'right',
   view = 'full',
   adult = false,
+  back = false,
   label,
   className,
 }: Props) {
@@ -167,13 +170,20 @@ export function Character({
         <Neck paint={paint} skin={skin} uid={uid} />
         <Torso outfit={spec.outfit} paint={paint} look={look} skin={skin} />
 
-        {spec.bag && <BagStraps />}
+        {spec.bag && !back && <BagStraps />}
+        {/* From behind, the bag and a ponytail hang over the back. */}
+        {back && spec.bag && <BagBehind paint={paint} />}
+        {back && !hidesHair && <HairBehind style={spec.hair} paint={paint} hair={hair} />}
         {spec.headwear === 'dupatta' && <Dupatta paint={paint} scarf={scarf} />}
         {!hidesHair && <HairOver style={spec.hair} paint={paint} hair={hair} />}
 
         <g className="ch-part ch-head">
           <g transform={`translate(60 68.5) scale(${adult ? 0.93 : 1.02}) translate(-60 -66)`}>
-            <Head spec={spec} mood={face} pose={pose} paint={paint} uid={uid} skin={skin} hair={hair} scarf={scarf} />
+            {back ? (
+              <HeadBack spec={spec} paint={paint} skin={skin} hair={hair} scarf={scarf} />
+            ) : (
+              <Head spec={spec} mood={face} pose={pose} paint={paint} uid={uid} skin={skin} hair={hair} scarf={scarf} />
+            )}
           </g>
         </g>
 
@@ -727,6 +737,44 @@ function Head(props: {
           <path d="M57.2 44.6 Q60.1 43.2 63 44.6 M45.6 44 L41.6 43 M74.6 44 L78.4 43" fill="none" />
           <path d="M47.5 43.5 L50 42.8" stroke="#ffffff" strokeWidth="0.8" opacity="0.7" />
           <path d="M65 43.5 L67.5 42.8" stroke="#ffffff" strokeWidth="0.8" opacity="0.7" />
+        </g>
+      )}
+    </g>
+  )
+}
+
+/** Hairstyles that cover the back of the head down to the neck (the others stop above the nape). */
+const LONG_HAIR = ['long', 'long-curly', 'bob', 'ponytail', 'bun', 'plait', 'two-plaits']
+// Short hair from behind: covers the crown and stops above the nape.
+const SHORT_BACK = 'M40.5 44 C38 22 48 14 60 14 C72 14 82 22 79.5 44 C79 52 76 58 72 60 C66 62 54 62 48 60 C44 58 41 52 40.5 44 Z'
+
+/** The head seen from behind: ears, the back of the neck, and hair or a head covering. */
+function HeadBack(props: { spec: CharacterSpec; paint: Paint; skin: string; hair: string; scarf: string }) {
+  const { spec, paint, skin, hair, scarf } = props
+  if (spec.headwear === 'hijab') {
+    return (
+      <g>
+        <HijabBack paint={paint} scarf={scarf} />
+        <path d={FACE} fill={paint('scarf')} {...line(scarf)} />
+        <path d="M44 24 Q60 16 76 24 M42 44 Q60 38 78 44" stroke={shade(scarf, 0.3)} strokeWidth="0.9" fill="none" />
+      </g>
+    )
+  }
+  const long = LONG_HAIR.includes(spec.hair)
+  return (
+    <g>
+      <g fill={paint('skin')} {...line(skin, 0.7)}>
+        <path d="M42 41 C38.2 39.6 36.8 43.5 37.4 47.5 C38 51.5 39.4 55 42.6 55.6 Z" />
+        <path d="M78 41 C81.8 39.6 83.2 43.5 82.6 47.5 C82 51.5 80.6 55 77.4 55.6 Z" />
+      </g>
+      <path d={FACE} fill={paint('skin')} {...line(skin, 0.8)} />
+      {spec.headwear === 'patka' ? (
+        <Patka paint={paint} scarf={scarf} />
+      ) : (
+        <g>
+          <path d={long ? FACE : SHORT_BACK} fill={paint('hair')} {...line(hair)} />
+          {long && <HairBack style={spec.hair} paint={paint} hair={hair} />}
+          {strands(hair, 'M50 22 Q48 36 50 52 M60 20 L60 56 M70 22 Q72 36 70 52', 'M48 24 Q60 18 72 24')}
         </g>
       )}
     </g>

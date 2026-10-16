@@ -97,7 +97,8 @@ test('FR-05 / FR-06 teen players see the teen card text and the teen-only questi
 test('FR-07 a locked building cannot be played', async ({ page }) => {
   await createPlayer(page, 'Asha')
   await page.goto('/#/play/dhaba')
-  await expect(page.getByText(strings['play.locked'])).toBeVisible()
+  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The School'))).toBeVisible()
+  await expect(page.getByTestId('help-button')).toBeVisible()
 })
 
 test('FR-07 the town starts with only the School open, and links to it', async ({ page }) => {

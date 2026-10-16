@@ -25,6 +25,7 @@ const FX_SECONDS = 1.2 // how long a cheer or gasp lasts
 const STAND_BESIDE = 100 // how far from a hotspot the player stops, so they don't overlap
 const START_DEPTH = 0.6 // the player arrives a little in front of the middle of the walkway
 const NPC_DEPTH = 0.35 // where people stand when the scene doesn't say
+export const ENTER_SECONDS = 0.6 // going in through a door: how long the last steps take, after turning
 
 /** How near the viewer a hotspot stands (0 = against the wall). */
 export function hotspotDepth(h: Hotspot): number {
@@ -51,6 +52,8 @@ export interface SceneState {
   idleSince: number | null // time (ms) the player last did something; null = restart the clock
   hint: boolean // Mitthu offers a hint after HINT_AFTER seconds of doing nothing
   exit: string | null // an exit hotspot was used
+  entering: string | null // going in through this exit: walking to the door, turning, then in (D-039)
+  enterTime: number // seconds since the player turned to the door
   completed: boolean
   seen: string[] // every line shown in this visit, in order (the History panel)
 }
@@ -93,6 +96,8 @@ export function initialSceneState(scene: SceneDef, startX?: number, startFlags: 
     idleSince: null,
     hint: false,
     exit: null,
+    entering: null,
+    enterTime: 0,
     completed: false,
     seen: arrival.dialogue ? [arrival.dialogue.nodeId] : [],
   }
@@ -123,7 +128,8 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
       const reply = startDialogue(scene, h.lockedNode, s.story)
       return withFx({ ...s, facing, target: null, pending: null, idleSince: null, hint: false, walking: false, ...reply }, h.lockedNode)
     }
-    if (h.kind === 'exit') return { ...s, facing, exit: h.id, target: null, targetDepth: null, pending: null }
+    // An open door: walk to it, turn and go in (the tick finishes it by setting `exit`).
+    if (h.kind === 'exit') return { ...s, facing, entering: h.id, enterTime: 0, target: h.x, targetDepth: 0, pending: null, idleSince: null, hint: false }
     if (!h.node) return s
     const started = startDialogue(scene, h.node, s.story)
     return withFx({ ...s, facing, target: null, pending: null, idleSince: null, hint: false, walking: false, ...started }, h.node)
@@ -162,8 +168,9 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
       case 'tick': {
         const { now, dt, viewWidth, calm } = action
         const talking = s.dialogue !== null
-        const dir = talking ? 0 : action.dir
-        const dirDepth = talking ? 0 : (action.dirDepth ?? 0)
+        const busy = talking || s.entering !== null // no walking by hand while talking or going in
+        const dir = busy ? 0 : action.dir
+        const dirDepth = busy ? 0 : (action.dirDepth ?? 0)
 
         // Walk: held keys or the walk pad win over tap-to-walk.
         let { x, depth, target, targetDepth, pending, facing } = s
@@ -178,7 +185,8 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
             x = moveToward(s.x, target, WALK_SPEED * dt, scene.walkable, scene.blockers)
             if (x === s.x) target = null // arrived, or stopped by a blocker
           }
-          if (targetDepth !== null) {
+          // Going in: first reach the door, then turn and walk up to it.
+          if (targetDepth !== null && !(s.entering && target !== null)) {
             depth = moveDepthToward(s.depth, targetDepth, DEPTH_SPEED * dt)
             if (depth === targetDepth) targetDepth = null
           }
@@ -202,6 +210,12 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
 
         let next: SceneState = { ...s, x, depth, facing, walking, camera, mitthuX, target, targetDepth, pending, fx, shake, idleSince, hint }
 
+        // At the door: the last steps in (the player fades into the doorway), then the scene is left.
+        if (s.entering && target === null && targetDepth === null) {
+          const enterTime = s.enterTime + dt
+          next = enterTime >= ENTER_SECONDS ? { ...next, enterTime, exit: s.entering } : { ...next, enterTime }
+        }
+
         // Arrived at a tapped hotspot: open it.
         if (pending && target === null && targetDepth === null) {
           const h = find(pending)
@@ -212,7 +226,7 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
       }
 
       case 'walkTo':
-        if (s.dialogue) return s
+        if (s.dialogue || s.entering) return s
         return {
           ...s,
           target: action.x,
@@ -224,7 +238,7 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
 
       case 'use': {
         const h = find(action.hotspotId)
-        if (!h || s.dialogue) return s
+        if (!h || s.dialogue || s.entering) return s
         if (Math.abs(h.x - s.x) <= PROMPT_RADIUS) return open(s, h)
         // Walk beside it, and to about the same distance from the viewer, so the two stand together.
         return { ...s, target: besideSpot(h, s.x), targetDepth: standDepth(h), pending: h.id, idleSince: null, hint: false }
@@ -232,14 +246,14 @@ export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new 
 
       case 'jumpTo': {
         const h = find(action.hotspotId)
-        if (!h || s.dialogue || !isHotspotVisible(h, s.story.flags)) return s
+        if (!h || s.dialogue || s.entering || !isHotspotVisible(h, s.story.flags)) return s
         // Stand beside it, then open it.
         const x = besideSpot(h, s.x)
         return open({ ...s, x, depth: standDepth(h), mitthuX: x - MITTHU_DISTANCE, target: null, targetDepth: null, pending: null }, h)
       }
 
       case 'interactNearby': {
-        if (s.dialogue) return s
+        if (s.dialogue || s.entering) return s
         const h = nearbyHotspot(scene, s.x, s.story.flags)
         return h ? open(s, h) : s
       }
@@ -285,6 +299,8 @@ function sameAs(a: SceneState, b: SceneState): boolean {
     a.shake === b.shake &&
     a.idleSince === b.idleSince &&
     a.hint === b.hint &&
+    a.enterTime === b.enterTime &&
+    a.exit === b.exit &&
     a.dialogue === b.dialogue
   )
 }

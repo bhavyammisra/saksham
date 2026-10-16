@@ -113,9 +113,10 @@
    (and, from Phase 1, by the "Calm motion" setting).
    Calm mode stops all CSS animation and transitions. Scene code also
    checks it to turn off parallax, ambient loops, screen movement and
-   confetti.
+   confetti. One exception (D-038, D-039): a character's legs while the
+   child walks them, or the character would slide along without stepping.
    ------------------------------------------------------------------ */
-html[data-calm] *,
+html[data-calm] *:not(.ch[data-pose='walk'] *),
 html[data-calm] *::before,
 html[data-calm] *::after {
   animation-duration: 0.01ms !important;

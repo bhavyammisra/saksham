@@ -88,8 +88,8 @@ describe('FR-03 hotspots', () => {
     expect(run(s, ticks(60, 1)).x).toBe(s.x)
   })
 
-  it('an exit hotspot ends the scene with that exit', () => {
-    const s = reduce(initialSceneState(scene), { type: 'jumpTo', hotspotId: 'door' })
+  it('an exit hotspot ends the scene with that exit (after going in through it)', () => {
+    const s = run(reduce(initialSceneState(scene), { type: 'jumpTo', hotspotId: 'door' }), ticks(300))
     expect(s.exit).toBe('door')
     expect(reduce(s, tick(1)).x).toBe(s.x) // nothing moves after leaving
   })
@@ -207,5 +207,27 @@ describe('D-036 History', () => {
     s = reduce(s, { type: 'back' })
     expect(s.seen).toHaveLength(two)
     expect(s.seen[0]).toBe('ravi-hello')
+  })
+})
+
+describe('D-039 going in through a door', () => {
+  it('walks to the door, turns, goes in, and only then leaves the scene', () => {
+    let s = reduce(initialSceneState(scene), { type: 'jumpTo', hotspotId: 'door' })
+    expect(s.entering).toBe('door')
+    expect(s.exit).toBeNull()
+    s = run(s, ticks(30))
+    expect(s.exit).toBeNull() // still on the way
+    s = run(s, ticks(240))
+    const door = scene.hotspots.find((h) => h.id === 'door')!
+    expect(s.x).toBe(door.x)
+    expect(s.depth).toBe(0)
+    expect(s.exit).toBe('door')
+  })
+
+  it('ignores the walking keys while going in', () => {
+    let s = reduce(initialSceneState(scene), { type: 'jumpTo', hotspotId: 'door' })
+    const x = s.x
+    s = run(s, ticks(5, -1))
+    expect(s.x).toBeGreaterThanOrEqual(x)
   })
 })

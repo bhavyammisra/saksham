@@ -117,3 +117,18 @@ test('D-036 W and S walk nearer and further; Back shows the line before; History
   await history.getByRole('button', { name: strings['hud.close'] }).click()
   await expect(history).toHaveCount(0)
 })
+
+test('D-039 the legs step while walking, even with reduced motion (no sliding)', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.reload()
+  await page.getByRole('region', { name: /Scene:/ }).focus()
+  await page.keyboard.down('d')
+  const leg = () => page.locator('.game-person svg.ch .ch-leg-l').last().evaluate((el) => getComputedStyle(el).transform)
+  const seen = new Set<string>()
+  for (let i = 0; i < 6; i++) {
+    await page.waitForTimeout(120)
+    seen.add(await leg())
+  }
+  await page.keyboard.up('d')
+  expect(seen.size).toBeGreaterThan(2) // the leg's angle keeps changing
+})
