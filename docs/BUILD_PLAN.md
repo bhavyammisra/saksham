@@ -24,7 +24,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | 🔄 in progress on `p4-town` (3 of 6 tasks, plus the Dhaba) | not opened | D-030 to D-033 |
+| P4 Town and all buildings | 🔄 in progress on `p4-town` (3 of 6 tasks, plus the Dhaba and Home; the game is full screen since D-036) | not opened | D-030 to D-039 |
 | P5 Backend | ⬜ | | |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
@@ -38,6 +38,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Title menu, new game and customiser redesign (owner feedback, P4) | ✅ owner moved on to gameplay 2026-10-16 (D-034) |
 | New gameplay frame: prototype (owner feedback, P4) | ✅ approved 2026-10-16 after one revision (D-035) |
 | New gameplay frame and modern scenes, built (P4) | ✅ approved 2026-10-16 (D-036) |
+| Owner's play-test feedback: walk, doors, scale, voice (P4) | ✅ applied 2026-10-16 (D-038, D-039); the owner should confirm the walk and the door entry on their own machine at the start of the next session |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
 | Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
 
@@ -444,7 +445,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: the look-dev page reuses the sandbox story and placeholder props (the box and notice). The real School story and props come in P3. Phone walk pad is only checked through `pointer: coarse`, not on a real device yet. No per-frame performance profiling yet (P7).
 - Waiting for: owner approval of the visual style at `/dev/look`. Then the next task is P3 › author `content/scenes/school.json`.
 
-**Handoff (2026-10-15): start of the next session**
+**Handoff (2026-10-15), superseded: use "Handoff for the next session (updated 2026-10-17)" below**
 - State: P0 and P1 are merged to `main` (PRs #1, #2). All of P2 is built and pushed on branch `p2-character-scene` (no PR yet). 155 unit and 34 e2e tests green locally.
 - Owner feedback: they do **not like the cover page or the character design**. The character gate is reopened, and the look-dev gate is not approved. Phase 3 must not start until both are redesigned and approved.
 - Exact next task: P2 › Owner feedback rework › "Clarify the feedback first". Ask the owner before changing any art.
@@ -498,16 +499,23 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: more villagers come with each new building (only Lata so far). Mitthu's marker sits at a fixed height above doors.
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
-**Handoff for the next session (written 2026-10-15, updated 2026-10-16)**
-- **State (updated 2026-10-16):** branch `p4-town`, everything committed and pushed. The last commit is `c752c21 P4: the Dhaba scene`, and CI is green on it. P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 195 unit tests, 37 e2e tests and 16 safety tests are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top for every phase, gate and owner task.
-- **Exact next task:** P4 › Dhaba, Home and Panchayat › **the Home scene**. Use the `gentle` tone (safety at home), and handle it only through conversation and witnessing, never by showing harm. Follow the Dhaba as the pattern: `content/scenes/dhaba.json`, `src/art/dhaba.tsx`, `src/engine/dhaba.test.ts`, one line in `src/lib/scenes.ts`, a play-through in `tests/e2e/play.spec.ts`, and a card `review` plus a SETUP.md §6 entry for the owner's fact check. Then the Panchayat (child marriage, also `gentle`). After the buildings: the Sort game, then Community (`/community` is still a `Placeholder` in `src/App.tsx`).
-- **How the town works (for the next buildings):** buildings are `exit` hotspots in `content/scenes/town.json` with `to` = building id and a `lockedNode`. `Town.tsx` decides locks (`isUnlocked` + whether `getScene(id)` exists), sets `done:<id>` flags from progress (`hostFlags`), and points Mitthu at `recommendedBuilding`. Adding a building = its scene JSON + art, plus one line in `src/lib/scenes.ts`; its door then opens by itself, and its celebration says "open now".
+**Handoff for the next session (updated 2026-10-17)**
+- **State:** branch `p4-town`, everything committed and pushed; the last app commit is `a558c60` (D-039) and CI is green on it. P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 210 unit tests (13 files) and 57 e2e tests (8 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **First thing:** ask the owner whether the walk (knees) and going in through doors (D-039) look right on their own laptop. Their Windows has "reduce motion" on, so calm mode is active there; walking is the one animation calm mode keeps.
+- **Exact next task:** P4 › Dhaba, Home and Panchayat › **the Panchayat** (child marriage, `gentle` tone; handled only through conversation and witnessing, never by showing harm). Follow Home as the pattern: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
+- **How the game is put together now (D-036 to D-039):**
+  - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
+  - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
+  - `Character` has a `back` view and knees (`ch-shin-*`, `ch-knee` in `character.css`). The voice is gone (no `speech.ts`, no narration setting).
 - **Rules learned the hard way (keep them):**
-  - No full-screen `mix-blend-mode`, no `backdrop-filter`, and no `filter: blur` on animated pictures: without a GPU each halves the frame rate (D-030). Put moving things in their own small SVG layer; keep huge SVGs (the town street) still.
-  - Long journey e2e tests run in calm mode (`test.use({ reducedMotion: 'reduce' })`); motion is tested by `scene.spec.ts` and `town.spec.ts`. Locally Playwright runs 3 browsers. If tests time out everywhere at once, the laptop is busy (another app); re-run before changing code.
-  - For screenshots, a throwaway Playwright script against the dev server (port 5174 when 5173 is taken) works best; close the browser pane's tab afterwards so it doesn't animate in the background.
-  - Writing files with Python on Windows: open with `newline='\n'` (the repo is LF), and use double quotes around test names that contain an apostrophe.
-- **Owner:** the School card fact check (SETUP.md §6) is the most important open item before anyone plays it.
+  - No full-screen `mix-blend-mode`, no `backdrop-filter`, and no `filter: blur` on animated pictures (D-030). Moving things go in their own small layer (clouds: `"drift": true`).
+  - Calm mode is set by the system's "reduce motion" too, and three files stop animations in it (`index.css`, `scene.css`, `character.css`). All three keep the walk exception `:not(.ch[data-pose='walk'] *)`; `scene.spec.ts` tests it.
+  - Scale: the owner tried true scale (D-038) and preferred the D-036 scale. Don't change it again without asking.
+  - Long journey e2e tests run in calm mode; motion is tested by `scene.spec.ts` and `town.spec.ts`. If tests time out everywhere at once, the laptop is busy; re-run first.
+  - Screenshots: a throwaway Playwright script against the dev server (port 5174 when 5173 is taken).
+  - Tooling on this machine: the Bash tool mangles heredocs (and `python -` waits for input forever), so write scripts to the scratchpad with the Write tool and run them. Write files with `newline='\n'` (the repo is LF).
+- **The Lab Eval I report** (not in git): `tmp-report/` (ignored via `.git/info/exclude`), built with `node tmp-report/build.ts "C:\SEM 5\Software Engineering\Project"`; notes in `tmp-report/NEXT.md`. Diagrams are SVG drawn in `tmp-report/figures.js` with helpers in `diagrams.js`; `node tmp-report/shot-uc.ts <figure-id>...` screenshots figures into `tmp-report/prev/`.
+- **Owner:** the fact checks (School, Dhaba, Home cards; Help Centre) are the most important open items before any child plays.
 
 **P4: Book, Me, Credits and demo mode (2026-10-15)**
 - Done: `/book` (card album, read any collected card again), Me (stars, all badges earned or not yet, settings, switch player, link to Credits), `/credits` (made-in-code art, fonts from `content/credits.json`, every card's source exactly as written), and demo mode (type "demo" or hold the logo 2 s; a top-bar chip turns it off). Shared card pieces in `src/play/RightsCard.tsx`; badge names in `src/play/badgeText.ts`; `SettingsControls` shared by the dialog and Me. Removed the last live blurs (D-030 rule).
@@ -548,3 +556,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: scale back to D-036; the player walks to a door, turns (new back view) and goes in; the walk now steps with "reduce motion" on (a global calm rule was stopping it); the locked-building page has Need help? and says which place to finish first. D-039.
 - Tests: reducer tests for going in, town and sandbox tests wait for the player to go in, an e2e test for the walk with reduced motion, and the locked page shows Need help?. 210 unit and 57 e2e tests green.
 - Next task: P4 › the Panchayat (child marriage, `gentle` tone).
+
+**Lab Eval I report fixes (2026-10-17, report only, not in git)**
+- Done: the three use case diagrams became one (Figure 5, page 11), with «include» and «extend», arrows on associations, the class backend as a «system» box (not a stick figure) and no "System" actor; the Actors table and UC-18 template were corrected to match. Figure 7 (swimlane: joining a class) now labels the offline loop "on reconnect: check again"; Figure 8 (swimlane: content review) has a straight, labelled arrow from "Status: published" to the Child app's hash check. PDF rebuilt (41 pages) in `C:\SEM 5\Software Engineering\Project\`.
+- Next task: unchanged, P4 › the Panchayat.

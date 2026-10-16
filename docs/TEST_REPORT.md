@@ -2,12 +2,12 @@
 
 Updated at the end of each phase. Test names start with the requirement IDs from BUILD_PLAN §11, so they map straight into the traceability matrix.
 
-## Counts (Phase 4 in progress, 2026-10-16, after the Dhaba)
+## Counts (Phase 4 in progress, 2026-10-17, after Home and the full-screen game)
 
 | Type | Tool | Files | Tests | Where |
 | --- | --- | --- | --- | --- |
-| Unit | Vitest | 12 | 195 | `src/**/*.test.ts`, `scripts/*.test.ts` |
-| End-to-end | Playwright (Chromium) | 7 | 37 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts` |
+| Unit | Vitest | 13 | 210 | `src/**/*.test.ts`, `scripts/*.test.ts` |
+| End-to-end | Playwright (Chromium) | 7 | 41 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts` |
 | Safety invariants | Playwright (Chromium) | 1 | 16 | `tests/e2e/safety.spec.ts` |
 | Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` |
 | RLS (database) | | 0 | 0 | from Phase 5 |
