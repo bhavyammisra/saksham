@@ -1,6 +1,7 @@
 // Playing the School building end to end at /play/school: story, rights card, quiz, results.
 import { expect, test } from '@playwright/test'
 import dhaba from '../../content/scenes/dhaba.json' with { type: 'json' }
+import home from '../../content/scenes/home.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
 import town from '../../content/scenes/town.json' with { type: 'json' }
 import { answerQuiz, createPlayer, doThing, openMap, playStory, seedPlayer, strings, talkThrough, thingsToDo } from './helpers.ts'
@@ -130,5 +131,33 @@ test('FR-04 / FR-07 the Dhaba (after the School) plays in the gentle tone, and i
   // No retries and every answer right: 3 stars. Gentle scenes add a quiet link to Help.
   await expect(page.getByText(strings['results.stars'].replace('{n}', '3')).last()).toBeVisible()
   await expect(page.getByText(strings['results.gentle'])).toBeVisible()
+  await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
+})
+
+test('FR-04 / FR-07 Home (after the Dhaba) plays in the gentle tone: the child listens and tells a trusted adult', async ({ page }) => {
+  await seedPlayer(page, '/play/home', { dhaba: true })
+  await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(home.nodes.intro.text)
+  await talkThrough(page)
+  // Farida Aunty only takes the request once the player has listened to Anu.
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Ask Farida Aunty for help' })).toHaveCount(0)
+  for (const label of ['Talk to the girl by the stairs', 'Look at the drawing by the letterboxes']) {
+    await doThing(page, label)
+    await talkThrough(page)
+  }
+  await doThing(page, 'Ask Farida Aunty for help')
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Nothing\. It's a family thing/ }).click()
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Anu is scared to go home/ }).click()
+  await talkThrough(page)
+
+  await page.getByRole('button', { name: strings['card.flip'] }).click()
+  await expect(page.getByRole('heading', { name: home.card.title })).toBeVisible()
+  await expect(page.locator('blockquote')).toHaveText(home.card.law)
+  await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
+  await answerQuiz(page, [true, true, true, true], home.games[0]!.questions.filter((q) => !q.band))
+
+  // One retry: 2 stars. Gentle scenes add a quiet link to Help.
+  await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
   await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
 })

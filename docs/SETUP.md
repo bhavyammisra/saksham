@@ -74,3 +74,13 @@ Claude could not open the official PDFs (labour.gov.in, indiacode.nic.in) from i
 3. In the same Act, confirm: a "child" is under 14 (section 2); the family exception: helping one's family or family enterprise only after school hours or in vacations, and never in hazardous work (section 3(2)(a)); adolescents aged 14 to 18 must not work in hazardous occupations or processes (section 3A).
 4. Read the card text (`kid`, `teen`, `ifItHappens`), Sunita Didi's lines (`sunita-good-2`, `sunita-good-3`) and the six quiz questions. Each must agree with points 1 to 3. Penalties are deliberately not mentioned anywhere.
 5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
+**Home (`content/scenes/home.json`), the right to be safe:**
+
+Claude compared both quotes with secondary sources only, and both match word for word: [constitutionofindia.net](https://www.constitutionofindia.net/articles/article-39-certain-principles-of-policy-to-be-followed-by-the-state/) for Article 39, and [lawx.in](https://lawx.in/acts/section/114/1026/8855) for section 75 (the same opening also appears on courtbook.in and lawrato.com).
+
+1. `card.law` quotes Article 39's opening words and clause (f) of the Constitution. Check the wording against the Constitution of India (https://legislative.gov.in).
+2. `card.law` quotes section 75 of the Juvenile Justice (Care and Protection of Children) Act, 2015, up to "shall be punishable", with the rest (the penalties) left out and marked […]. Check it on India Code (https://www.indiacode.nic.in).
+3. Confirm that section 75 covers anyone having "the actual charge of, or control over, a child", which includes family members (the card and quiz say so), and that Article 39(f) is described fairly: a Directive Principle, something the State is asked to do.
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Farida Aunty's lines (`farida-good` to `farida-good-3`) and the six quiz questions. Each must agree with points 1 to 3. Also read the whole story once for tone, with an 8-year-old in mind: harm is only told, never shown.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.

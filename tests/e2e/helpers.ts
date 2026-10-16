@@ -92,14 +92,22 @@ export async function answerQuiz(page: Page, rightAnswers: boolean[], questions 
 export async function seedPlayer(
   page: Page,
   path: string,
-  { band = 'young', school = false, badges = [] as string[], demo = false }: { band?: 'young' | 'teen'; school?: boolean; badges?: string[]; demo?: boolean } = {},
+  {
+    band = 'young',
+    school = false,
+    dhaba = false,
+    badges = [] as string[],
+    demo = false,
+  }: { band?: 'young' | 'teen'; school?: boolean; dhaba?: boolean; badges?: string[]; demo?: boolean } = {},
 ) {
   await page.goto('/')
   await page.evaluate(
-    ({ band, school, badges, demo }) => {
+    ({ band, school, dhaba, badges, demo }) => {
       const avatar = { skin: 'skin-4', hair: 'two-plaits', hairColor: 'black', outfit: 'salwar', outfitColor: 'peacock', headwear: 'none', headwearColor: 'navy', glasses: false, bag: false }
-      const progress = school ? { school: { stars: 2, bestScore: 75, completed: true } } : {}
-      const cards = school ? ['right-to-education'] : []
+      // `dhaba` means the School and the Dhaba are both finished (the Dhaba opens after the School).
+      const done = { stars: 2, bestScore: 75, completed: true }
+      const progress = dhaba ? { school: done, dhaba: done } : school ? { school: done } : {}
+      const cards = dhaba ? ['right-to-education', 'freedom-from-child-labour'] : school ? ['right-to-education'] : []
       localStorage.setItem(
         'saksham',
         JSON.stringify({
@@ -114,7 +122,7 @@ export async function seedPlayer(
         }),
       )
     },
-    { band, school, badges, demo },
+    { band, school, dhaba, badges, demo },
   )
   await page.goto('about:blank')
   await page.goto(`/#${path}`)

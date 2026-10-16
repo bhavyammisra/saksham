@@ -3,6 +3,7 @@
 // Each scene's art lives in its own file and is added below.
 
 import { dhabaLayers, dhabaProps } from './dhaba'
+import { homeLayers, homeProps } from './home'
 import { modernLayers } from './modern'
 import { sandboxLayers, sandboxProps } from './sandbox'
 import { schoolLayers, schoolProps } from './school'
@@ -15,12 +16,14 @@ export const layerArt: Record<string, LayerArt> = {
   ...schoolLayers,
   ...townLayers,
   ...dhabaLayers,
+  ...homeLayers,
 }
 
 export const propArt: Record<string, PropArt> = {
   ...sandboxProps,
   ...schoolProps,
   ...dhabaProps,
+  ...homeProps,
 }
 
 export { GROUND_Y, SCENE_HEIGHT } from './types'

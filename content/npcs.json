@@ -80,5 +80,51 @@
       "glasses": true,
       "bag": true
     }
+  },
+  "anu": {
+    "name": "Anu",
+    "look": {
+      "gender": "girl",
+      "skin": "skin-3",
+      "hair": "ponytail",
+      "hairColor": "dark-brown",
+      "outfit": "hoodie",
+      "outfitColor": "mustard",
+      "bottom": "jeans",
+      "bottomColor": "denim",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "kabir": {
+    "name": "Kabir",
+    "look": {
+      "gender": "boy",
+      "skin": "skin-8",
+      "hair": "fade",
+      "hairColor": "black",
+      "outfit": "tshirt",
+      "outfitColor": "rust",
+      "bottom": "joggers",
+      "bottomColor": "charcoal",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "farida-aunty": {
+    "name": "Farida Aunty",
+    "adult": true,
+    "look": {
+      "gender": "girl",
+      "skin": "skin-5",
+      "hair": "bun",
+      "hairColor": "black",
+      "outfit": "kurta",
+      "outfitColor": "peacock",
+      "headwear": "hijab",
+      "headwearColor": "cream",
+      "glasses": true,
+      "bag": false
+    }
   }
 }

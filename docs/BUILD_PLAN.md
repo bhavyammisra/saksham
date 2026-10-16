@@ -37,7 +37,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Cover screens (owner feedback, P2) | ✅ approved 2026-10-15 (D-025) |
 | Title menu, new game and customiser redesign (owner feedback, P4) | ✅ owner moved on to gameplay 2026-10-16 (D-034) |
 | New gameplay frame: prototype (owner feedback, P4) | ✅ approved 2026-10-16 after one revision (D-035) |
-| New gameplay frame and modern scenes, built (P4) | 🛑 waiting for the owner's review (D-036) |
+| New gameplay frame and modern scenes, built (P4) | ✅ approved 2026-10-16 (D-036) |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
 | Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
 
@@ -47,6 +47,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | --- | --- |
 | Fact-check the School rights card (Article 21A matched the Ministry of Education page; the rest is unverified) | SETUP.md §6, `content/scenes/school.json` › `card.review` |
 | Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
+| Fact-check the Home rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/home.json` › `card.review` |
 | Fact-check the Help Centre numbers and sentences | SETUP.md §5, `content/help.json` › `review` |
 | Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
@@ -58,7 +59,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Walkable town scene (doors, locked replies, teasers, Help door) | ✅ D-030 |
 | Mitthu's guidance, return celebration, town changing with progress | ✅ D-031 |
 | Book, Me, Credits, badges, demo mode | ✅ D-032 |
-| Dhaba, Home and Panchayat scenes | 🔄 Dhaba ✅ (D-033); **next: Home** (gentle tone), then Panchayat. Each needs its legal text fact-checked |
+| Dhaba, Home and Panchayat scenes | 🔄 Dhaba ✅ (D-033), Home ✅ (D-037); **next: Panchayat** (gentle tone). Each needs its legal text fact-checked |
 | Sort game, in at least two buildings | ⬜ |
 | Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ |
 
@@ -531,3 +532,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: reducer tests for depth, Back and History; e2e helpers `thingsToDo` (opens the panel), `doThing` and `openMap`; town and play tests now check places on the map; a new test for W/S, Back and History. 202 unit and 55 e2e tests green.
 - Watch: the sandbox (`/dev/scene`) still uses its old flat art. People in the stories keep their traditional clothes (the owner only asked about the player). The Book, Me and Credits pages still have the old warm look; the owner may want them restyled next.
 - Next task: 🛑 the owner reviews the new game. Then, unless they say otherwise, the Home scene (gentle tone), drawn with the modern kit.
+
+**P4: Home (2026-10-16)**
+- Done: the owner approved the full-screen game (D-036) and it is pushed. `content/scenes/home.json` (gentle tone): Anu tells the player that her uncle hits her and told her to keep it secret; the player listens, sees her drawing, and tells Farida Aunty, who explains that no one may hurt a child and makes a plan (1098 if needed). Two gentle retries, a good ending, a rights card (Article 39(f) and section 75 of the JJ Act, 2015; no penalties), and a 4 + 2 question quiz. New characters Anu, Kabir and Farida Aunty; art `src/art/home.tsx`. Registered in `src/lib/scenes.ts`, so the Home door and map pin open after the Dhaba. D-037.
+- Tests: `src/engine/home.test.ts` (6), a Home play-through in `play.spec.ts` (with a new `dhaba` option for `seedPlayer`), and the Book now counts 3 written cards.
+- Owner: fact-check the Home card (SETUP.md §6), and read the story once for tone.
+- Next task: P4 › the Panchayat (child marriage, `gentle` tone), the same way.
