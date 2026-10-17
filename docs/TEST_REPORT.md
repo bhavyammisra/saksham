@@ -89,4 +89,4 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-14 | `p1-core` (PR #2) | ✅ green, merged | |
 | 2026-10-15 | `p2-character-scene` (PR #3) | ✅ green, merged | |
 | 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |
-| 2026-10-16 | `p4-town` (last commit `c752c21`, the Dhaba) | ✅ green, PR not opened yet | [run 38785416490](https://github.com/bhavyammisra/saksham/actions/runs/38785416490) |
+| 2026-10-18 | `p4-town` (PR #5) | ✅ green, merged | |

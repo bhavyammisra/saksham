@@ -24,8 +24,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | ✅ all 6 tasks done on `p4-town`; **pull request next** | not opened | D-030 to D-042 |
-| P5 Backend | ⬜ | | |
+| P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
+| P5 Backend | 🔄 branch `p5-backend`; waiting at the first 🛑 gate (Supabase setup) | | |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -501,8 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** branch `p4-town`, everything committed and pushed; the last app commit is Community (D-042), so every P4 task is done. P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** open the P4 pull request (`p4-town` into `main`, with the owner's go-ahead), wait for CI, and merge with `gh pr merge <n> --merge`. Then Phase 5 starts with a 🛑 gate: the owner creates the Supabase project (SETUP.md §4). (Community is done, D-042: `src/screens/Community.tsx`, `content/community.json`, `questions` in `ProfileData`.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5; P4 merged 2026-10-18 as `bf0240b`). Phase 5 has its branch, `p5-backend`, cut from `main`. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** P5 › Backend core, first box: write `docs/SETUP.md` §4 with the owner's manual steps (create the Supabase project, enable anonymous sign-ins, enable email auth, set the site URL, add the two GitHub repository variables), then 🛑 **stop and ask the owner to do them**. Nothing else in P5 starts before that. (Community is done, D-042: `src/screens/Community.tsx`, `content/community.json`, `questions` in `ProfileData`.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -581,3 +581,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `cleanQuestion` (rules), questions per player and removal (store), and `tests/e2e/community.spec.ts` (4): a pledge survives a reload and there is no free-text pledge; the mission is labelled Sample, counts the stars, and names nobody; a question is refused when empty, saved, hidden from another player on the same device, and removed; places are shown exactly as written. 226 unit and 62 e2e tests green; checked by screenshot at 1280 and 390 wide.
 - Owner: fact-check the places that help (SETUP.md §5).
 - Next task: open the P4 pull request (with the owner's go-ahead), then Phase 5's first 🛑 gate.
+
+**P4 merged (2026-10-18)**
+- PR #5 (`p4-town` into `main`) merged with a merge commit (`bf0240b`) after CI went green (8 checks passing). Phase 4 is complete.
+- Next task: P5 › write SETUP.md §4 (Supabase), then 🛑 stop for the owner.
