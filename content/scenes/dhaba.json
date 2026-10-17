@@ -203,6 +203,7 @@
       "checkedOn": null,
       "note": "Written by Claude, 2026-10-15. The official PDFs (labour.gov.in, indiacode.nic.in) did not open from Claude's tools. The two quotes in card.law match secondary sources (constitutionofindia.net for Article 24; lawx.in for section 3(1) of the 2016-amended Act). Check every item in \"checks\" against India Code (https://www.indiacode.nic.in) or the Ministry of Labour and Employment (https://labour.gov.in). Penalties are deliberately not mentioned. Then set status to \"verified\" with your name and the date (see docs/SETUP.md §6).",
       "checks": [
+        "Sort game (dhaba-sort): each of the five cases is in the right box under sections 3(1), 3(2)(a) and 3A (a child under 14 employed by someone else is not allowed; helping one's own family or family business after school or in the holidays, in safe work, is allowed; an adolescent of 15 in work with fire and chemicals is not allowed).",
         "card.law: the exact wording of Article 24, quoted.",
         "card.law: the exact wording of section 3(1) of the Act as amended in 2016, quoted.",
         "card.source: the Act's name after the 2016 amendment, and that sections 2, 3 and 3A are the right ones.",
@@ -263,6 +264,53 @@
           "answer": 1,
           "explanation": "A child may help their own family only after school hours or in the holidays, and the work must not be dangerous.",
           "band": "teen"
+        }
+      ]
+    },
+    {
+      "kind": "sort",
+      "id": "dhaba-sort",
+      "prompt": "Is this work allowed for this child?",
+      "bins": [
+        {
+          "id": "ok",
+          "label": "Allowed"
+        },
+        {
+          "id": "not-ok",
+          "label": "Not allowed"
+        }
+      ],
+      "items": [
+        {
+          "id": "raju",
+          "text": "Raju, 12, washes glasses at a dhaba all day instead of going to school.",
+          "bin": "not-ok",
+          "explanation": "No child under 14 may be made to work in any job, and Raju should be in school."
+        },
+        {
+          "id": "priya",
+          "text": "Priya, 11, helps her family at home after school.",
+          "bin": "ok",
+          "explanation": "Helping your own family after school is allowed, as long as it isn't dangerous work."
+        },
+        {
+          "id": "shop-hire",
+          "text": "A shop owner pays a 10-year-old to work there every evening.",
+          "bin": "not-ok",
+          "explanation": "No child under 14 may be employed, not even for a few hours."
+        },
+        {
+          "id": "arjun",
+          "text": "Arjun, 13, helps in his family's shop in the holidays, doing safe work.",
+          "bin": "ok",
+          "explanation": "A child may help their own family's business in the holidays, if the work is not dangerous."
+        },
+        {
+          "id": "sameer",
+          "text": "Sameer, 15, works with fire and chemicals in a factory.",
+          "bin": "not-ok",
+          "explanation": "Young people aged 14 to 18 must not do dangerous work like this."
         }
       ]
     }

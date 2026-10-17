@@ -12,6 +12,7 @@ import {
   isUnlocked,
   isValidFirstName,
   mergeExtras,
+  addScores,
   mergeProgress,
   needsHintRound,
   nextDemoBuffer,
@@ -244,6 +245,21 @@ describe('FR-06 quiz score', () => {
 
   it('counts unanswered questions as wrong', () => {
     expect(scoreQuiz(shown, [])).toEqual({ correct: 0, total: 5 })
+  })
+
+  it('FR-06 scores a sort game the same way: first placement of each card', () => {
+    const cards = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+    const placed = [
+      { questionId: 'a', correct: true },
+      { questionId: 'b', correct: false },
+      { questionId: 'c', correct: true },
+    ]
+    expect(scoreQuiz(cards, placed)).toEqual({ correct: 2, total: 3 })
+  })
+
+  it('FR-06 adds the quiz and sort scores into one game score', () => {
+    expect(addScores([{ correct: 3, total: 4 }, { correct: 5, total: 5 }])).toEqual({ correct: 8, total: 9 })
+    expect(addScores([])).toEqual({ correct: 0, total: 0 })
   })
 
   it('rounds the stored percentage to a whole number', () => {

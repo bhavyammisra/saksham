@@ -214,6 +214,7 @@
       "checkedOn": null,
       "note": "Written by Claude, 2026-10-18. Both quotes in card.law were compared word for word with two copies of the Act and match: the Act as published by PRS Legislative Research (https://prsindia.org/files/bills_acts/acts_parliament/2006/the-prohibition-of-child-marriage-act-2006.pdf) and Indian Kanoon (https://indiankanoon.org/doc/790355/). India Code (indiacode.nic.in) timed out. No penalties are quoted. Check every item in \"checks\" against India Code (https://www.indiacode.nic.in). Then set status to \"verified\" with your name and the date (see docs/SETUP.md §6).",
       "checks": [
+        "Sort game (panchayat-sort): each of the five weddings is in the right box under section 2(a) and 2(b) (a girl under 18 or a boy under 21 makes it a child marriage; 19 and 23, and 24, are allowed).",
         "card.law: the exact wording of section 2(a) and 2(b) of the Prohibition of Child Marriage Act, 2006.",
         "card.law: the exact wording of section 13(1) of the same Act.",
         "card.kid, card.teen, scene (Sarpanch Kavita ji), quiz: a girl must be at least 18 and a boy at least 21 to marry (section 2(a)).",
@@ -273,6 +274,53 @@
           "answer": 0,
           "explanation": "Section 13(1): the magistrate must issue an injunction prohibiting the marriage. Anyone who knows about it can complain.",
           "band": "teen"
+        }
+      ]
+    },
+    {
+      "kind": "sort",
+      "id": "panchayat-sort",
+      "prompt": "Is this wedding allowed?",
+      "bins": [
+        {
+          "id": "ok",
+          "label": "Allowed"
+        },
+        {
+          "id": "not-ok",
+          "label": "Not allowed"
+        }
+      ],
+      "items": [
+        {
+          "id": "meena",
+          "text": "Meena is 16. Her family says a good match has come along, so she should marry now.",
+          "bin": "not-ok",
+          "explanation": "A girl must be at least 18 to marry. At 16, Meena is still a child."
+        },
+        {
+          "id": "asha-vikram",
+          "text": "Asha is 19 and Vikram is 23. They decide to get married.",
+          "bin": "ok",
+          "explanation": "Asha is over 18 and Vikram is over 21, so neither is a child."
+        },
+        {
+          "id": "ravi-sunita",
+          "text": "Ravi is 19 and Sunita is 20. Their families fix their wedding.",
+          "bin": "not-ok",
+          "explanation": "A boy must be at least 21 to marry. Ravi is 19, so it is still a child marriage."
+        },
+        {
+          "id": "pooja",
+          "text": "Pooja finishes school first, and gets married when she is 24.",
+          "bin": "ok",
+          "explanation": "At 24, Pooja is grown up, and she got to finish school first."
+        },
+        {
+          "id": "fourteen",
+          "text": "A 14-year-old's wedding is planned for after her exams.",
+          "bin": "not-ok",
+          "explanation": "She is far too young. Tell a grown-up you trust, or call 1098."
         }
       ]
     }

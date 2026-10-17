@@ -29,7 +29,7 @@ export interface SceneDef {
   /** A hub (the town) links to other places: it has no card or games and never "completes". */
   hub?: boolean
   card?: Card // required for every scene that is not a hub (checked by the validator)
-  games?: GameDef[] // quiz first, sort later; required unless hub
+  games?: GameDef[] // played in order after the card; must include a quiz; required unless hub
 }
 
 export interface Layer {
@@ -102,8 +102,8 @@ export interface ContentReview {
   checks?: string[]
 }
 
-// Games. The quiz comes first; the sort game is added in Phase 4.
-export type GameDef = QuizGame
+// Games, played in order after the card. Every building has a quiz; some add a sort game (D-041).
+export type GameDef = QuizGame | SortGame
 
 export interface QuizGame {
   kind: 'quiz'
@@ -118,6 +118,27 @@ export interface QuizQuestion {
   answer: number // index into options
   explanation: string // shown after answering, and first in the hint round
   band?: 'teen' // teen-only question; no band means everyone sees it
+}
+
+/** Sort each card into one of two boxes, by dragging it or tapping a box (FR-06, D-041). */
+export interface SortGame {
+  kind: 'sort'
+  id: string
+  prompt: string // what to do, e.g. "Is this allowed?"
+  bins: [SortBin, SortBin] // exactly two boxes
+  items: SortItem[] // everyone sorts every item, in this order
+}
+
+export interface SortBin {
+  id: string
+  label: string
+}
+
+export interface SortItem {
+  id: string
+  text: string
+  bin: string // the id of the right box
+  explanation: string // shown after placing it
 }
 
 // The town's buildings, in unlock order (content/buildings.json).

@@ -17,6 +17,12 @@ export async function createPlayer(page: Page, name: string, band: 'young' | 'te
 
 // ---------------------------------------------------------------- playing the School
 
+type Question = { id: string; text: string; options: string[]; answer: number; band?: string }
+type Game = { kind: string; id: string; questions?: Question[] }
+
+/** A scene's quiz questions for young players. */
+export const quizFor = (scene: { games: unknown[] }) => (scene.games as Game[]).find((g) => g.kind === 'quiz')!.questions!.filter((q) => !q.band)
+
 // ---------------------------------------------------------------- the game frame (D-036)
 
 const menu = (page: Page) => page.getByRole('navigation', { name: strings['hud.menu'] })
@@ -71,7 +77,7 @@ export async function playStory(page: Page, alreadyThere = false) {
 }
 
 /** Answers the quiz: `rightAnswers` says, question by question, whether to pick the right option. */
-export async function answerQuiz(page: Page, rightAnswers: boolean[], questions = school.games[0]!.questions.filter((q) => !q.band)) {
+export async function answerQuiz(page: Page, rightAnswers: boolean[], questions: Question[] = quizFor(school)) {
   for (const [i, right] of rightAnswers.entries()) {
     const q = questions[i]!
     await expect(page.getByRole('heading', { name: q.text })).toBeVisible()
@@ -80,6 +86,34 @@ export async function answerQuiz(page: Page, rightAnswers: boolean[], questions 
     await expect(page.getByText(right ? strings['quiz.correct'] : strings['quiz.notQuite'])).toBeVisible()
     const isLast = i === rightAnswers.length - 1
     await page.getByRole('button', { name: isLast ? strings['quiz.finish'] : strings['quiz.next'] }).click()
+  }
+}
+
+type SortGame = { kind: string; id: string; bins: { id: string; label: string }[]; items: { id: string; text: string; bin: string }[] }
+
+/** A scene's sort game. */
+export const sortFor = (scene: { games: unknown[] }) => scene.games.find((g) => (g as SortGame).kind === 'sort') as SortGame
+
+/**
+ * Plays a sort game by tapping the boxes: `rightAnswers` says, card by card, whether to pick the right box.
+ * With `dragFirst`, the first card is dragged onto its box with the mouse instead (the drag way).
+ */
+export async function sortCards(page: Page, game: SortGame, rightAnswers: boolean[], dragFirst = false) {
+  await expect(page.getByRole('heading', { name: strings['sort.title'] })).toBeVisible()
+  for (const [i, right] of rightAnswers.entries()) {
+    const item = game.items[i]!
+    const bin = right ? item.bin : game.bins.find((b) => b.id !== item.bin)!.id
+    const box = page.getByRole('button', { name: strings['sort.putIn'].replace('{bin}', game.bins.find((b) => b.id === bin)!.label), exact: true })
+    const card = page.getByRole('heading', { name: item.text })
+    await expect(card).toBeVisible()
+    if (dragFirst && i === 0) {
+      await card.dragTo(box)
+    } else {
+      await box.click()
+    }
+    await expect(page.getByText(right ? strings['quiz.correct'] : strings['quiz.notQuite'])).toBeVisible()
+    const isLast = i === rightAnswers.length - 1
+    await page.getByRole('button', { name: isLast ? strings['quiz.finish'] : strings['sort.next'] }).click()
   }
 }
 

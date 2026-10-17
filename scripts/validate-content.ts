@@ -10,7 +10,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { SceneDef, StoryNode } from '../content/types.ts'
+import type { SceneDef, SortGame, StoryNode } from '../content/types.ts'
 
 const TONES = ['normal', 'gentle']
 const MOODS = ['neutral', 'happy', 'worried', 'surprised', 'sad']
@@ -202,7 +202,8 @@ export function validateScene(raw: unknown): string[] {
   } else {
     if (!scene.games.some((g) => g?.kind === 'quiz')) fail('"games" must include a quiz')
     scene.games.forEach((game, gi) => {
-      if (game?.kind !== 'quiz') return fail(`games[${gi}] has unknown kind "${String(game?.kind)}"`)
+      if (game?.kind === 'sort') return validateSort(game, fail)
+      if (game?.kind !== 'quiz') return fail(`games[${gi}] has unknown kind "${String((game as { kind?: unknown } | undefined)?.kind)}"`)
       if (!isText(game.id)) fail(`games[${gi}] needs an "id"`)
       if (!Array.isArray(game.questions) || game.questions.length === 0) {
         return fail(`quiz "${game.id}" needs questions`)
@@ -227,6 +228,30 @@ export function validateScene(raw: unknown): string[] {
   }
 
   return errors
+}
+
+/** A sort game: two boxes, at least 3 items, each item going into one of the boxes, and both boxes used. */
+function validateSort(game: SortGame, fail: (message: string) => void) {
+  const where = `sort "${String(game.id)}"`
+  if (!isText(game.id)) fail('a sort game needs an "id"')
+  if (!isText(game.prompt)) fail(`${where} needs a "prompt"`)
+  if (!Array.isArray(game.bins) || game.bins.length !== 2 || !game.bins.every((b) => isText(b?.id) && isText(b?.label))) {
+    return fail(`${where} needs exactly 2 "bins", each with an "id" and a "label"`)
+  }
+  if (game.bins[0].id === game.bins[1].id) fail(`${where} has two bins with the same id`)
+  if (!Array.isArray(game.items) || game.items.length < 3) return fail(`${where} needs at least 3 items`)
+  const bins = new Set(game.bins.map((b) => b.id))
+  const ids = new Set<string>()
+  game.items.forEach((item, i) => {
+    const at = `${where} item "${item?.id ?? i}"`
+    if (!isText(item?.id)) fail(`${where} items[${i}] needs an "id"`)
+    else if (ids.has(item.id)) fail(`${at} is duplicated`)
+    else ids.add(item.id)
+    if (!isText(item?.text)) fail(`${at} needs "text"`)
+    if (!isText(item?.explanation)) fail(`${at} needs an "explanation"`)
+    if (!bins.has(item?.bin)) fail(`${at}.bin must be one of the bins`)
+  })
+  for (const bin of bins) if (!game.items.some((item) => item?.bin === bin)) fail(`${where} has no items for bin "${bin}"`)
 }
 
 /** Follows next/choices from the start node and reports whether an end: "good" node is reachable. */

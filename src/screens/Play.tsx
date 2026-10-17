@@ -3,16 +3,17 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { GameFrame } from '@/components/GameFrame'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
-import { badgesFor, isUnlocked, questionsForBand, starsFor, type BuildingResult, type Score } from '@/lib/rules'
+import { addScores, badgesFor, isUnlocked, questionsForBand, starsFor, type BuildingResult, type Score } from '@/lib/rules'
 import { buildings, getScene, nextBuilding, townScene } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { CardReveal } from '@/play/CardReveal'
 import { Quiz } from '@/play/Quiz'
 import type { Celebration } from '@/components/ReturnCelebration'
 import { Results, type Summary } from '@/play/Results'
+import { Sort } from '@/play/Sort'
 import { useMap } from '@/play/useMap'
 
-type Stage = 'scene' | 'card' | 'quiz' | 'results'
+type Stage = 'scene' | 'card' | 'games' | 'results'
 
 /** /play/:id. Travelling from one building to another (the map) starts the new one afresh. */
 export function Play() {
@@ -22,7 +23,7 @@ export function Play() {
 
 /**
  * Playing one building, the core loop from BUILD_PLAN §2: the scene (full screen, D-036),
- * then its rights card, the quiz, and the results, which are saved.
+ * then its rights card, its games in order (the quiz, and a sort game in some buildings), and the results, which are saved.
  * Leaving through the scene's exit before finishing goes back to the town without saving.
  */
 function PlayBuilding({ id }: { id: string }) {
@@ -38,6 +39,7 @@ function PlayBuilding({ id }: { id: string }) {
   const [stage, setStage] = useState<Stage>('scene')
   const [run, setRun] = useState(0) // bumping this restarts the scene ("Play again")
   const [retries, setRetries] = useState(0)
+  const [scores, setScores] = useState<Score[]>([]) // one per game played so far
   const [summary, setSummary] = useState<Summary | null>(null)
   const [celebration, setCelebration] = useState<Celebration | null>(null)
 
@@ -67,7 +69,17 @@ function PlayBuilding({ id }: { id: string }) {
     )
   }
 
-  /** The quiz is over: save the result, the card and any new badges, then show the results. */
+  const games = scene.games ?? []
+  const game = games[scores.length]
+
+  /** One game is over: go on to the next one, or finish once every game is played. */
+  const gameDone = (score: Score) => {
+    const all = [...scores, score]
+    setScores(all)
+    if (all.length === games.length) finish(addScores(all))
+  }
+
+  /** Every game is over: save the result, the card and any new badges, then show the results. */
   const finish = (score: Score) => {
     const store = useStore.getState()
     const before = selectActiveData(store)
@@ -97,6 +109,7 @@ function PlayBuilding({ id }: { id: string }) {
     setSummary(null)
     setCelebration(null)
     setRetries(0)
+    setScores([])
     setRun((n) => n + 1)
   }
 
@@ -106,8 +119,9 @@ function PlayBuilding({ id }: { id: string }) {
   return (
     <GameFrame scene={scene} focusX={scene.width / 2}>
       <div className="mx-auto max-w-3xl rounded-2xl bg-plaster p-5 text-ink shadow-2xl md:p-8">
-        {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
-        {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games?.[0]?.questions ?? [], profile.band)} onDone={finish} />}
+        {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('games')} />}
+        {stage === 'games' && game?.kind === 'quiz' && <Quiz key={game.id} questions={questionsForBand(game.questions, profile.band)} onDone={gameDone} />}
+        {stage === 'games' && game?.kind === 'sort' && <Sort key={game.id} game={game} onDone={gameDone} />}
         {stage === 'results' && summary && (
           <Results from={id} celebration={celebration} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
         )}

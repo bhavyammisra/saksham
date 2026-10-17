@@ -221,6 +221,46 @@ describe('NFR-07 content validation: scenes', () => {
     )
   })
 
+  const sort = {
+    kind: 'sort',
+    id: 'test-sort',
+    prompt: 'Allowed?',
+    bins: [
+      { id: 'ok', label: 'Allowed' },
+      { id: 'no', label: 'Not allowed' },
+    ],
+    items: [
+      { id: 'a', text: 'A', bin: 'ok', explanation: 'Because.' },
+      { id: 'b', text: 'B', bin: 'no', explanation: 'Because.' },
+      { id: 'c', text: 'C', bin: 'no', explanation: 'Because.' },
+    ],
+  }
+  const withSort = (change: (game: typeof sort) => void = () => {}) =>
+    broken((s) => {
+      const game = structuredClone(sort)
+      change(game)
+      s.games.push(game)
+    })
+
+  it('accepts a sort game after the quiz', () => {
+    expect(validateScene(withSort())).toEqual([])
+  })
+
+  it('rejects a sort game with a card for a missing box, or a box with no cards', () => {
+    const errors = validateScene(withSort((g) => (g.items[0]!.bin = 'maybe')))
+    expect(errors).toContain('sort "test-sort" item "a".bin must be one of the bins')
+    expect(errors).toContain('sort "test-sort" has no items for bin "ok"')
+  })
+
+  it('rejects a sort game without exactly two boxes, or with too few cards', () => {
+    expect(validateScene(withSort((g) => g.bins.pop()))).toContain('sort "test-sort" needs exactly 2 "bins", each with an "id" and a "label"')
+    expect(validateScene(withSort((g) => g.items.pop()))).toContain('sort "test-sort" needs at least 3 items')
+  })
+
+  it('rejects a scene with only a sort game', () => {
+    expect(validateScene(broken((s) => (s.games = [structuredClone(sort)])))).toContain('"games" must include a quiz')
+  })
+
   it('rejects a scene without a quiz', () => {
     expect(validateScene(broken((s) => (s.games = [])))).toContain('"games" must list at least one game')
   })

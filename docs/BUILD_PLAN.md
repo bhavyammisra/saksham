@@ -24,7 +24,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | 🔄 in progress on `p4-town` (4 of 6 tasks; the game is full screen since D-036) | not opened | D-030 to D-040 |
+| P4 Town and all buildings | 🔄 in progress on `p4-town` (5 of 6 tasks; the game is full screen since D-036) | not opened | D-030 to D-041 |
 | P5 Backend | ⬜ | | |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
@@ -38,7 +38,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Title menu, new game and customiser redesign (owner feedback, P4) | ✅ owner moved on to gameplay 2026-10-16 (D-034) |
 | New gameplay frame: prototype (owner feedback, P4) | ✅ approved 2026-10-16 after one revision (D-035) |
 | New gameplay frame and modern scenes, built (P4) | ✅ approved 2026-10-16 (D-036) |
-| Owner's play-test feedback: walk, doors, scale, voice (P4) | ✅ applied 2026-10-16 (D-038, D-039); the owner should confirm the walk and the door entry on their own machine at the start of the next session |
+| Owner's play-test feedback: walk, doors, scale, voice (P4) | ✅ applied 2026-10-16 (D-038, D-039); the owner confirmed the walk and the door entry on their laptop 2026-10-18 |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
 | Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
 
@@ -62,8 +62,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Mitthu's guidance, return celebration, town changing with progress | ✅ D-031 |
 | Book, Me, Credits, badges, demo mode | ✅ D-032 |
 | Dhaba, Home and Panchayat scenes | ✅ Dhaba (D-033), Home (D-037), Panchayat (D-040). Each needs its legal text fact-checked |
-| Sort game, in at least two buildings | ⬜ **next** |
-| Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ |
+| Sort game, in at least two buildings | ✅ D-041 (the Dhaba and the Panchayat) |
+| Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ **next** |
 
 ## 1. Context
 
@@ -304,7 +304,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 #### Remaining buildings
 
 - [x] Dhaba, Home and Panchayat as scenes. ✅ 2026-10-18 (D-033, D-037, D-040). This should be content and art only. If one needs engine changes, fix the engine, not the content. Home and any heavy story use `gentle` tone and are handled through conversation and witnessing, never by showing harm.
-- [ ] Sort game (drag plus a tap alternative) and add one to at least two buildings.
+- [x] Sort game (drag plus a tap alternative) and add one to at least two buildings. ✅ 2026-10-18 (D-041).
 
 #### Community
 
@@ -501,9 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** branch `p4-town`, everything committed and pushed; the last app commit is the Panchayat (D-040). P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 216 unit tests (14 files) and 58 e2e tests (8 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **First thing:** ask the owner whether the walk (knees) and going in through doors (D-039) look right on their own laptop. Their Windows has "reduce motion" on, so calm mode is active there; walking is the one animation calm mode keeps.
-- **Exact next task:** P4 › **the Sort game** (drag plus a tap alternative), added to at least two buildings. It is a new game kind next to `quiz` in `content/types.ts` (`games`), so it needs engine work, the validator and tests. Then Community (`/community` is still a `Placeholder`). The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
+- **State:** branch `p4-town`, everything committed and pushed; the last app commit is the sort game (D-041). P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 222 unit tests (14 files) and 58 e2e tests (8 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** P4 › **Community**: Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help, labelled "Sample" where the data is not live. `/community` is still a `Placeholder`. It is the last P4 task; then open the P4 pull request. (The sort game is done, D-041: `SortGame` in `content/types.ts`, `src/play/Sort.tsx`, games played in order in `Play.tsx`, `sortCards` in the e2e helpers.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -570,3 +569,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `src/engine/panchayat.test.ts` (6), a Panchayat play-through in `play.spec.ts` (`seedPlayer` has a `home` option now), the Book counts 4 cards, and demo mode opens the Panchayat. 216 unit and 58 e2e tests green.
 - Owner: fact-check the Panchayat card (SETUP.md §6) and read the story once for tone. Still to confirm from last time: the walk and going in through doors (D-039) on your laptop.
 - Next task: P4 › the Sort game, then Community.
+
+**P4: the sort game (2026-10-18)**
+- Done: the owner confirmed the walk and going in through doors (D-039) on their laptop. A sort game (`SortGame` in `content/types.ts`, `src/play/Sort.tsx`): one card at a time, dragged or tapped into one of two boxes, with the explanation after each card. A building plays its games in order and adds their scores (`addScores` in `rules.ts`). Added to the Dhaba ("Is this work allowed for this child?") and the Panchayat ("Is this wedding allowed?"), five cards each, with each card's claims added to its fact-check list. The validator checks sort games. D-041.
+- Tests: rules (sort scoring, adding scores), validator (a good sort game, wrong or unused boxes, too few cards or boxes, a sort game alone), and the Dhaba and Panchayat play-throughs now sort every card (the Panchayat drags its first card with the mouse). 222 unit and 58 e2e tests green; checked by screenshot at 1280 and 390 wide.
+- Watch: the "Quiz whiz" badge now needs every quiz and sort answer right on the first try in that building.
+- Next task: P4 › Community (the last P4 task), then open the P4 pull request.

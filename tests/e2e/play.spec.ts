@@ -5,7 +5,7 @@ import home from '../../content/scenes/home.json' with { type: 'json' }
 import panchayat from '../../content/scenes/panchayat.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
 import town from '../../content/scenes/town.json' with { type: 'json' }
-import { answerQuiz, createPlayer, doThing, openMap, playStory, seedPlayer, strings, talkThrough, thingsToDo } from './helpers.ts'
+import { answerQuiz, createPlayer, doThing, openMap, playStory, quizFor, seedPlayer, sortCards, sortFor, strings, talkThrough, thingsToDo } from './helpers.ts'
 
 // These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
 test.describe.configure({ timeout: 60_000 })
@@ -128,7 +128,9 @@ test('FR-04 / FR-07 the Dhaba (after the School) plays in the gentle tone, and i
   await page.getByRole('button', { name: strings['card.flip'] }).click()
   await expect(page.locator('blockquote')).toHaveText(dhaba.card.law)
   await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
-  await answerQuiz(page, [true, true, true, true], dhaba.games[0]!.questions.filter((q) => !q.band))
+  await answerQuiz(page, [true, true, true, true], quizFor(dhaba))
+  // Then the sort game: every card in the right box.
+  await sortCards(page, sortFor(dhaba), [true, true, true, true, true])
 
   // No retries and every answer right: 3 stars. Gentle scenes add a quiet link to Help.
   await expect(page.getByText(strings['results.stars'].replace('{n}', '3')).last()).toBeVisible()
@@ -157,7 +159,7 @@ test('FR-04 / FR-07 Home (after the Dhaba) plays in the gentle tone: the child l
   await expect(page.getByRole('heading', { name: home.card.title })).toBeVisible()
   await expect(page.locator('blockquote')).toHaveText(home.card.law)
   await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
-  await answerQuiz(page, [true, true, true, true], home.games[0]!.questions.filter((q) => !q.band))
+  await answerQuiz(page, [true, true, true, true], quizFor(home))
 
   // One retry: 2 stars. Gentle scenes add a quiet link to Help.
   await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
@@ -183,9 +185,12 @@ test('FR-04 / FR-07 the Panchayat (after Home) plays in the gentle tone: the chi
   await expect(page.getByRole('heading', { name: panchayat.card.title })).toBeVisible()
   await expect(page.locator('blockquote')).toHaveText(panchayat.card.law)
   await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
-  await answerQuiz(page, [true, true, true, true], panchayat.games[0]!.questions.filter((q) => !q.band))
+  await answerQuiz(page, [true, true, true, true], quizFor(panchayat))
+  // Then the sort game: the first card dragged into its box, the rest tapped, one in the wrong box.
+  await sortCards(page, sortFor(panchayat), [true, true, false, true, true], true)
 
-  // No retries and every answer right: 3 stars. Gentle scenes add a quiet link to Help.
-  await expect(page.getByText(strings['results.stars'].replace('{n}', '3')).last()).toBeVisible()
+  // No retries and 8 of 9 right (89%, under 90%): 2 stars. Gentle scenes add a quiet link to Help.
+  await expect(page.getByText(strings['results.score'].replace('{correct}', '8').replace('{total}', '9'))).toBeVisible()
+  await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
   await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
 })

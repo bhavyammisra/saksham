@@ -2,11 +2,11 @@
 
 Updated at the end of each phase. Test names start with the requirement IDs from BUILD_PLAN §11, so they map straight into the traceability matrix.
 
-## Counts (Phase 4 in progress, 2026-10-18, after the Panchayat)
+## Counts (Phase 4 in progress, 2026-10-18, after the sort game)
 
 | Type | Tool | Files | Tests | Where |
 | --- | --- | --- | --- | --- |
-| Unit | Vitest | 14 | 216 | `src/**/*.test.ts`, `scripts/*.test.ts` |
+| Unit | Vitest | 14 | 222 | `src/**/*.test.ts`, `scripts/*.test.ts` |
 | End-to-end | Playwright (Chromium) | 7 | 42 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts` |
 | Safety invariants | Playwright (Chromium) | 1 | 16 | `tests/e2e/safety.spec.ts` |
 | Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` |
@@ -21,13 +21,13 @@ Updated at the end of each phase. Test names start with the requirement IDs from
   - FR-07 unlocks: School always unlocked, N+1 after N is completed, teasers never.
   - FR-07 recommended building.
   - FR-05 card text by band.
-  - FR-06 band filtering, first-attempt scoring, and that the hint round never changes the score.
+  - FR-06 band filtering, first-attempt scoring, and that the hint round never changes the score. A sort game is scored the same way, card by card, and the quiz and sort scores add into one game score.
   - FR-12 merge: max for stars and score, union for extras, order-independent.
   - FR-17 demo mode.
   - FR-07 badges: none for an unfinished building; first steps, right first time and quiz whiz when earned; kind helper after two buildings; town hero after every playable one (teasers don't count).
   - FR-01/NFR-01 first-name rule: English and Hindi names accepted; digits, symbols, emoji and more than 20 characters rejected.
 - **`validate-content.test.ts` (35).**
-  - NFR-07: a valid scene passes, and one broken scene per rule fails (missing targets, no reachable good end, dead ends, unset flags, out-of-bounds hotspots, card and quiz errors).
+  - NFR-07: a valid scene passes, and one broken scene per rule fails (missing targets, no reachable good end, dead ends, unset flags, out-of-bounds hotspots, card and quiz errors). A sort game after the quiz passes; a card for a missing box, a box with no cards, one box, too few cards, or a sort game with no quiz fail.
   - NFR-09: every `t()` key in code exists.
   - NFR-06: `help.json` is valid, and sources must be https `.gov.in`/`.nic.in` pages.
   - People: every hotspot `npc` and node `speaker` must exist in `npcs.json`.
@@ -61,7 +61,7 @@ Updated at the end of each phase. Test names start with the requirement IDs from
   - The builder's part tabs work with the arrow keys.
 - **`scene.spec.ts` (6).** Plays `/dev/scene`: walk with the arrow keys (in short taps, so a busy machine can't walk past the prompt) and press E; "Things to do here" shows only visible hotspots; a weaker choice then the good one completes the scene with 1 retry; exits; calm mode shows whole lines at once; panel tap targets are at least 48px.
 
-- **`play.spec.ts` (6).** FR-05/06/07, plays School at `/play/school`. The card flips, "Tell me more" shows the teen text, and the law matches content exactly. 3 of 4 right with one retry gives 2 stars, the first-steps badge and the Dhaba unlocked; back in the town Mitthu celebrates once (2 stars at The School), Lata stands outside, and it all survives a reload with no second celebration. A 25% score offers the hint round, which replays the 3 missed questions and leaves the score at 1 of 4. Teen players see the teen card and all 6 questions. A locked building can't be played. A new player's town has only School open. The Dhaba (after the School), Home (after the Dhaba) and the Panchayat (after Home) play in the gentle tone, the law on each card matches content exactly, and their results point to "Need help?".
+- **`play.spec.ts` (6).** FR-05/06/07, plays School at `/play/school`. The card flips, "Tell me more" shows the teen text, and the law matches content exactly. 3 of 4 right with one retry gives 2 stars, the first-steps badge and the Dhaba unlocked; back in the town Mitthu celebrates once (2 stars at The School), Lata stands outside, and it all survives a reload with no second celebration. A 25% score offers the hint round, which replays the 3 missed questions and leaves the score at 1 of 4. Teen players see the teen card and all 6 questions. A locked building can't be played. A new player's town has only School open. The Dhaba (after the School), Home (after the Dhaba) and the Panchayat (after Home) play in the gentle tone, the law on each card matches content exactly, and their results point to "Need help?". The Dhaba and the Panchayat end with the sort game: every card is sorted by tapping a box, and at the Panchayat the first card is dragged with the mouse; one card in the wrong box gives 8 of 9 and 2 stars.
 - **`town.spec.ts` (4).** FR-07/08 on `/town`: the School door is open, says "Mitthu suggests" and leads into the School; a locked door says "locked", replies gently and stays in the town; teasers say "Coming soon"; the Help door opens the Help Centre and Back returns to the town.
 - **`collection.spec.ts` (7).** FR-05 the Book: collected cards open and the law reads exactly as written; a new player's Book is empty and says how to collect the School card. FR-07 Me: the player's own stars, badges marked earned or not yet, settings working from Me (calm motion), and Switch player. Credits: the fonts and each card's source exactly as written, reached from Me. FR-17 demo mode: typing "demo" opens every playable place (Home and the Panchayat included) and the chip turns it off; holding the logo for 2 s turns it on without following the link; typing "demo" in a text box does nothing.
 - **`demo-path.spec.ts` (1).** MILESTONE A, the whole journey through the real UI: welcome, name, age, customiser, town, School story with a retry, card flip, a perfect quiz (2 stars, quiz whiz), back to the town, reload, then "Need help?" to a calm Help Centre with no Help button.
