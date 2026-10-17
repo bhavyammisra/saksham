@@ -1,55 +1,85 @@
 import { useCallback, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
-import { Page } from '@/components/Page'
+import { GameFrame } from '@/components/GameFrame'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
-import { badgesFor, isUnlocked, questionsForBand, starsFor, type BuildingResult, type Score } from '@/lib/rules'
-import { buildings, getScene, nextBuilding } from '@/lib/scenes'
+import { addScores, badgesFor, isUnlocked, questionsForBand, starsFor, type BuildingResult, type Score } from '@/lib/rules'
+import { buildings, getScene, nextBuilding, townScene } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { CardReveal } from '@/play/CardReveal'
 import { Quiz } from '@/play/Quiz'
+import type { Celebration } from '@/components/ReturnCelebration'
 import { Results, type Summary } from '@/play/Results'
+import { Sort } from '@/play/Sort'
+import { useMap } from '@/play/useMap'
 
-type Stage = 'scene' | 'card' | 'quiz' | 'results'
+type Stage = 'scene' | 'card' | 'games' | 'results'
 
-/**
- * Playing one building (/play/:id), the core loop from BUILD_PLAN §2:
- * the scene, then its rights card, the quiz, and the results, which are saved.
- * Leaving through the scene's exit before finishing goes back to the town without saving.
- */
+/** /play/:id. Travelling from one building to another (the map) starts the new one afresh. */
 export function Play() {
   const { id = '' } = useParams()
+  return <PlayBuilding key={id} id={id} />
+}
+
+/**
+ * Playing one building, the core loop from BUILD_PLAN §2: the scene (full screen, D-036),
+ * then its rights card, its games in order (the quiz, and a sort game in some buildings), and the results, which are saved.
+ * Leaving through the scene's exit before finishing goes back to the town without saving.
+ */
+function PlayBuilding({ id }: { id: string }) {
   const scene = getScene(id)
+  // A building needs its card; a hub scene (the town) has none and isn't played here.
+  const card = scene?.card
   const profile = useStore(selectActiveProfile)
   const data = useStore(selectActiveData)
   const demo = useStore((s) => s.demo)
   const navigate = useNavigate()
+  const map = useMap(id)
 
   const [stage, setStage] = useState<Stage>('scene')
   const [run, setRun] = useState(0) // bumping this restarts the scene ("Play again")
   const [retries, setRetries] = useState(0)
+  const [scores, setScores] = useState<Score[]>([]) // one per game played so far
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [celebration, setCelebration] = useState<Celebration | null>(null)
 
   const onComplete = useCallback((result: SceneResult) => {
     setRetries(result.retries)
     setStage('card')
   }, [])
-  const onExit = useCallback(() => navigate('/town'), [navigate])
+  const onExit = useCallback(() => navigate('/town', { state: { from: id } }), [navigate, id])
 
   if (!profile) return null
   const unlocked = isUnlocked(id, buildings, data?.progress ?? {}, demo)
-  if (!scene || !unlocked) {
+  if (!scene || !card || !unlocked) {
+    // Still locked (or not written): say which place to finish first, over the town's picture,
+    // with Need help? in the corner like every game screen.
+    const playable = buildings.filter((b) => !b.teaser)
+    const before = playable[playable.findIndex((b) => b.id === id) - 1]
     return (
-      <Page title={t('play.title')}>
-        <p>{unlocked ? t('play.notFound') : t('play.locked')}</p>
-        <Link to="/town" className="mt-4 inline-flex min-h-tap items-center font-semibold text-peacock underline">
-          {t('play.backToTown')}
-        </Link>
-      </Page>
+      <GameFrame scene={townScene} focusX={townScene.spawn.x}>
+        <div className="mx-auto max-w-xl rounded-2xl bg-plaster p-6 text-ink shadow-2xl">
+          <h2 className="text-xl font-semibold">{scene?.title ?? t('play.title')}</h2>
+          <p className="mt-2">{!unlocked && before ? t('town.lockedAfter', { name: before.name }) : unlocked ? t('play.notFound') : t('play.locked')}</p>
+          <Link to="/town" className="mt-4 inline-flex min-h-tap items-center font-semibold text-peacock underline">
+            {t('play.backToTown')}
+          </Link>
+        </div>
+      </GameFrame>
     )
   }
 
-  /** The quiz is over: save the result, the card and any new badges, then show the results. */
+  const games = scene.games ?? []
+  const game = games[scores.length]
+
+  /** One game is over: go on to the next one, or finish once every game is played. */
+  const gameDone = (score: Score) => {
+    const all = [...scores, score]
+    setScores(all)
+    if (all.length === games.length) finish(addScores(all))
+  }
+
+  /** Every game is over: save the result, the card and any new badges, then show the results. */
   const finish = (score: Score) => {
     const store = useStore.getState()
     const before = selectActiveData(store)
@@ -58,31 +88,44 @@ export function Play() {
 
     const result: BuildingResult = { completed: true, retries, score }
     store.recordResult(id, result)
-    store.addExtra('cards', scene.card.id)
+    store.addExtra('cards', card.id)
     const after = selectActiveData(useStore.getState())
     const newBadges = badgesFor(result, after?.progress ?? {}, buildings).filter((b) => !before?.extras.badges.includes(b))
     newBadges.forEach((b) => store.addExtra('badges', b))
 
     const nowOpen = next !== null && isUnlocked(next, buildings, after?.progress ?? {}, store.demo)
-    setSummary({ stars: starsFor(result), score, retries, newBadges, unlocked: !wasOpen && nowOpen })
+    const stars = starsFor(result)
+    const name = (buildingId: string | null) => buildings.find((b) => b.id === buildingId)?.name ?? null
+    // Only announce a place as open if its story exists, so the door really opens.
+    const opened = !wasOpen && nowOpen && next !== null && getScene(next) !== null ? name(next) : null
+    setSummary({ stars, score, retries, newBadges, unlocked: opened !== null })
+    // What the town celebrates when the player walks back out (shown once).
+    setCelebration({ place: name(id) ?? scene.title, stars, opened, tone: scene.tone })
     setStage('results')
   }
 
   const again = () => {
     setStage('scene')
     setSummary(null)
+    setCelebration(null)
     setRetries(0)
+    setScores([])
     setRun((n) => n + 1)
   }
 
+  if (stage === 'scene') return <Scene key={run} scene={scene} onComplete={onComplete} onExit={onExit} map={map} />
+
+  // The card, quiz and results sit in front of the scene's picture.
   return (
-    <Page title={scene.title} wide={stage === 'scene'}>
-      {stage === 'scene' && <Scene key={run} scene={scene} onComplete={onComplete} onExit={onExit} />}
-      {stage === 'card' && <CardReveal card={scene.card} band={profile.band} right={scene.right} onNext={() => setStage('quiz')} />}
-      {stage === 'quiz' && <Quiz questions={questionsForBand(scene.games[0]?.questions ?? [], profile.band)} onDone={finish} />}
-      {stage === 'results' && summary && (
-        <Results name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
-      )}
-    </Page>
+    <GameFrame scene={scene} focusX={scene.width / 2}>
+      <div className="mx-auto max-w-3xl rounded-2xl bg-plaster p-5 text-ink shadow-2xl md:p-8">
+        {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('games')} />}
+        {stage === 'games' && game?.kind === 'quiz' && <Quiz key={game.id} questions={questionsForBand(game.questions, profile.band)} onDone={gameDone} />}
+        {stage === 'games' && game?.kind === 'sort' && <Sort key={game.id} game={game} onDone={gameDone} />}
+        {stage === 'results' && summary && (
+          <Results from={id} celebration={celebration} name={profile.firstName} avatar={profile.avatar} summary={summary} tone={scene.tone} onAgain={again} />
+        )}
+      </div>
+    </GameFrame>
   )
 }

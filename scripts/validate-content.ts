@@ -10,7 +10,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { SceneDef, StoryNode } from '../content/types.ts'
+import type { SceneDef, SortGame, StoryNode } from '../content/types.ts'
 
 const TONES = ['normal', 'gentle']
 const MOODS = ['neutral', 'happy', 'worried', 'surprised', 'sad']
@@ -90,6 +90,11 @@ export function validateScene(raw: unknown): string[] {
   if (scene.intro !== undefined && !nodeExists(scene.intro)) fail(`"intro" points to missing node "${String(scene.intro)}"`)
 
   const flagsSet = new Set<string>()
+  // Flags the host sets from saved progress count as set (they are used by showIf/hideIf and art).
+  if (scene.hostFlags !== undefined) {
+    if (!isStringList(scene.hostFlags)) fail('"hostFlags" must be a list of flags')
+    else scene.hostFlags.forEach((flag) => flagsSet.add(flag))
+  }
   for (const [key, node] of Object.entries(nodes)) {
     const where = `node "${key}"`
     if (!isObject(node)) {
@@ -149,6 +154,9 @@ export function validateScene(raw: unknown): string[] {
       if (h?.kind === 'npc' && !isText(h.npc)) fail(`${where} is an npc and needs "npc"`)
       if (h?.kind !== 'exit' && h?.node === undefined) fail(`${where} needs a "node" to open`)
       if (h?.node !== undefined && !nodeExists(h.node)) fail(`${where}.node points to missing node "${h.node}"`)
+      if (h?.lockedNode !== undefined && !nodeExists(h.lockedNode)) fail(`${where}.lockedNode points to missing node "${h.lockedNode}"`)
+      if (h?.lockedNode !== undefined && h.kind !== 'exit') fail(`${where} has a lockedNode but is not an exit`)
+      if (h?.to !== undefined && !isText(h.to)) fail(`${where}.to must be non-empty text`)
       for (const list of ['showIf', 'hideIf'] as const) {
         const flags = h?.[list]
         if (flags === undefined) continue
@@ -174,20 +182,28 @@ export function validateScene(raw: unknown): string[] {
     })
   }
 
-  // Card
-  if (!isObject(scene.card)) fail('"card" is missing')
+  if (scene.hub !== undefined && typeof scene.hub !== 'boolean') fail('"hub" must be true or false')
+  const isHub = scene.hub === true
+
+  // Card (every scene except a hub)
+  if (isHub) {
+    if (scene.card !== undefined || scene.games !== undefined) fail('a hub has no "card" or "games"')
+  } else if (!isObject(scene.card)) fail('"card" is missing')
   else {
     for (const field of CARD_FIELDS) if (!isText(scene.card[field])) fail(`card.${field} must be non-empty text`)
     validateReview(scene.card.review).forEach((p) => fail(`card.review ${p}`))
   }
 
-  // Games
-  if (!Array.isArray(scene.games) || scene.games.length === 0) {
+  // Games (every scene except a hub)
+  if (isHub) {
+    // nothing to check
+  } else if (!Array.isArray(scene.games) || scene.games.length === 0) {
     fail('"games" must list at least one game')
   } else {
     if (!scene.games.some((g) => g?.kind === 'quiz')) fail('"games" must include a quiz')
     scene.games.forEach((game, gi) => {
-      if (game?.kind !== 'quiz') return fail(`games[${gi}] has unknown kind "${String(game?.kind)}"`)
+      if (game?.kind === 'sort') return validateSort(game, fail)
+      if (game?.kind !== 'quiz') return fail(`games[${gi}] has unknown kind "${String((game as { kind?: unknown } | undefined)?.kind)}"`)
       if (!isText(game.id)) fail(`games[${gi}] needs an "id"`)
       if (!Array.isArray(game.questions) || game.questions.length === 0) {
         return fail(`quiz "${game.id}" needs questions`)
@@ -212,6 +228,30 @@ export function validateScene(raw: unknown): string[] {
   }
 
   return errors
+}
+
+/** A sort game: two boxes, at least 3 items, each item going into one of the boxes, and both boxes used. */
+function validateSort(game: SortGame, fail: (message: string) => void) {
+  const where = `sort "${String(game.id)}"`
+  if (!isText(game.id)) fail('a sort game needs an "id"')
+  if (!isText(game.prompt)) fail(`${where} needs a "prompt"`)
+  if (!Array.isArray(game.bins) || game.bins.length !== 2 || !game.bins.every((b) => isText(b?.id) && isText(b?.label))) {
+    return fail(`${where} needs exactly 2 "bins", each with an "id" and a "label"`)
+  }
+  if (game.bins[0].id === game.bins[1].id) fail(`${where} has two bins with the same id`)
+  if (!Array.isArray(game.items) || game.items.length < 3) return fail(`${where} needs at least 3 items`)
+  const bins = new Set(game.bins.map((b) => b.id))
+  const ids = new Set<string>()
+  game.items.forEach((item, i) => {
+    const at = `${where} item "${item?.id ?? i}"`
+    if (!isText(item?.id)) fail(`${where} items[${i}] needs an "id"`)
+    else if (ids.has(item.id)) fail(`${at} is duplicated`)
+    else ids.add(item.id)
+    if (!isText(item?.text)) fail(`${at} needs "text"`)
+    if (!isText(item?.explanation)) fail(`${at} needs an "explanation"`)
+    if (!bins.has(item?.bin)) fail(`${at}.bin must be one of the bins`)
+  })
+  for (const bin of bins) if (!game.items.some((item) => item?.bin === bin)) fail(`${where} has no items for bin "${bin}"`)
 }
 
 /** Follows next/choices from the start node and reports whether an end: "good" node is reachable. */
@@ -247,6 +287,15 @@ export function validateBuildings(raw: unknown): string[] {
   })
   if (isObject(raw[0]) && raw[0].teaser === true) errors.push('the first building must be playable (it is always unlocked)')
   return errors
+}
+
+/** A hub's doors must lead somewhere real: a building in buildings.json, or "help". */
+export function validateHubLinks(raw: unknown, buildingIds: Set<string>): string[] {
+  if (!isObject(raw) || raw.hub !== true || !Array.isArray(raw.hotspots)) return []
+  return (raw.hotspots as Partial<SceneDef['hotspots'][number]>[])
+    .filter((h) => h?.kind === 'exit')
+    .filter((h) => h.to !== 'help' && !(typeof h.to === 'string' && buildingIds.has(h.to)))
+    .map((h) => `hub door "${String(h.id)}" leads to "${String(h.to)}", which is not a building or "help"`)
 }
 
 // ---------------------------------------------------------------- people
@@ -381,6 +430,8 @@ function main(): void {
   const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'))
 
   const npcIds = new Set(Object.keys(readJson(join(root, 'content', 'npcs.json')) as object))
+  const buildingsRaw = readJson(join(root, 'content', 'buildings.json'))
+  const buildingIds = new Set(Array.isArray(buildingsRaw) ? buildingsRaw.map((b: { id?: unknown }) => String(b?.id)) : [])
   const sceneFiles = listFiles(join(root, 'content', 'scenes'), (n) => n.endsWith('.json'))
   for (const file of sceneFiles) {
     let scene: unknown
@@ -390,7 +441,9 @@ function main(): void {
       problems.push(`${relative(root, file)}: not valid JSON (${(error as Error).message})`)
       continue
     }
-    for (const p of [...validateScene(scene), ...validatePeople(scene, npcIds)]) problems.push(`${relative(root, file)}: ${p}`)
+    for (const p of [...validateScene(scene), ...validatePeople(scene, npcIds), ...validateHubLinks(scene, buildingIds)]) {
+      problems.push(`${relative(root, file)}: ${p}`)
+    }
   }
 
   const sourceFiles = listFiles(join(root, 'src'), (n) => /\.tsx?$/.test(n) && !n.includes('.test.'))

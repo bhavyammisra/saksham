@@ -1,8 +1,8 @@
 [
-  { "id": "school", "name": "The School", "right": "The right to education" },
-  { "id": "dhaba", "name": "The Dhaba", "right": "Freedom from child labour" },
-  { "id": "home", "name": "Home", "right": "The right to be safe" },
-  { "id": "panchayat", "name": "The Panchayat", "right": "Freedom from child marriage" },
-  { "id": "playground", "name": "The Playground", "right": "The right to play", "teaser": true },
-  { "id": "cyber-adda", "name": "Cyber Adda", "right": "Staying safe online", "teaser": true }
+  {"id": "school", "name": "The School", "right": "The right to education", "map": {"x": 1040, "y": 300}},
+  {"id": "dhaba", "name": "The Dhaba", "right": "Freedom from child labour", "map": {"x": 380, "y": 700}},
+  {"id": "home", "name": "Home", "right": "The right to be safe", "map": {"x": 1190, "y": 740}},
+  {"id": "panchayat", "name": "The Panchayat", "right": "Freedom from child marriage", "map": {"x": 470, "y": 250}},
+  {"id": "playground", "name": "The Playground", "right": "The right to play", "teaser": true, "map": {"x": 250, "y": 420}},
+  {"id": "cyber-adda", "name": "Cyber Adda", "right": "Staying safe online", "teaser": true, "map": {"x": 960, "y": 820}}
 ]

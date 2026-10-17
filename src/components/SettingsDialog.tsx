@@ -2,12 +2,11 @@ import { useRef } from 'react'
 import { t, type Lang, type StringKey } from '@/lib/i18n'
 import { useStore, type Settings } from '@/lib/store'
 
-type Toggle = 'sound' | 'music' | 'narration' | 'calmMotion'
+type Toggle = 'sound' | 'music' | 'calmMotion'
 
 const toggles: { key: Toggle; label: StringKey; hint?: StringKey }[] = [
   { key: 'sound', label: 'settings.sound' },
   { key: 'music', label: 'settings.music' },
-  { key: 'narration', label: 'settings.narration' },
   { key: 'calmMotion', label: 'settings.calmMotion', hint: 'settings.calmMotionHint' },
 ]
 
@@ -17,16 +16,21 @@ const languages: { lang: Lang; label: StringKey }[] = [{ lang: 'en', label: 'lan
 /**
  * The settings button and its dialog. Uses the browser's <dialog>, which
  * traps focus, closes on Escape and returns focus to the button by itself.
+ * `menuItem` draws it as a plain word instead of the gear button (the title menu's "Settings").
  */
-export function SettingsDialog() {
+export function SettingsDialog({ menuItem }: { menuItem?: { label: string; className: string } }) {
   const dialog = useRef<HTMLDialogElement>(null)
-  const settings = useStore((s) => s.settings)
-  const updateSettings = useStore((s) => s.updateSettings)
 
   return (
     <>
+      {menuItem && (
+        <button type="button" onClick={() => dialog.current?.showModal()} className={menuItem.className}>
+          {menuItem.label}
+        </button>
+      )}
       <button
         type="button"
+        hidden={!!menuItem}
         onClick={() => dialog.current?.showModal()}
         className="inline-flex min-h-tap min-w-tap shrink-0 items-center justify-center gap-2 rounded-pill border-2 border-sand bg-plaster px-3 font-semibold text-ink hover:bg-marigold-soft sm:px-4"
       >
@@ -44,35 +48,7 @@ export function SettingsDialog() {
           {t('settings.title')}
         </h2>
 
-        <ul className="mt-4 space-y-2">
-          {toggles.map(({ key, label, hint }) => (
-            <li key={key}>
-              <SwitchRow
-                label={t(label)}
-                hint={hint ? t(hint) : undefined}
-                on={settings[key]}
-                onChange={(on) => updateSettings({ [key]: on } as Partial<Settings>)}
-              />
-            </li>
-          ))}
-        </ul>
-
-        <fieldset className="mt-6">
-          <legend className="font-semibold">{t('settings.language')}</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {languages.map(({ lang, label }) => (
-              <button
-                key={lang}
-                type="button"
-                aria-pressed={settings.lang === lang}
-                onClick={() => updateSettings({ lang })}
-                className="min-h-tap rounded-button border-2 border-sand px-4 aria-pressed:border-ink aria-pressed:bg-marigold-soft aria-pressed:font-semibold"
-              >
-                {t(label)}
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        <SettingsControls />
 
         <form method="dialog" className="mt-6 text-right">
           <button
@@ -83,6 +59,45 @@ export function SettingsDialog() {
           </button>
         </form>
       </dialog>
+    </>
+  )
+}
+
+/** The settings switches and language choice. Used in the Settings dialog and on the Me page. */
+export function SettingsControls() {
+  const settings = useStore((s) => s.settings)
+  const updateSettings = useStore((s) => s.updateSettings)
+  return (
+    <>
+      <ul className="mt-4 space-y-2">
+        {toggles.map(({ key, label, hint }) => (
+          <li key={key}>
+            <SwitchRow
+              label={t(label)}
+              hint={hint ? t(hint) : undefined}
+              on={settings[key]}
+              onChange={(on) => updateSettings({ [key]: on } as Partial<Settings>)}
+            />
+          </li>
+        ))}
+      </ul>
+
+      <fieldset className="mt-6">
+        <legend className="font-semibold">{t('settings.language')}</legend>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {languages.map(({ lang, label }) => (
+            <button
+              key={lang}
+              type="button"
+              aria-pressed={settings.lang === lang}
+              onClick={() => updateSettings({ lang })}
+              className="min-h-tap rounded-button border-2 border-sand px-4 aria-pressed:border-ink aria-pressed:bg-marigold-soft aria-pressed:font-semibold"
+            >
+              {t(label)}
+            </button>
+          ))}
+        </div>
+      </fieldset>
     </>
   )
 }

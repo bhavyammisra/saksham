@@ -1,10 +1,12 @@
 import { Link } from 'react-router'
 import type { Tone } from '@content/types'
 import { Portrait } from '@/character/Portrait'
+import type { Celebration } from '@/components/ReturnCelebration'
 import type { CharacterSpec } from '@/character/spec'
 import { Button } from '@/components/Button'
 import { t, type StringKey } from '@/lib/i18n'
 import type { BadgeId, Score } from '@/lib/rules'
+import { BADGE_TEXT } from './badgeText'
 import './play.css'
 
 /** What one play-through earned (worked out by the Play screen when the quiz ends). */
@@ -16,14 +18,6 @@ export interface Summary {
   unlocked: boolean // the next building opened just now
 }
 
-const BADGE_TEXT: Record<BadgeId, { name: StringKey; about: StringKey }> = {
-  'first-steps': { name: 'badge.firstSteps', about: 'badge.firstStepsAbout' },
-  'kind-helper': { name: 'badge.kindHelper', about: 'badge.kindHelperAbout' },
-  'quiz-whiz': { name: 'badge.quizWhiz', about: 'badge.quizWhizAbout' },
-  'right-first-time': { name: 'badge.rightFirstTime', about: 'badge.rightFirstTimeAbout' },
-  'all-buildings': { name: 'badge.allBuildings', about: 'badge.allBuildingsAbout' },
-}
-
 // Why each star was given, in the order of the rules (BUILD_PLAN §7).
 const STAR_REASONS: StringKey[] = ['results.starFinish', 'results.starQuiz', 'results.starBest']
 
@@ -33,12 +27,16 @@ const STAR_REASONS: StringKey[] = ['results.starFinish', 'results.starQuiz', 're
  * A `gentle` scene adds a quiet note linking to Need help? (safety rule).
  */
 export function Results({
+  from,
+  celebration,
   name,
   avatar,
   summary,
   tone,
   onAgain,
 }: {
+  from: string // the building just played: the town puts the player back outside its door
+  celebration: Celebration | null // what the town celebrates when the player walks back out
   name: string
   avatar: CharacterSpec
   summary: Summary
@@ -104,7 +102,7 @@ export function Results({
       )}
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link to="/town" className="inline-flex min-h-tap items-center rounded-button bg-terracotta px-5 font-semibold text-white hover:bg-terracotta-deep">
+        <Link to="/town" state={{ from, celebration }} className="inline-flex min-h-tap items-center rounded-button bg-terracotta px-5 font-semibold text-white hover:bg-terracotta-deep">
           {t('play.backToTown')}
         </Link>
         <Button look="secondary" onClick={onAgain}>

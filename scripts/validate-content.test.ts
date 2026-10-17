@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validatePeople, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validateHubLinks, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -163,7 +163,7 @@ describe('NFR-07 content validation: scenes', () => {
   })
 
   it('requires a fact-check record on every card', () => {
-    expect(validateScene(broken((s) => delete (s.card as Partial<SceneDef['card']>).review))).toContain(
+    expect(validateScene(broken((s) => delete (s.card as Partial<NonNullable<SceneDef['card']>>).review))).toContain(
       'card.review is missing (add { status: "unverified", ... } for the owner to fact-check)',
     )
   })
@@ -178,6 +178,37 @@ describe('NFR-07 content validation: scenes', () => {
     expect(validateScene(scene)).toEqual([])
   })
 
+  it('accepts a hub with no card or games, and rejects a hub that has them', () => {
+    const hub = broken((s) => {
+      s.hub = true
+      delete s.card
+      delete s.games
+    })
+    expect(validateScene(hub)).toEqual([])
+    expect(validateScene(broken((s) => (s.hub = true)))).toContain('a hub has no "card" or "games"')
+  })
+
+  it('accepts showIf flags that the host sets (hostFlags), and rejects unknown ones', () => {
+    const scene = broken((s) => {
+      s.hostFlags = ['done:park']
+      s.hotspots[0].showIf = ['done:park']
+    })
+    expect(validateScene(scene)).toEqual([])
+    const bad = broken((s) => (s.hotspots[0].showIf = ['done:park']))
+    expect(validateScene(bad).some((e) => e.includes('uses flag "done:park" that no node sets'))).toBe(true)
+  })
+
+  it("checks an exit's lockedNode", () => {
+    const errors = validateScene(
+      broken((s) => {
+        s.hotspots.push({ id: 'door', x: 600, label: 'Door', kind: 'exit', to: 'park', lockedNode: 'nope' })
+        s.hotspots[0].lockedNode = 'hello'
+      }),
+    )
+    expect(errors).toContain('hotspot "door".lockedNode points to missing node "nope"')
+    expect(errors.some((e) => e.endsWith('has a lockedNode but is not an exit'))).toBe(true)
+  })
+
   it('rejects a quiz answer outside the options', () => {
     expect(validateScene(broken((s) => (s.games[0].questions[0].answer = 2)))).toContain(
       'quiz "test-quiz" question "q1".answer must be an index into options',
@@ -188,6 +219,46 @@ describe('NFR-07 content validation: scenes', () => {
     expect(validateScene(broken((s) => (s.games[0].questions[0].band = 'teen')))).toContain(
       'quiz "test-quiz" has no questions for young players',
     )
+  })
+
+  const sort = {
+    kind: 'sort',
+    id: 'test-sort',
+    prompt: 'Allowed?',
+    bins: [
+      { id: 'ok', label: 'Allowed' },
+      { id: 'no', label: 'Not allowed' },
+    ],
+    items: [
+      { id: 'a', text: 'A', bin: 'ok', explanation: 'Because.' },
+      { id: 'b', text: 'B', bin: 'no', explanation: 'Because.' },
+      { id: 'c', text: 'C', bin: 'no', explanation: 'Because.' },
+    ],
+  }
+  const withSort = (change: (game: typeof sort) => void = () => {}) =>
+    broken((s) => {
+      const game = structuredClone(sort)
+      change(game)
+      s.games.push(game)
+    })
+
+  it('accepts a sort game after the quiz', () => {
+    expect(validateScene(withSort())).toEqual([])
+  })
+
+  it('rejects a sort game with a card for a missing box, or a box with no cards', () => {
+    const errors = validateScene(withSort((g) => (g.items[0]!.bin = 'maybe')))
+    expect(errors).toContain('sort "test-sort" item "a".bin must be one of the bins')
+    expect(errors).toContain('sort "test-sort" has no items for bin "ok"')
+  })
+
+  it('rejects a sort game without exactly two boxes, or with too few cards', () => {
+    expect(validateScene(withSort((g) => g.bins.pop()))).toContain('sort "test-sort" needs exactly 2 "bins", each with an "id" and a "label"')
+    expect(validateScene(withSort((g) => g.items.pop()))).toContain('sort "test-sort" needs at least 3 items')
+  })
+
+  it('rejects a scene with only a sort game', () => {
+    expect(validateScene(broken((s) => (s.games = [structuredClone(sort)])))).toContain('"games" must include a quiz')
   })
 
   it('rejects a scene without a quiz', () => {
@@ -270,5 +341,17 @@ describe('buildings list', () => {
     expect(errors).toContain('building "park" is duplicated')
     expect(errors).toContain('building "park" needs a "name" and a "right"')
     expect(errors).toContain('the first building must be playable (it is always unlocked)')
+  })
+})
+
+describe('hub doors', () => {
+  const hub = { hub: true, hotspots: [{ id: 'a', kind: 'exit', to: 'school' }, { id: 'b', kind: 'exit', to: 'help' }, { id: 'c', kind: 'exit', to: 'moon' }] }
+
+  it('accept buildings and "help", and reject anything else', () => {
+    expect(validateHubLinks(hub, new Set(['school']))).toEqual(['hub door "c" leads to "moon", which is not a building or "help"'])
+  })
+
+  it('ignore scenes that are not hubs', () => {
+    expect(validateHubLinks({ ...hub, hub: false }, new Set())).toEqual([])
   })
 })

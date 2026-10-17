@@ -1,0 +1,22 @@
+{
+  "fonts": [
+    {
+      "name": "Noto Serif",
+      "by": "The Noto project (Google)",
+      "licence": "SIL Open Font License 1.1",
+      "use": "All English text"
+    },
+    {
+      "name": "Noto Serif Devanagari",
+      "by": "The Noto project (Google)",
+      "licence": "SIL Open Font License 1.1",
+      "use": "All Hindi text"
+    },
+    {
+      "name": "Inter",
+      "by": "Rasmus Andersson",
+      "licence": "SIL Open Font License 1.1",
+      "use": "Menus and forms before the game"
+    }
+  ]
+}

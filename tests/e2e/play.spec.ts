@@ -1,7 +1,18 @@
 // Playing the School building end to end at /play/school: story, rights card, quiz, results.
 import { expect, test } from '@playwright/test'
+import dhaba from '../../content/scenes/dhaba.json' with { type: 'json' }
+import home from '../../content/scenes/home.json' with { type: 'json' }
+import panchayat from '../../content/scenes/panchayat.json' with { type: 'json' }
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, createPlayer, playStory, strings } from './helpers.ts'
+import town from '../../content/scenes/town.json' with { type: 'json' }
+import { answerQuiz, createPlayer, doThing, openMap, playStory, quizFor, seedPlayer, sortCards, sortFor, strings, talkThrough, thingsToDo } from './helpers.ts'
+
+// These tests play whole scenes, which are heavy without a GPU when tests run in parallel.
+test.describe.configure({ timeout: 60_000 })
+// They run in calm mode (a real setting: no typewriter, nothing ambient moving), so lines appear
+// at once and the page holds still. The game logic is the same; motion is covered by
+// scene.spec.ts and town.spec.ts, which run with it on.
+test.use({ reducedMotion: 'reduce' })
 
 test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results that survive a reload', async ({ page }) => {
   await createPlayer(page, 'Asha') // young band: 4 questions
@@ -22,18 +33,30 @@ test('FR-05 / FR-06 / FR-07 School: story, card flip, quiz, and saved results th
   await answerQuiz(page, [true, true, true, false])
   await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
   await expect(page.getByText(strings['badge.firstSteps'])).toBeVisible()
+  // Finishing the School opens the Dhaba (its story exists, so the game says so).
   await expect(page.getByText(strings['results.unlocked'])).toBeVisible()
 
-  // Back in the town: School shows its stars, the Dhaba is now open, Home is still locked.
+  // Back in the town: Mitthu celebrates once; School shows its stars, the Dhaba is now open, Home is still locked.
   await page.getByRole('link', { name: strings['play.backToTown'] }).click()
   await expect(page).toHaveURL(/#\/town$/)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(strings['town.title'])
-  await expect(page.getByText(strings['town.stars'].replace('{n}', '2'))).toBeAttached()
-  await expect(page.getByText(strings['town.beingBuilt'])).toBeVisible()
-  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The Dhaba'))).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(town.title)
+  const celebration = page.getByRole('status').filter({ hasText: strings['town.welcomeBack'].replace('{name}', 'Asha') })
+  await expect(celebration).toContainText(strings['town.earned'].replace('{n}', '2').replace('{place}', 'The School'))
+  await expect(celebration).toContainText(strings['town.nowOpen'].replace('{place}', 'The Dhaba'))
+  await page.getByRole('button', { name: strings['town.celebrateClose'] }).click()
+  await expect(celebration).toHaveCount(0)
+  // Lata now stands outside the School, and the town has changed.
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Talk to Lata' })).toBeVisible()
+  // The map: the School has its stars, the Dhaba is open, Home is still locked.
+  let map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.stars'].replace('{n}', '2')))
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The Dhaba')}`) })).toBeVisible()
+  await expect(map.getByRole('button', { name: /^Home: / })).toHaveAccessibleName(new RegExp(strings['town.lockedAfter'].replace('{name}', 'The Dhaba')))
 
   await page.reload()
-  await expect(page.getByRole('link', { name: strings['town.playAgain'].replace('{name}', 'The School') })).toBeVisible()
+  map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.stars'].replace('{n}', '2')))
+  await expect(page.getByRole('button', { name: strings['town.celebrateClose'] })).toHaveCount(0) // only once
   const saved = await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('saksham') ?? '{}').state
     return s.data[s.activeProfileId]
@@ -75,14 +98,99 @@ test('FR-05 / FR-06 teen players see the teen card text and the teen-only questi
 test('FR-07 a locked building cannot be played', async ({ page }) => {
   await createPlayer(page, 'Asha')
   await page.goto('/#/play/dhaba')
-  await expect(page.getByText(strings['play.locked'])).toBeVisible()
+  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The School'))).toBeVisible()
+  await expect(page.getByTestId('help-button')).toBeVisible()
 })
 
 test('FR-07 the town starts with only the School open, and links to it', async ({ page }) => {
   await createPlayer(page, 'Asha')
-  await expect(page.getByText(strings['town.suggest'])).toBeVisible()
-  await expect(page.getByText(strings['town.comingSoon'])).toHaveCount(2)
-  await expect(page.getByText(strings['town.lockedAfter'].replace('{name}', 'The School'))).toBeVisible()
-  await page.getByRole('link', { name: strings['town.visit'].replace('{name}', 'The School') }).click()
+  const map = await openMap(page)
+  await expect(map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) })).toHaveAccessibleName(new RegExp(strings['town.suggest']))
+  await expect(map.getByRole('button', { name: new RegExp(strings['town.comingSoon']) })).toHaveCount(2)
+  await expect(map.getByRole('button', { name: /^The Dhaba: / })).toHaveAccessibleName(new RegExp(strings['town.lockedAfter'].replace('{name}', 'The School')))
+  await map.getByRole('button', { name: new RegExp(`^${strings['map.travel'].replace('{place}', 'The School')}`) }).click()
   await expect(page).toHaveURL(/#\/play\/school$/)
+})
+
+test('FR-04 / FR-07 the Dhaba (after the School) plays in the gentle tone, and its results point to Need help?', async ({ page }) => {
+  await seedPlayer(page, '/play/dhaba', { school: true })
+  await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(dhaba.nodes.intro.text)
+  await talkThrough(page)
+  for (const label of ['Talk to the boy washing glasses', 'Look at the notebook on the shelf']) {
+    await doThing(page, label)
+    await talkThrough(page)
+  }
+  await doThing(page, 'Ask Sunita Didi for help')
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Raju is twelve/ }).click()
+  await talkThrough(page)
+
+  await page.getByRole('button', { name: strings['card.flip'] }).click()
+  await expect(page.locator('blockquote')).toHaveText(dhaba.card.law)
+  await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
+  await answerQuiz(page, [true, true, true, true], quizFor(dhaba))
+  // Then the sort game: every card in the right box.
+  await sortCards(page, sortFor(dhaba), [true, true, true, true, true])
+
+  // No retries and every answer right: 3 stars. Gentle scenes add a quiet link to Help.
+  await expect(page.getByText(strings['results.stars'].replace('{n}', '3')).last()).toBeVisible()
+  await expect(page.getByText(strings['results.gentle'])).toBeVisible()
+  await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
+})
+
+test('FR-04 / FR-07 Home (after the Dhaba) plays in the gentle tone: the child listens and tells a trusted adult', async ({ page }) => {
+  await seedPlayer(page, '/play/home', { dhaba: true })
+  await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(home.nodes.intro.text)
+  await talkThrough(page)
+  // Farida Aunty only takes the request once the player has listened to Anu.
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Ask Farida Aunty for help' })).toHaveCount(0)
+  for (const label of ['Talk to the girl by the stairs', 'Look at the drawing by the letterboxes']) {
+    await doThing(page, label)
+    await talkThrough(page)
+  }
+  await doThing(page, 'Ask Farida Aunty for help')
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Nothing\. It's a family thing/ }).click()
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Anu is scared to go home/ }).click()
+  await talkThrough(page)
+
+  await page.getByRole('button', { name: strings['card.flip'] }).click()
+  await expect(page.getByRole('heading', { name: home.card.title })).toBeVisible()
+  await expect(page.locator('blockquote')).toHaveText(home.card.law)
+  await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
+  await answerQuiz(page, [true, true, true, true], quizFor(home))
+
+  // One retry: 2 stars. Gentle scenes add a quiet link to Help.
+  await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
+  await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
+})
+
+test('FR-04 / FR-07 the Panchayat (after Home) plays in the gentle tone: the child listens and tells the Sarpanch', async ({ page }) => {
+  await seedPlayer(page, '/play/panchayat', { home: true })
+  await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Mitthu:' }).first()).toContainText(panchayat.nodes.intro.text)
+  await talkThrough(page)
+  // The Sarpanch only takes the request once the player has listened to Pooja.
+  await expect((await thingsToDo(page)).getByRole('button', { name: 'Ask Sarpanch Kavita ji for help' })).toHaveCount(0)
+  for (const label of ['Talk to the girl under the tree', 'Pick up the paper on the bench', 'Talk to Sonu']) {
+    await doThing(page, label)
+    await talkThrough(page)
+  }
+  await doThing(page, 'Ask Sarpanch Kavita ji for help')
+  await talkThrough(page)
+  await page.getByRole('button', { name: /^Pooja is only fifteen/ }).click()
+  await talkThrough(page)
+
+  await page.getByRole('button', { name: strings['card.flip'] }).click()
+  await expect(page.getByRole('heading', { name: panchayat.card.title })).toBeVisible()
+  await expect(page.locator('blockquote')).toHaveText(panchayat.card.law)
+  await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
+  await answerQuiz(page, [true, true, true, true], quizFor(panchayat))
+  // Then the sort game: the first card dragged into its box, the rest tapped, one in the wrong box.
+  await sortCards(page, sortFor(panchayat), [true, true, false, true, true], true)
+
+  // No retries and 8 of 9 right (89%, under 90%): 2 stars. Gentle scenes add a quiet link to Help.
+  await expect(page.getByText(strings['results.score'].replace('{correct}', '8').replace('{total}', '9'))).toBeVisible()
+  await expect(page.getByText(strings['results.stars'].replace('{n}', '2')).last()).toBeVisible()
+  await expect(page.getByRole('link', { name: strings['results.gentleLink'] })).toHaveAttribute('href', '#/help')
 })

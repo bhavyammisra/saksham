@@ -1,0 +1,279 @@
+{
+  "id": "home",
+  "title": "Home",
+  "right": "The right to be safe",
+  "tagline": "Help Anu feel safe at home.",
+  "tone": "gentle",
+  "width": 3400,
+  "layers": [
+    { "id": "sky", "art": "modern.skyEvening", "speed": 0 },
+    { "id": "clouds", "art": "modern.clouds", "speed": 0.08, "drift": true },
+    { "id": "far", "art": "modern.far", "speed": 0.3 },
+    { "id": "stage", "art": "home.courtyard", "speed": 1 },
+    { "id": "front", "art": "modern.front", "speed": 1.25, "front": true }
+  ],
+  "walkable": { "minX": 150, "maxX": 3250 },
+  "spawn": { "x": 420 },
+  "ambience": "home",
+  "hotspots": [
+    { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
+    { "id": "kabir", "x": 900, "label": "Talk to Kabir", "kind": "npc", "npc": "kabir", "node": "kabir-hello", "depth": 0.5 },
+    { "id": "farida-busy", "x": 1500, "label": "Say hello to Farida Aunty", "kind": "npc", "npc": "farida-aunty", "node": "farida-busy", "hideIf": ["met-anu"] },
+    { "id": "farida", "x": 1500, "label": "Ask Farida Aunty for help", "kind": "npc", "npc": "farida-aunty", "node": "farida-hello", "showIf": ["met-anu"] },
+    { "id": "drawing", "x": 2250, "label": "Look at the drawing by the letterboxes", "kind": "object", "art": "home.drawing", "node": "drawing" },
+    { "id": "anu", "x": 2800, "label": "Talk to the girl by the stairs", "kind": "npc", "npc": "anu", "node": "anu-hello", "hideIf": ["met-anu"], "depth": 0.2 },
+    { "id": "anu-again", "x": 2800, "label": "Talk to Anu", "kind": "npc", "npc": "anu", "node": "anu-again", "showIf": ["met-anu"], "depth": 0.2 }
+  ],
+  "objectives": [
+    { "id": "meet-anu", "text": "Talk to the girl by the stairs", "requires": ["met-anu"] },
+    { "id": "drawing", "text": "Look at the drawing by the letterboxes", "requires": ["saw-drawing"] },
+    { "id": "ask-farida", "text": "Ask Farida Aunty how to help Anu", "requires": ["asked-farida"] }
+  ],
+  "startNode": "anu-hello",
+  "intro": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Home! This is your building. Everyone is back from school and the courtyard is busy. Hmm, why is Anu standing all alone by the stairs?",
+      "end": "good"
+    },
+
+    "kabir-hello": {
+      "id": "kabir-hello",
+      "speaker": "kabir",
+      "mood": "neutral",
+      "text": "Want to play cricket? Anu used to play with us every evening. Now she just stands by the stairs. I think something is wrong.",
+      "end": "good"
+    },
+
+    "farida-busy": {
+      "id": "farida-busy",
+      "speaker": "farida-aunty",
+      "mood": "happy",
+      "text": "Hello! Back from school? I'm just watering my plants before my shift at the health centre.",
+      "end": "good"
+    },
+
+    "anu-hello": {
+      "id": "anu-hello",
+      "speaker": "anu",
+      "mood": "sad",
+      "text": "Oh, hi. I'm fine. I just don't want to go upstairs yet.",
+      "next": "player-anu"
+    },
+    "player-anu": {
+      "id": "player-anu",
+      "speaker": "player",
+      "text": "You don't look fine. You can tell me, if you want.",
+      "next": "anu-2"
+    },
+    "anu-2": {
+      "id": "anu-2",
+      "speaker": "anu",
+      "mood": "sad",
+      "text": "When I make a mistake, my uncle gets really angry. He hits me. Yesterday it was because I spilled the milk.",
+      "next": "anu-3"
+    },
+    "anu-3": {
+      "id": "anu-3",
+      "speaker": "anu",
+      "mood": "worried",
+      "text": "He says it's a family secret and I mustn't tell anyone. I'm scared to go home.",
+      "set": ["met-anu"],
+      "next": "player-anu-2"
+    },
+    "player-anu-2": {
+      "id": "player-anu-2",
+      "speaker": "player",
+      "text": "I'm glad you told me. It's not your fault.",
+      "next": "mitthu-anu"
+    },
+    "mitthu-anu": {
+      "id": "mitthu-anu",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Nobody is allowed to hurt Anu. And this is a secret she should not have to keep. Let's find a grown-up we can trust.",
+      "end": "good"
+    },
+    "anu-again": {
+      "id": "anu-again",
+      "speaker": "anu",
+      "mood": "neutral",
+      "text": "Thank you for listening. I feel a little better already.",
+      "end": "good"
+    },
+
+    "drawing": {
+      "id": "drawing",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "A drawing by Anu, pinned up by the letterboxes. Her family is big and colourful. Anu drew herself very small in the corner, under a grey cloud.",
+      "set": ["saw-drawing"],
+      "end": "good"
+    },
+
+    "farida-hello": {
+      "id": "farida-hello",
+      "speaker": "farida-aunty",
+      "mood": "happy",
+      "text": "You look worried. Is something wrong?",
+      "choices": [
+        { "label": "Nothing. It's a family thing, so it's not our business.", "to": "farida-weak-1", "kind": "weak" },
+        { "label": "Anu should be more careful, so she doesn't make mistakes.", "to": "farida-weak-2", "kind": "weak" },
+        {
+          "label": "Anu is scared to go home. Her uncle hits her when she makes a mistake, and he told her to keep it a secret. Can you help her?",
+          "to": "farida-good",
+          "kind": "good"
+        }
+      ]
+    },
+    "farida-weak-1": {
+      "id": "farida-weak-1",
+      "speaker": "farida-aunty",
+      "mood": "neutral",
+      "text": "All right. But if something is worrying you, you can always tell me.",
+      "next": "mitthu-retry-1"
+    },
+    "mitthu-retry-1": {
+      "id": "mitthu-retry-1",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "When a child is being hurt, helping is everyone's business. Let's try that again.",
+      "end": "retry"
+    },
+    "farida-weak-2": {
+      "id": "farida-weak-2",
+      "speaker": "farida-aunty",
+      "mood": "worried",
+      "text": "Everyone makes mistakes. That's how children learn. Tell me, what happened?",
+      "next": "mitthu-retry-2"
+    },
+    "mitthu-retry-2": {
+      "id": "mitthu-retry-2",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "It is never Anu's fault when someone hurts her. Farida Aunty needs to know what is really happening. Let's try that again.",
+      "end": "retry"
+    },
+    "farida-good": {
+      "id": "farida-good",
+      "speaker": "farida-aunty",
+      "mood": "neutral",
+      "text": "Thank you for telling me. Telling was the right thing to do, even though it was a secret.",
+      "set": ["asked-farida"],
+      "next": "farida-good-2"
+    },
+    "farida-good-2": {
+      "id": "farida-good-2",
+      "speaker": "farida-aunty",
+      "mood": "neutral",
+      "text": "Nobody is allowed to hurt a child. Not a stranger, not a teacher, not even family. And it is never the child's fault.",
+      "next": "farida-good-3"
+    },
+    "farida-good-3": {
+      "id": "farida-good-3",
+      "speaker": "farida-aunty",
+      "mood": "happy",
+      "text": "I'll sit with Anu now, and talk to her mother this evening. If Anu isn't safe at home, we will call 1098 together. People there are trained to help keep children safe.",
+      "next": "player-good"
+    },
+    "player-good": {
+      "id": "player-good",
+      "speaker": "player",
+      "text": "Can I sit with Anu too?",
+      "next": "farida-good-4"
+    },
+    "farida-good-4": {
+      "id": "farida-good-4",
+      "speaker": "farida-aunty",
+      "mood": "happy",
+      "text": "Of course. A good friend helps a lot.",
+      "next": "mitthu-good"
+    },
+    "mitthu-good": {
+      "id": "mitthu-good",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "A few weeks later, Anu is back to playing cricket in the courtyard. Home feels calmer now, and she knows who she can talk to.",
+      "end": "good"
+    }
+  },
+  "card": {
+    "id": "right-to-be-safe",
+    "title": "No one is allowed to hurt you",
+    "kid": "No one is allowed to hurt a child: not a stranger, not a teacher, not even family. If someone hurts you, it is never your fault. Some secrets are not okay to keep, so tell a grown-up you trust.",
+    "teen": "In India, it is a crime for anyone who has charge of a child or control over a child to assault, abuse, abandon or wilfully neglect them in a way likely to cause unnecessary mental or physical suffering. This includes family members. The Constitution also asks the State to protect children against exploitation and abandonment, so they can grow up in freedom and dignity. Anyone can call 1098 to get help for a child.",
+    "ifItHappens": "If someone hurts you, or a friend tells you they are being hurt, tell a grown-up you trust: a teacher, a neighbour, or someone in your family you feel safe with. You can also call 1098 for free, at any time. It is never your fault.",
+    "law": "Article 39(f), Constitution of India: \"The State shall, in particular, direct its policy towards securing— (f) that children are given opportunities and facilities to develop in a healthy manner and in conditions of freedom and dignity and that childhood and youth are protected against exploitation and against moral and material abandonment.\"\n\nSection 75, Juvenile Justice (Care and Protection of Children) Act, 2015: \"Whoever, having the actual charge of, or control over, a child, assaults, abandons, abuses, exposes or wilfully neglects the child or causes or procures the child to be assaulted, abandoned, abused, exposed or neglected in a manner likely to cause such child unnecessary mental or physical suffering, shall be punishable […]\"",
+    "source": "Constitution of India, Article 39(f). The Juvenile Justice (Care and Protection of Children) Act, 2015: section 75.",
+    "review": {
+      "status": "unverified",
+      "checkedBy": null,
+      "checkedOn": null,
+      "note": "Written by Claude, 2026-10-16. Both quotes in card.law were compared with two secondary sources each and match word for word (Article 39: constitutionofindia.net; section 75: lawx.in, and the same opening on courtbook.in and lawrato.com). The official texts were not opened. Section 75 is quoted only up to \"shall be punishable\": the penalties are deliberately left out, as in the Dhaba card. Check every item in \"checks\" against the Constitution (https://legislative.gov.in) and India Code (https://www.indiacode.nic.in). Then set status to \"verified\" with your name and the date (see docs/SETUP.md §6).",
+      "checks": [
+        "card.law: the exact wording of Article 39's opening words and clause (f), quoted.",
+        "card.law: the exact wording of section 75 of the Juvenile Justice (Care and Protection of Children) Act, 2015, quoted up to \"shall be punishable\", with the rest marked […].",
+        "card.teen, quiz: section 75 applies to anyone having the actual charge of, or control over, a child, which includes family members.",
+        "card.kid, card.teen, scene (Farida Aunty): \"Nobody is allowed to hurt a child ... not even family\" is a fair plain-language summary.",
+        "card.teen, quiz: Article 39(f) is a Directive Principle that asks the State to protect children against exploitation and moral and material abandonment (it is described as what the State is asked to do, not as a right a child can take to court).",
+        "card.ifItHappens, scene, quiz: 1098 is the right number to suggest (same check as the Help Centre, SETUP.md §5).",
+        "Scene: the story is told only in words (Anu tells the player); nothing harmful is shown. Read it once more for tone with an 8-year-old in mind."
+      ]
+    }
+  },
+  "games": [
+    {
+      "kind": "quiz",
+      "id": "home-quiz",
+      "questions": [
+        {
+          "id": "allowed",
+          "text": "Anu's uncle hits her when she makes a mistake. Is that allowed?",
+          "options": ["Yes, because he is family.", "No. No one is allowed to hurt a child, not even family.", "Only if it was a big mistake."],
+          "answer": 1,
+          "explanation": "No one is allowed to hurt a child: not a stranger, not a teacher, not even family."
+        },
+        {
+          "id": "fault",
+          "text": "Whose fault is it when a grown-up hurts a child?",
+          "options": ["The child's, for making a mistake", "Never the child's", "Nobody's, it just happens"],
+          "answer": 1,
+          "explanation": "It is never the child's fault. Grown-ups are responsible for keeping children safe."
+        },
+        {
+          "id": "secret",
+          "text": "A friend tells you a secret: someone at home is hurting them. What should you do?",
+          "options": ["Keep the secret, because a promise is a promise", "Tell a grown-up you trust, so they can help", "Tell everyone at school"],
+          "answer": 1,
+          "explanation": "Some secrets are not okay to keep. Telling a grown-up you trust is how you help your friend."
+        },
+        {
+          "id": "helpline",
+          "text": "Who can call 1098?",
+          "options": ["Only the police", "Anyone, at any time, to get help for a child", "Only grown-ups"],
+          "answer": 1,
+          "explanation": "1098 is free, open at any time, and anyone can call it to get help for a child, including children themselves."
+        },
+        {
+          "id": "who-law",
+          "text": "Under the Juvenile Justice Act, 2015, who can be punished for cruelty to a child?",
+          "options": ["Only strangers", "Anyone who has charge of a child or control over them, including family", "No one, if it happens at home"],
+          "answer": 1,
+          "explanation": "Section 75 covers anyone who has the actual charge of, or control over, a child. Being family is no excuse.",
+          "band": "teen"
+        },
+        {
+          "id": "article-39f",
+          "text": "Article 39(f) of the Constitution asks the State to protect children against what?",
+          "options": ["Hard homework", "Exploitation, and moral and material abandonment", "Playing outside"],
+          "answer": 1,
+          "explanation": "Article 39(f) asks the State to make sure children can grow up in freedom and dignity, protected against exploitation and abandonment.",
+          "band": "teen"
+        }
+      ]
+    }
+  ]
+}

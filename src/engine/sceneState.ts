@@ -4,11 +4,12 @@
 //   state + action -> new state      (no timers, no DOM, so it is unit-tested)
 
 import type { Hotspot, SceneDef } from '@content/types'
-import { cameraLeft, moveBy, moveToward, WALK_SPEED } from './movement'
+import { cameraLeft, clampDepth, DEPTH_SPEED, moveBy, moveDepthToward, moveToward, WALK_SPEED } from './movement'
 import {
   advance,
   choose,
   getNode,
+  goBack,
   isHotspotVisible,
   isSceneComplete,
   nearbyHotspot,
@@ -22,17 +23,27 @@ export const HINT_AFTER = 20 // seconds of doing nothing before Mitthu offers a 
 const MITTHU_DISTANCE = 110 // Mitthu flies this far behind the player
 const FX_SECONDS = 1.2 // how long a cheer or gasp lasts
 const STAND_BESIDE = 100 // how far from a hotspot the player stops, so they don't overlap
+const START_DEPTH = 0.6 // the player arrives a little in front of the middle of the walkway
+const NPC_DEPTH = 0.35 // where people stand when the scene doesn't say
+export const ENTER_SECONDS = 0.6 // going in through a door: how long the last steps take, after turning
+
+/** How near the viewer a hotspot stands (0 = against the wall). */
+export function hotspotDepth(h: Hotspot): number {
+  return h.depth ?? (h.kind === 'npc' ? NPC_DEPTH : 0)
+}
 
 export type Facing = 'left' | 'right'
 export type FxPose = 'cheer' | 'gasp'
 
 export interface SceneState {
   x: number
+  depth: number // 0 = far edge of the walkway, 1 = nearest the viewer (W and S, D-036)
   facing: Facing
   walking: boolean
   camera: number // left edge of the view, in design units
   mitthuX: number
   target: number | null // tap-to-walk destination
+  targetDepth: number | null // and how near or far it is
   pending: string | null // hotspot to open on arrival
   story: StoryState
   dialogue: DialogueState | null
@@ -41,30 +52,42 @@ export interface SceneState {
   idleSince: number | null // time (ms) the player last did something; null = restart the clock
   hint: boolean // Mitthu offers a hint after HINT_AFTER seconds of doing nothing
   exit: string | null // an exit hotspot was used
+  entering: string | null // going in through this exit: walking to the door, turning, then in (D-039)
+  enterTime: number // seconds since the player turned to the door
   completed: boolean
+  seen: string[] // every line shown in this visit, in order (the History panel)
 }
 
 export type SceneAction =
-  | { type: 'tick'; now: number; dt: number; dir: -1 | 0 | 1; viewWidth: number; calm: boolean }
-  | { type: 'walkTo'; x: number }
+  | { type: 'tick'; now: number; dt: number; dir: -1 | 0 | 1; dirDepth?: -1 | 0 | 1; viewWidth: number; calm: boolean }
+  | { type: 'walkTo'; x: number; depth?: number }
   | { type: 'use'; hotspotId: string } // tap a hotspot: walk to it, then open it
   | { type: 'jumpTo'; hotspotId: string } // "Things to do here": go there at once and open it
   | { type: 'interactNearby' } // E or Enter
   | { type: 'next' }
+  | { type: 'back' } // the line before, again
   | { type: 'choose'; index: number }
   | { type: 'activity' }
 
-export function initialSceneState(scene: SceneDef): SceneState {
-  const story: StoryState = { flags: new Set(), retries: 0, reachedGood: false }
+/**
+ * `startX` puts the player somewhere other than the scene's spawn point (e.g. back outside a door).
+ * `startFlags` are flags the host sets before anything happens (e.g. "done:school" from saved progress).
+ * `skipIntro` leaves out the arrival line (e.g. coming back to the town, not arriving for the first time).
+ */
+export function initialSceneState(scene: SceneDef, startX?: number, startFlags: readonly string[] = [], skipIntro = false): SceneState {
+  const x = startX !== undefined ? Math.min(scene.walkable.maxX, Math.max(scene.walkable.minX, startX)) : scene.spawn.x
+  const story: StoryState = { flags: new Set(startFlags), retries: 0, reachedGood: false }
   // Arriving: Mitthu introduces the place in one line, if the scene has an intro.
-  const arrival = scene.intro ? startDialogue(scene, scene.intro, story) : { dialogue: null, story }
+  const arrival = scene.intro && !skipIntro ? startDialogue(scene, scene.intro, story) : { dialogue: null, story }
   return {
-    x: scene.spawn.x,
+    x,
+    depth: START_DEPTH,
     facing: 'right',
     walking: false,
     camera: 0,
-    mitthuX: scene.spawn.x - MITTHU_DISTANCE,
+    mitthuX: x - MITTHU_DISTANCE,
     target: null,
+    targetDepth: null,
     pending: null,
     story: arrival.story,
     dialogue: arrival.dialogue,
@@ -73,11 +96,18 @@ export function initialSceneState(scene: SceneDef): SceneState {
     idleSince: null,
     hint: false,
     exit: null,
+    entering: null,
+    enterTime: 0,
     completed: false,
+    seen: arrival.dialogue ? [arrival.dialogue.nodeId] : [],
   }
 }
 
-export function sceneReducer(scene: SceneDef) {
+/**
+ * `locked` lists exit hotspots the host has locked right now (e.g. a building not yet unlocked).
+ * Opening a locked exit plays its `lockedNode` instead of leaving. The engine doesn't know why it is locked.
+ */
+export function sceneReducer(scene: SceneDef, locked: ReadonlySet<string> = new Set()) {
   const find = (id: string) => scene.hotspots.find((h) => h.id === id) ?? null
 
   /** Where to stand to use a hotspot: beside it, on the side the player is coming from. */
@@ -86,11 +116,20 @@ export function sceneReducer(scene: SceneDef) {
     return Math.min(scene.walkable.maxX, Math.max(scene.walkable.minX, h.x + side * STAND_BESIDE))
   }
 
+  /** How near to stand when using a hotspot: just in front of it. */
+  const standDepth = (h: Hotspot) => clampDepth(hotspotDepth(h) + 0.15)
+
   /** Opens a hotspot: an exit ends the scene, anything else starts its conversation. */
   const open = (s: SceneState, h: Hotspot): SceneState => {
     if (!isHotspotVisible(h, s.story.flags)) return s
     const facing: Facing = h.x < s.x ? 'left' : h.x > s.x ? 'right' : s.facing
-    if (h.kind === 'exit') return { ...s, facing, exit: h.id, target: null, pending: null }
+    if (h.kind === 'exit' && locked.has(h.id)) {
+      if (!h.lockedNode) return { ...s, facing }
+      const reply = startDialogue(scene, h.lockedNode, s.story)
+      return withFx({ ...s, facing, target: null, pending: null, idleSince: null, hint: false, walking: false, ...reply }, h.lockedNode)
+    }
+    // An open door: walk to it, turn and go in (the tick finishes it by setting `exit`).
+    if (h.kind === 'exit') return { ...s, facing, entering: h.id, enterTime: 0, target: h.x, targetDepth: 0, pending: null, idleSince: null, hint: false }
     if (!h.node) return s
     const started = startDialogue(scene, h.node, s.story)
     return withFx({ ...s, facing, target: null, pending: null, idleSince: null, hint: false, walking: false, ...started }, h.node)
@@ -114,27 +153,46 @@ export function sceneReducer(scene: SceneDef) {
     completed: s.completed || isSceneComplete(scene, story),
   })
 
+  /** Every action, then: a new line on screen is added to the History. */
   return function reduce(s: SceneState, action: SceneAction): SceneState {
+    const next = step(s, action)
+    const line = next.dialogue?.nodeId
+    if (!line || line === s.dialogue?.nodeId || action.type === 'back') return next
+    return { ...next, seen: [...next.seen, line] }
+  }
+
+  function step(s: SceneState, action: SceneAction): SceneState {
     if (s.exit || s.completed) return s // the scene is over
 
     switch (action.type) {
       case 'tick': {
         const { now, dt, viewWidth, calm } = action
         const talking = s.dialogue !== null
-        const dir = talking ? 0 : action.dir
+        const busy = talking || s.entering !== null // no walking by hand while talking or going in
+        const dir = busy ? 0 : action.dir
+        const dirDepth = busy ? 0 : (action.dirDepth ?? 0)
 
         // Walk: held keys or the walk pad win over tap-to-walk.
-        let { x, target, pending, facing } = s
-        if (dir !== 0) {
+        let { x, depth, target, targetDepth, pending, facing } = s
+        if (dir !== 0 || dirDepth !== 0) {
           target = null
+          targetDepth = null
           pending = null
           x = moveBy(s.x, dir * WALK_SPEED * dt, scene.walkable, scene.blockers)
-        } else if (target !== null && !talking) {
-          x = moveToward(s.x, target, WALK_SPEED * dt, scene.walkable, scene.blockers)
-          if (x === s.x) target = null // arrived, or stopped by a blocker
+          depth = clampDepth(s.depth + dirDepth * DEPTH_SPEED * dt)
+        } else if ((target !== null || targetDepth !== null) && !talking) {
+          if (target !== null) {
+            x = moveToward(s.x, target, WALK_SPEED * dt, scene.walkable, scene.blockers)
+            if (x === s.x) target = null // arrived, or stopped by a blocker
+          }
+          // Going in: first reach the door, then turn and walk up to it.
+          if (targetDepth !== null && !(s.entering && target !== null)) {
+            depth = moveDepthToward(s.depth, targetDepth, DEPTH_SPEED * dt)
+            if (depth === targetDepth) targetDepth = null
+          }
         }
         if (x !== s.x) facing = x > s.x ? 'right' : 'left'
-        const walking = x !== s.x
+        const walking = x !== s.x || depth !== s.depth
 
         // Camera follows smoothly (instantly in calm mode).
         const aim = cameraLeft(x, viewWidth, scene.width)
@@ -150,10 +208,16 @@ export function sceneReducer(scene: SceneDef) {
         const idleSince = walking || s.idleSince === null ? now : s.idleSince
         const hint = !talking && !walking && now - idleSince >= HINT_AFTER * 1000
 
-        let next: SceneState = { ...s, x, facing, walking, camera, mitthuX, target, pending, fx, shake, idleSince, hint }
+        let next: SceneState = { ...s, x, depth, facing, walking, camera, mitthuX, target, targetDepth, pending, fx, shake, idleSince, hint }
+
+        // At the door: the last steps in (the player fades into the doorway), then the scene is left.
+        if (s.entering && target === null && targetDepth === null) {
+          const enterTime = s.enterTime + dt
+          next = enterTime >= ENTER_SECONDS ? { ...next, enterTime, exit: s.entering } : { ...next, enterTime }
+        }
 
         // Arrived at a tapped hotspot: open it.
-        if (pending && target === null) {
+        if (pending && target === null && targetDepth === null) {
           const h = find(pending)
           next = { ...next, pending: null }
           if (h && Math.abs(h.x - x) <= PROMPT_RADIUS) next = open(next, h)
@@ -162,26 +226,34 @@ export function sceneReducer(scene: SceneDef) {
       }
 
       case 'walkTo':
-        if (s.dialogue) return s
-        return { ...s, target: action.x, pending: null, idleSince: null, hint: false }
+        if (s.dialogue || s.entering) return s
+        return {
+          ...s,
+          target: action.x,
+          targetDepth: action.depth === undefined ? null : clampDepth(action.depth),
+          pending: null,
+          idleSince: null,
+          hint: false,
+        }
 
       case 'use': {
         const h = find(action.hotspotId)
-        if (!h || s.dialogue) return s
+        if (!h || s.dialogue || s.entering) return s
         if (Math.abs(h.x - s.x) <= PROMPT_RADIUS) return open(s, h)
-        return { ...s, target: besideSpot(h, s.x), pending: h.id, idleSince: null, hint: false }
+        // Walk beside it, and to about the same distance from the viewer, so the two stand together.
+        return { ...s, target: besideSpot(h, s.x), targetDepth: standDepth(h), pending: h.id, idleSince: null, hint: false }
       }
 
       case 'jumpTo': {
         const h = find(action.hotspotId)
-        if (!h || s.dialogue || !isHotspotVisible(h, s.story.flags)) return s
+        if (!h || s.dialogue || s.entering || !isHotspotVisible(h, s.story.flags)) return s
         // Stand beside it, then open it.
         const x = besideSpot(h, s.x)
-        return open({ ...s, x, mitthuX: x - MITTHU_DISTANCE, target: null, pending: null }, h)
+        return open({ ...s, x, depth: standDepth(h), mitthuX: x - MITTHU_DISTANCE, target: null, targetDepth: null, pending: null }, h)
       }
 
       case 'interactNearby': {
-        if (s.dialogue) return s
+        if (s.dialogue || s.entering) return s
         const h = nearbyHotspot(scene, s.x, s.story.flags)
         return h ? open(s, h) : s
       }
@@ -191,6 +263,12 @@ export function sceneReducer(scene: SceneDef) {
         const result = advance(scene, s.dialogue, s.story)
         if (!result.dialogue) return finishDialogue(s, result.story)
         return withFx({ ...s, dialogue: result.dialogue, story: result.story }, result.dialogue.nodeId)
+      }
+
+      case 'back': {
+        if (!s.dialogue) return s
+        const dialogue = goBack(scene, s.dialogue)
+        return dialogue === s.dialogue ? s : { ...s, dialogue }
       }
 
       case 'choose': {
@@ -209,16 +287,20 @@ export function sceneReducer(scene: SceneDef) {
 function sameAs(a: SceneState, b: SceneState): boolean {
   return (
     a.x === b.x &&
+    a.depth === b.depth &&
     a.facing === b.facing &&
     a.walking === b.walking &&
     Math.abs(a.camera - b.camera) < 0.05 &&
     Math.abs(a.mitthuX - b.mitthuX) < 0.05 &&
     a.target === b.target &&
+    a.targetDepth === b.targetDepth &&
     a.pending === b.pending &&
     a.fx === b.fx &&
     a.shake === b.shake &&
     a.idleSince === b.idleSince &&
     a.hint === b.hint &&
+    a.enterTime === b.enterTime &&
+    a.exit === b.exit &&
     a.dialogue === b.dialogue
   )
 }

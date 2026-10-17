@@ -39,5 +39,138 @@
       "headwear": "none",
       "bag": false
     }
+  },
+  "raju": {
+    "name": "Raju",
+    "look": {
+      "skin": "skin-7",
+      "hair": "short",
+      "hairColor": "soft-black",
+      "outfit": "casual",
+      "outfitColor": "leaf",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "mohan-bhaiya": {
+    "name": "Mohan Bhaiya",
+    "adult": true,
+    "look": {
+      "skin": "skin-5",
+      "hair": "short",
+      "hairColor": "black",
+      "outfit": "kurta",
+      "outfitColor": "marigold",
+      "headwear": "none",
+      "glasses": false,
+      "bag": false
+    }
+  },
+  "sunita-didi": {
+    "name": "Sunita Didi",
+    "adult": true,
+    "look": {
+      "skin": "skin-6",
+      "hair": "bun",
+      "hairColor": "black",
+      "outfit": "salwar",
+      "outfitColor": "rose",
+      "headwear": "dupatta",
+      "headwearColor": "saffron",
+      "glasses": true,
+      "bag": true
+    }
+  },
+  "anu": {
+    "name": "Anu",
+    "look": {
+      "gender": "girl",
+      "skin": "skin-3",
+      "hair": "ponytail",
+      "hairColor": "dark-brown",
+      "outfit": "hoodie",
+      "outfitColor": "mustard",
+      "bottom": "jeans",
+      "bottomColor": "denim",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "kabir": {
+    "name": "Kabir",
+    "look": {
+      "gender": "boy",
+      "skin": "skin-8",
+      "hair": "fade",
+      "hairColor": "black",
+      "outfit": "tshirt",
+      "outfitColor": "rust",
+      "bottom": "joggers",
+      "bottomColor": "charcoal",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "farida-aunty": {
+    "name": "Farida Aunty",
+    "adult": true,
+    "look": {
+      "gender": "girl",
+      "skin": "skin-5",
+      "hair": "bun",
+      "hairColor": "black",
+      "outfit": "kurta",
+      "outfitColor": "peacock",
+      "headwear": "hijab",
+      "headwearColor": "cream",
+      "glasses": true,
+      "bag": false
+    }
+  },
+  "pooja": {
+    "name": "Pooja",
+    "look": {
+      "gender": "girl",
+      "skin": "skin-6",
+      "hair": "plait",
+      "hairColor": "black",
+      "outfit": "shirt",
+      "outfitColor": "sage",
+      "bottom": "trousers",
+      "bottomColor": "charcoal",
+      "headwear": "none",
+      "bag": true
+    }
+  },
+  "sonu": {
+    "name": "Sonu",
+    "look": {
+      "gender": "boy",
+      "skin": "skin-6",
+      "hair": "buzz",
+      "hairColor": "black",
+      "outfit": "tshirt",
+      "outfitColor": "navy",
+      "bottom": "joggers",
+      "bottomColor": "khaki",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "sarpanch-kavita": {
+    "name": "Sarpanch Kavita ji",
+    "adult": true,
+    "look": {
+      "gender": "girl",
+      "skin": "skin-7",
+      "hair": "bun",
+      "hairColor": "black",
+      "outfit": "salwar",
+      "outfitColor": "maroon",
+      "headwear": "dupatta",
+      "headwearColor": "saffron",
+      "glasses": false,
+      "bag": false
+    }
   }
 }

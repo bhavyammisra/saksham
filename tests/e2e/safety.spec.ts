@@ -19,7 +19,6 @@ const ROUTES_WITH_HELP_BUTTON = [
   '/reviewer',
   '/dev/characters',
   '/dev/scene',
-  '/dev/look',
 ]
 
 test.describe('FR-08 / NFR-06 "Need help?" is on every screen except the Help Centre', () => {
@@ -68,7 +67,7 @@ test.describe('NFR-06 the Help Centre is calm and silent', () => {
     await countSounds(page)
     await page.goto('/#/onboarding')
     // Control: a normal button does make a sound.
-    await page.getByRole('button', { name: strings['onboarding.start'] }).click()
+    await page.getByRole('button', { name: strings['onboarding.bandYoung'] }).click()
     await expect.poll(() => soundsStarted(page)).toBeGreaterThan(0)
 
     const before = await soundsStarted(page)
@@ -127,8 +126,8 @@ test.describe('NFR-01 the first name field accepts only a first name', () => {
   for (const bad of ['Asha1', '12345', 'asha@mail.com', 'Ravi!', 'R_K', '😀', 'A'.repeat(21)]) {
     test(`rejects "${bad}"`, async ({ page }) => {
       await page.goto('/#/onboarding')
-      await page.getByRole('button', { name: strings['onboarding.start'] }).click()
       await page.getByLabel(strings['onboarding.nameLabel']).fill(bad)
+      await page.getByRole('button', { name: strings['onboarding.bandYoung'] }).click()
       await page.getByRole('button', { name: strings['onboarding.next'] }).click()
 
       await expect(page.getByRole('alert')).toHaveText(strings['onboarding.nameError'])

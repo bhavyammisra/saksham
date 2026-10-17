@@ -53,6 +53,8 @@ Filled in during Phase 5: create the project, enable anonymous sign-ins and emai
 
 Claude could not open 112.gov.in, cybercrime.gov.in or telemanas.mohfw.gov.in from its tools (connection refused or JavaScript-only pages). The numbers were cross-checked against PIB press releases instead.
 
+**Community page (`content/community.json`), places that help:** read the six places and their descriptions, and check the items in `review.checks` (each place is fair for children across India; 112 and 1098 match the Help Centre). When done, set `review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
 ## 6. Fact-check each rights card ⬜ (owner, before any child uses the app)
 
 Every scene's rights card (`card` in `content/scenes/<id>.json`) has a `review` block, which is never shown in the app. `review.checks` lists each claim to verify. The validator refuses `"verified"` unless `checkedBy` and `checkedOn` are filled in.
@@ -64,3 +66,33 @@ Every scene's rights card (`card` in `content/scenes/<id>.json`) has a `review` 
 3. In the same Act, confirm: ages 6 to 14 (section 3); "elementary education" means Classes 1 to 8 (section 2(f)); no fee may stop a child finishing elementary education (section 3(2)); private unaided schools keep at least 25% of entry-class seats for weaker and disadvantaged groups (section 12(1)(c)).
 4. Read the card text (`kid`, `teen`, `ifItHappens`), Meena Didi's lines (`didi-good-2`) and the six quiz questions. Each must agree with points 1 to 3. Change any wording **in the JSON only**: the app shows it exactly as written.
 5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn` (YYYY-MM-DD).
+
+**Dhaba (`content/scenes/dhaba.json`), freedom from child labour:**
+
+Claude could not open the official PDFs (labour.gov.in, indiacode.nic.in) from its tools, so both quotes were matched only against secondary sources: [constitutionofindia.net](https://www.constitutionofindia.net/constitution_of_india/fundamental_rights/articles/Article%2024) for Article 24, and [lawx.in](https://lawx.in/acts/section/74/660/6272) for section 3(1).
+
+1. `card.law` quotes Article 24 of the Constitution. Check the wording against the Constitution of India (https://legislative.gov.in).
+2. `card.law` quotes section 3(1) of the Child and Adolescent Labour (Prohibition and Regulation) Act, 1986, **as amended in 2016**: "No child shall be employed or permitted to work in any occupation or process." Check it on India Code (https://www.indiacode.nic.in) or the Ministry of Labour and Employment (https://labour.gov.in). The wording before 2016 was different.
+3. In the same Act, confirm: a "child" is under 14 (section 2); the family exception: helping one's family or family enterprise only after school hours or in vacations, and never in hazardous work (section 3(2)(a)); adolescents aged 14 to 18 must not work in hazardous occupations or processes (section 3A).
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Sunita Didi's lines (`sunita-good-2`, `sunita-good-3`), the six quiz questions and the five sort cards (`dhaba-sort`). Each must agree with points 1 to 3. Penalties are deliberately not mentioned anywhere.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
+**Home (`content/scenes/home.json`), the right to be safe:**
+
+Claude compared both quotes with secondary sources only, and both match word for word: [constitutionofindia.net](https://www.constitutionofindia.net/articles/article-39-certain-principles-of-policy-to-be-followed-by-the-state/) for Article 39, and [lawx.in](https://lawx.in/acts/section/114/1026/8855) for section 75 (the same opening also appears on courtbook.in and lawrato.com).
+
+1. `card.law` quotes Article 39's opening words and clause (f) of the Constitution. Check the wording against the Constitution of India (https://legislative.gov.in).
+2. `card.law` quotes section 75 of the Juvenile Justice (Care and Protection of Children) Act, 2015, up to "shall be punishable", with the rest (the penalties) left out and marked […]. Check it on India Code (https://www.indiacode.nic.in).
+3. Confirm that section 75 covers anyone having "the actual charge of, or control over, a child", which includes family members (the card and quiz say so), and that Article 39(f) is described fairly: a Directive Principle, something the State is asked to do.
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Farida Aunty's lines (`farida-good` to `farida-good-3`) and the six quiz questions. Each must agree with points 1 to 3. Also read the whole story once for tone, with an 8-year-old in mind: harm is only told, never shown.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
+**Panchayat (`content/scenes/panchayat.json`), freedom from child marriage:**
+
+Claude compared both quotes word for word with two copies of the Act, and both match: [PRS Legislative Research](https://prsindia.org/files/bills_acts/acts_parliament/2006/the-prohibition-of-child-marriage-act-2006.pdf) and [Indian Kanoon](https://indiankanoon.org/doc/790355/). India Code did not load from Claude's tools.
+
+1. `card.law` quotes section 2(a) and 2(b) of the Prohibition of Child Marriage Act, 2006 (who is a "child", and what a "child marriage" is). Check the wording on India Code (https://www.indiacode.nic.in).
+2. `card.law` also quotes section 13(1) (a magistrate who is satisfied that a child marriage has been arranged or is about to happen must issue an injunction prohibiting it). Check the wording.
+3. In the same Act, confirm: anyone with personal knowledge or reason to believe can complain (section 13(2)); the State appoints Child Marriage Prohibition Officers whose duty includes preventing child marriages (section 16(1), 16(3)(a)); and the State may ask an officer of the Gram Panchayat to assist them (section 16(2)), which is why the Sarpanch goes with the officer in the story.
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Sarpanch Kavita ji's lines (`sarpanch-good` to `sarpanch-good-3`), the six quiz questions and the five sort cards (`panchayat-sort`). Each must agree with points 1 to 3. Penalties are deliberately not mentioned anywhere. Also read the whole story once for tone, with an 8-year-old in mind: no wedding is shown, Pooja only tells the player.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.

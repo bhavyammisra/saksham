@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import sandboxJson from '@content/scenes/sandbox.json'
 import type { Hotspot, SceneDef } from '@content/types'
 import { Button } from '@/components/Button'
-import { Page } from '@/components/Page'
+import { GameFrame } from '@/components/GameFrame'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
 
@@ -17,9 +17,10 @@ export function DevScene() {
   const onExit = useCallback((h: Hotspot) => setMessage(t('dev.sceneExit', { label: h.label })), [])
 
   return (
-    <Page title={t('dev.scene')} wide>
+    <>
       {message ? (
-        <div className="rounded-card bg-plaster-deep p-6">
+        <GameFrame scene={sandbox} focusX={sandbox.spawn.x}>
+        <div className="mx-auto max-w-xl rounded-card bg-plaster p-6 text-ink">
           <p className="text-lg font-semibold" role="status">
             {message}
           </p>
@@ -33,9 +34,10 @@ export function DevScene() {
             {t('dev.sceneRestart')}
           </Button>
         </div>
+        </GameFrame>
       ) : (
         <Scene key={run} scene={sandbox} onComplete={onComplete} onExit={onExit} />
       )}
-    </Page>
+    </>
   )
 }

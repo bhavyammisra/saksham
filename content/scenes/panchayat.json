@@ -1,0 +1,328 @@
+{
+  "id": "panchayat",
+  "title": "The Panchayat",
+  "right": "Freedom from child marriage",
+  "tagline": "Help Pooja finish school first.",
+  "tone": "gentle",
+  "width": 3400,
+  "layers": [
+    { "id": "sky", "art": "modern.sky", "speed": 0 },
+    { "id": "clouds", "art": "modern.clouds", "speed": 0.08, "drift": true },
+    { "id": "far", "art": "modern.far", "speed": 0.3 },
+    { "id": "stage", "art": "panchayat.square", "speed": 1 },
+    { "id": "front", "art": "modern.front", "speed": 1.25, "front": true }
+  ],
+  "walkable": { "minX": 150, "maxX": 3250 },
+  "spawn": { "x": 420 },
+  "ambience": "panchayat",
+  "hotspots": [
+    { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
+    { "id": "sonu", "x": 950, "label": "Talk to Sonu", "kind": "npc", "npc": "sonu", "node": "sonu-hello", "depth": 0.5 },
+    { "id": "admit-card", "x": 1650, "label": "Pick up the paper on the bench", "kind": "object", "art": "panchayat.admitCard", "node": "admit-card" },
+    { "id": "pooja", "x": 2200, "label": "Talk to the girl under the tree", "kind": "npc", "npc": "pooja", "node": "pooja-hello", "hideIf": ["met-pooja"], "depth": 0.2 },
+    { "id": "pooja-again", "x": 2200, "label": "Talk to Pooja", "kind": "npc", "npc": "pooja", "node": "pooja-again", "showIf": ["met-pooja"], "depth": 0.2 },
+    { "id": "sarpanch-busy", "x": 2900, "label": "Say hello to Sarpanch Kavita ji", "kind": "npc", "npc": "sarpanch-kavita", "node": "sarpanch-busy", "hideIf": ["met-pooja"] },
+    { "id": "sarpanch", "x": 2900, "label": "Ask Sarpanch Kavita ji for help", "kind": "npc", "npc": "sarpanch-kavita", "node": "sarpanch-hello", "showIf": ["met-pooja"] }
+  ],
+  "objectives": [
+    { "id": "meet-pooja", "text": "Talk to the girl under the tree", "requires": ["met-pooja"] },
+    { "id": "admit-card", "text": "Look at the paper on the bench", "requires": ["saw-card"] },
+    { "id": "ask-sarpanch", "text": "Ask Sarpanch Kavita ji how to help Pooja", "requires": ["asked-sarpanch"] }
+  ],
+  "startNode": "pooja-hello",
+  "intro": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "The Panchayat! This is where the village meets to sort out problems. Today the square is busy. Hmm, why is that girl under the tree reading the same page again and again?",
+      "end": "good"
+    },
+
+    "sonu-hello": {
+      "id": "sonu-hello",
+      "speaker": "sonu",
+      "mood": "neutral",
+      "text": "That's my sister Pooja under the tree. She always helps me with homework. But this week she keeps crying when she thinks nobody is looking.",
+      "end": "good"
+    },
+
+    "admit-card": {
+      "id": "admit-card",
+      "speaker": "mitthu",
+      "mood": "surprised",
+      "text": "Someone left their exam admit card on the bench. Class 10, Pooja Kumari. Look at her date of birth: Pooja is only fifteen.",
+      "set": ["saw-card"],
+      "end": "good"
+    },
+
+    "pooja-hello": {
+      "id": "pooja-hello",
+      "speaker": "pooja",
+      "mood": "sad",
+      "text": "Oh, hello. Sorry, I'm trying to study. My board exams start next month.",
+      "next": "player-pooja"
+    },
+    "player-pooja": {
+      "id": "player-pooja",
+      "speaker": "player",
+      "text": "You look sad. Is everything okay?",
+      "next": "pooja-2"
+    },
+    "pooja-2": {
+      "id": "pooja-2",
+      "speaker": "pooja",
+      "mood": "sad",
+      "text": "My family has fixed my wedding. Right after my exams. They say a good match won't wait.",
+      "next": "pooja-3"
+    },
+    "pooja-3": {
+      "id": "pooja-3",
+      "speaker": "pooja",
+      "mood": "worried",
+      "text": "But I want to finish school and become a nurse. I don't know how to tell them.",
+      "set": ["met-pooja"],
+      "next": "player-pooja-2"
+    },
+    "player-pooja-2": {
+      "id": "player-pooja-2",
+      "speaker": "player",
+      "text": "Thank you for telling me. You shouldn't have to deal with this alone.",
+      "next": "mitthu-pooja"
+    },
+    "mitthu-pooja": {
+      "id": "mitthu-pooja",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Pooja is still a child. She should be studying, not getting married. The Sarpanch runs the Panchayat. Let's ask her.",
+      "end": "good"
+    },
+    "pooja-again": {
+      "id": "pooja-again",
+      "speaker": "pooja",
+      "mood": "neutral",
+      "text": "It helped to say it out loud. Thank you for listening.",
+      "end": "good"
+    },
+
+    "sarpanch-busy": {
+      "id": "sarpanch-busy",
+      "speaker": "sarpanch-kavita",
+      "mood": "happy",
+      "text": "Namaste! The meeting starts soon. We're deciding where the new hand pump should go.",
+      "end": "good"
+    },
+
+    "sarpanch-hello": {
+      "id": "sarpanch-hello",
+      "speaker": "sarpanch-kavita",
+      "mood": "neutral",
+      "text": "You look like you have something important to say. Tell me.",
+      "choices": [
+        { "label": "It's nothing. Weddings are a family matter, so it's not our business.", "to": "sarpanch-weak-1", "kind": "weak" },
+        { "label": "Pooja's wedding is after her exams, so she can still study until then.", "to": "sarpanch-weak-2", "kind": "weak" },
+        {
+          "label": "Pooja is only fifteen, and her family has fixed her wedding for after her exams. She wants to finish school. Can you help?",
+          "to": "sarpanch-good",
+          "kind": "good"
+        }
+      ]
+    },
+    "sarpanch-weak-1": {
+      "id": "sarpanch-weak-1",
+      "speaker": "sarpanch-kavita",
+      "mood": "neutral",
+      "text": "All right. But my door is always open if something is worrying you.",
+      "next": "mitthu-retry-1"
+    },
+    "mitthu-retry-1": {
+      "id": "mitthu-retry-1",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "When a child is going to be married, it is not just a family matter. Helping is everyone's business. Let's try that again.",
+      "end": "retry"
+    },
+    "sarpanch-weak-2": {
+      "id": "sarpanch-weak-2",
+      "speaker": "sarpanch-kavita",
+      "mood": "worried",
+      "text": "A wedding? Whose wedding? Tell me more.",
+      "next": "mitthu-retry-2"
+    },
+    "mitthu-retry-2": {
+      "id": "mitthu-retry-2",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Studying until the wedding isn't enough. Pooja is fifteen, too young to marry at all. Let's tell the Sarpanch everything.",
+      "end": "retry"
+    },
+    "sarpanch-good": {
+      "id": "sarpanch-good",
+      "speaker": "sarpanch-kavita",
+      "mood": "neutral",
+      "text": "Thank you for telling me. You did the right thing.",
+      "set": ["asked-sarpanch"],
+      "next": "sarpanch-good-2"
+    },
+    "sarpanch-good-2": {
+      "id": "sarpanch-good-2",
+      "speaker": "sarpanch-kavita",
+      "mood": "neutral",
+      "text": "In India, a girl must be at least eighteen to marry, and a boy at least twenty-one. Before that, they are children, and a wedding is not allowed.",
+      "next": "sarpanch-good-3"
+    },
+    "sarpanch-good-3": {
+      "id": "sarpanch-good-3",
+      "speaker": "sarpanch-kavita",
+      "mood": "happy",
+      "text": "I'll visit Pooja's parents this evening with the Child Marriage Prohibition Officer. Their job is to stop child marriages, and to help families understand. Anyone can call 1098 too.",
+      "next": "player-good"
+    },
+    "player-good": {
+      "id": "player-good",
+      "speaker": "player",
+      "text": "Can I tell Pooja she isn't alone?",
+      "next": "sarpanch-good-4"
+    },
+    "sarpanch-good-4": {
+      "id": "sarpanch-good-4",
+      "speaker": "sarpanch-kavita",
+      "mood": "happy",
+      "text": "Yes, please. And tell her to keep studying.",
+      "next": "mitthu-good"
+    },
+    "mitthu-good": {
+      "id": "mitthu-good",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Pooja's family has called off the wedding. She passed her exams, and now she's in Class 11, studying science to become a nurse.",
+      "end": "good"
+    }
+  },
+  "card": {
+    "id": "freedom-from-child-marriage",
+    "title": "Grow up first, marry later",
+    "kid": "In India, a girl must be at least 18 and a boy at least 21 to get married. A wedding before that is a child marriage, and the law does not allow it. Every child has the right to finish growing up first.",
+    "teen": "Under the Prohibition of Child Marriage Act, 2006, a \"child\" is a boy under 21 or a girl under 18, and a child marriage is one where either person is a child. If a child marriage has been arranged or is about to happen, a magistrate who is satisfied of this must stop it with an order called an injunction. Anyone who knows about it can complain, and every State appoints Child Marriage Prohibition Officers to prevent child marriages.",
+    "ifItHappens": "If you hear that a wedding is being planned for someone under 18 (or a boy under 21), tell a grown-up you trust: a teacher, the sarpanch, or someone in your family. You can also call 1098 for free, at any time.",
+    "law": "Section 2, Prohibition of Child Marriage Act, 2006: \"(a) \"child\" means a person who, if a male, has not completed twenty-one years of age, and if a female, has not completed eighteen years of age; (b) \"child marriage\" means a marriage to which either of the contracting parties is a child;\"\n\nSection 13(1), Prohibition of Child Marriage Act, 2006: \"Notwithstanding anything to the contrary contained in this Act, if, on an application of the Child Marriage Prohibition Officer or on receipt of information through a complaint or otherwise from any person, a Judicial Magistrate of the first class or a Metropolitan Magistrate is satisfied that a child marriage in contravention of this Act has been arranged or is about to be solemnised, such Magistrate shall issue an injunction against any person including a member of an organisation or an association of persons prohibiting such marriage.\"",
+    "source": "The Prohibition of Child Marriage Act, 2006 (6 of 2007): sections 2(a), 2(b), 13(1), 13(2) and 16.",
+    "review": {
+      "status": "unverified",
+      "checkedBy": null,
+      "checkedOn": null,
+      "note": "Written by Claude, 2026-10-18. Both quotes in card.law were compared word for word with two copies of the Act and match: the Act as published by PRS Legislative Research (https://prsindia.org/files/bills_acts/acts_parliament/2006/the-prohibition-of-child-marriage-act-2006.pdf) and Indian Kanoon (https://indiankanoon.org/doc/790355/). India Code (indiacode.nic.in) timed out. No penalties are quoted. Check every item in \"checks\" against India Code (https://www.indiacode.nic.in). Then set status to \"verified\" with your name and the date (see docs/SETUP.md §6).",
+      "checks": [
+        "Sort game (panchayat-sort): each of the five weddings is in the right box under section 2(a) and 2(b) (a girl under 18 or a boy under 21 makes it a child marriage; 19 and 23, and 24, are allowed).",
+        "card.law: the exact wording of section 2(a) and 2(b) of the Prohibition of Child Marriage Act, 2006.",
+        "card.law: the exact wording of section 13(1) of the same Act.",
+        "card.kid, card.teen, scene (Sarpanch Kavita ji), quiz: a girl must be at least 18 and a boy at least 21 to marry (section 2(a)).",
+        "card.teen, quiz: anyone with personal knowledge or reason to believe can complain (section 13(2)), and the State appoints Child Marriage Prohibition Officers whose duty includes preventing child marriages (section 16(1) and 16(3)(a)).",
+        "Scene (Sarpanch Kavita ji): a sarpanch going with the Child Marriage Prohibition Officer is a fair picture (section 16(2) lets the State ask an officer of the Gram Panchayat to assist the officer).",
+        "Quiz (\"why\"): \"so children can finish school, stay healthy and grow up first\" is a fair plain-language reason (the Act's Statement of Objects and Reasons mentions the health of children).",
+        "card.ifItHappens, scene, quiz: 1098 is the right number to suggest (same check as the Help Centre, SETUP.md §5).",
+        "Scene: no wedding is shown; Pooja only tells the player, and the wedding is called off. Read it once for tone with an 8-year-old in mind."
+      ]
+    }
+  },
+  "games": [
+    {
+      "kind": "quiz",
+      "id": "panchayat-quiz",
+      "questions": [
+        {
+          "id": "pooja-age",
+          "text": "Pooja is 15. Can she get married?",
+          "options": ["Yes, if her family agrees.", "No. A girl must be at least 18 to marry.", "Yes, once her exams are over."],
+          "answer": 1,
+          "explanation": "In India, a girl must be at least 18 to marry. At 15, Pooja is still a child."
+        },
+        {
+          "id": "boy-age",
+          "text": "How old must a boy be to get married in India?",
+          "options": ["16", "18", "21"],
+          "answer": 2,
+          "explanation": "A boy must be at least 21. A girl must be at least 18."
+        },
+        {
+          "id": "what-to-do",
+          "text": "You hear that a wedding is being planned for a 14-year-old friend. What can you do?",
+          "options": ["Nothing, it's a family matter", "Tell a grown-up you trust, or call 1098", "Tell everyone at school"],
+          "answer": 1,
+          "explanation": "Telling a grown-up you trust, or calling 1098, is how you help. It is everyone's business when a child is going to be married."
+        },
+        {
+          "id": "why",
+          "text": "Why does the law say children should not marry?",
+          "options": ["So children can finish school, stay healthy and grow up first", "Because weddings cost too much", "Because children don't like weddings"],
+          "answer": 0,
+          "explanation": "Children have the right to grow up first: to finish school, stay healthy and choose for themselves when they are older."
+        },
+        {
+          "id": "definition",
+          "text": "Under the Prohibition of Child Marriage Act, 2006, what is a \"child marriage\"?",
+          "options": ["A marriage held at a child's house", "Only a marriage where both people are children", "A marriage where either person is a child"],
+          "answer": 2,
+          "explanation": "Section 2(b): a child marriage is one where either of the two people marrying is a child.",
+          "band": "teen"
+        },
+        {
+          "id": "injunction",
+          "text": "A child marriage has been arranged. Once satisfied that this is true, what must a Judicial Magistrate do?",
+          "options": ["Issue an injunction that stops the marriage", "Nothing, if both families agree", "Wait until after the wedding"],
+          "answer": 0,
+          "explanation": "Section 13(1): the magistrate must issue an injunction prohibiting the marriage. Anyone who knows about it can complain.",
+          "band": "teen"
+        }
+      ]
+    },
+    {
+      "kind": "sort",
+      "id": "panchayat-sort",
+      "prompt": "Is this wedding allowed?",
+      "bins": [
+        {
+          "id": "ok",
+          "label": "Allowed"
+        },
+        {
+          "id": "not-ok",
+          "label": "Not allowed"
+        }
+      ],
+      "items": [
+        {
+          "id": "meena",
+          "text": "Meena is 16. Her family says a good match has come along, so she should marry now.",
+          "bin": "not-ok",
+          "explanation": "A girl must be at least 18 to marry. At 16, Meena is still a child."
+        },
+        {
+          "id": "asha-vikram",
+          "text": "Asha is 19 and Vikram is 23. They decide to get married.",
+          "bin": "ok",
+          "explanation": "Asha is over 18 and Vikram is over 21, so neither is a child."
+        },
+        {
+          "id": "ravi-sunita",
+          "text": "Ravi is 19 and Sunita is 20. Their families fix their wedding.",
+          "bin": "not-ok",
+          "explanation": "A boy must be at least 21 to marry. Ravi is 19, so it is still a child marriage."
+        },
+        {
+          "id": "pooja",
+          "text": "Pooja finishes school first, and gets married when she is 24.",
+          "bin": "ok",
+          "explanation": "At 24, Pooja is grown up, and she got to finish school first."
+        },
+        {
+          "id": "fourteen",
+          "text": "A 14-year-old's wedding is planned for after her exams.",
+          "bin": "not-ok",
+          "explanation": "She is far too young. Tell a grown-up you trust, or call 1098."
+        }
+      ]
+    }
+  ]
+}

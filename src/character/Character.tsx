@@ -17,6 +17,7 @@ import { useId, type ReactNode } from 'react'
 import type { Mood } from '@content/types'
 import { ink, lighten, mix, shade } from './color'
 import {
+  bottomColors,
   colorOf,
   hairColors,
   headwearColors,
@@ -29,6 +30,9 @@ import './character.css'
 export type Pose = 'idle' | 'walk' | 'talk' | 'wave' | 'gasp' | 'cheer'
 export type Facing = 'left' | 'right'
 export type View = 'full' | 'portrait'
+
+/** Where the knee bends (y, in design units). */
+const KNEE = 268
 
 const VIEW_BOX: Record<View, string> = {
   full: '0 0 120 360',
@@ -56,6 +60,8 @@ interface Props {
   view?: View
   /** Adults (teachers, shopkeepers) get a slightly smaller head for their height. */
   adult?: boolean
+  /** Seen from behind (D-039): the back of the head instead of a face, e.g. going in through a door. */
+  back?: boolean
   /** Accessible description. Without it the drawing is hidden from screen readers (decorative). */
   label?: string
   className?: string
@@ -71,6 +77,7 @@ export function Character({
   facing = 'right',
   view = 'full',
   adult = false,
+  back = false,
   label,
   className,
 }: Props) {
@@ -82,7 +89,7 @@ export function Character({
   const hair = colorOf(hairColors, spec.hairColor)
   const cloth = colorOf(outfitColors, spec.outfitColor)
   const scarf = colorOf(headwearColors, spec.headwearColor)
-  const look = outfitLook(spec.outfit, cloth)
+  const look = outfitLook(spec.outfit, cloth, spec.bottom, colorOf(bottomColors, spec.bottomColor))
 
   const paint: Paint = (name) => `url(#${uid}-${name})`
   // Each material gets a cel-shaded gradient (see Cel below).
@@ -125,6 +132,13 @@ export function Character({
         <clipPath id={`${uid}-neckclip`}>
           <path d={NECK} />
         </clipPath>
+        {/* The leg above and below the knee (they overlap a little, so no gap shows as it bends). */}
+        <clipPath id={`${uid}-thigh`}>
+          <rect x="-40" y="0" width="200" height={KNEE + 5} />
+        </clipPath>
+        <clipPath id={`${uid}-shin`}>
+          <rect x="-40" y={KNEE - 5} width="200" height="200" />
+        </clipPath>
         <radialGradient id={`${uid}-ground`}>
           <stop offset="0" stopColor="#1c1016" stopOpacity="0.42" />
           <stop offset="1" stopColor="#1c1016" stopOpacity="0" />
@@ -137,9 +151,18 @@ export function Character({
         {!hidesHair && <HairBehind style={spec.hair} paint={paint} hair={hair} />}
         {spec.bag && <BagBehind paint={paint} />}
 
+        {/* Each leg is drawn twice and cut at the knee (D-038): the thigh swings from the hip,
+            and the shin, inside it, bends at the knee, so walking looks like stepping, not sliding. */}
         {(['l', 'r'] as const).map((side) => (
           <g key={side} className={`ch-part ch-leg-${side}`}>
-            <Leg side={side} outfit={spec.outfit} paint={paint} look={look} skin={skin} />
+            <g clipPath={`url(#${uid}-thigh)`}>
+              <Leg side={side} outfit={look.bottom ?? spec.outfit} paint={paint} look={look} skin={skin} />
+            </g>
+            <g className={`ch-part ch-shin-${side}`}>
+              <g clipPath={`url(#${uid}-shin)`}>
+                <Leg side={side} outfit={look.bottom ?? spec.outfit} paint={paint} look={look} skin={skin} />
+              </g>
+            </g>
           </g>
         ))}
 
@@ -147,13 +170,20 @@ export function Character({
         <Neck paint={paint} skin={skin} uid={uid} />
         <Torso outfit={spec.outfit} paint={paint} look={look} skin={skin} />
 
-        {spec.bag && <BagStraps />}
+        {spec.bag && !back && <BagStraps />}
+        {/* From behind, the bag and a ponytail hang over the back. */}
+        {back && spec.bag && <BagBehind paint={paint} />}
+        {back && !hidesHair && <HairBehind style={spec.hair} paint={paint} hair={hair} />}
         {spec.headwear === 'dupatta' && <Dupatta paint={paint} scarf={scarf} />}
         {!hidesHair && <HairOver style={spec.hair} paint={paint} hair={hair} />}
 
         <g className="ch-part ch-head">
           <g transform={`translate(60 68.5) scale(${adult ? 0.93 : 1.02}) translate(-60 -66)`}>
-            <Head spec={spec} mood={face} pose={pose} paint={paint} uid={uid} skin={skin} hair={hair} scarf={scarf} />
+            {back ? (
+              <HeadBack spec={spec} paint={paint} skin={skin} hair={hair} scarf={scarf} />
+            ) : (
+              <Head spec={spec} mood={face} pose={pose} paint={paint} uid={uid} skin={skin} hair={hair} scarf={scarf} />
+            )}
           </g>
         </g>
 
@@ -204,10 +234,20 @@ interface OutfitLook {
   shoe: string
   shoeKind: 'school' | 'sneaker' | 'sandal'
   sleeveEnd: number // where the sleeve ends on the arm (y); 196 = full sleeve
+  cuff?: boolean // a ribbed band at the end of the sleeve (hoodie, jacket)
+  bottom?: string // modern tops: which legs to draw (jeans, trousers, joggers)
 }
 
-function outfitLook(outfit: string, cloth: string): OutfitLook {
+function outfitLook(outfit: string, cloth: string, bottom: string, bottomColor: string): OutfitLook {
+  const modern = { top: cloth, legs: bottomColor, shoe: SNEAKER, shoeKind: 'sneaker' as const, bottom }
   switch (outfit) {
+    case 'tshirt':
+      return { ...modern, sleeveEnd: 128 }
+    case 'shirt':
+      return { ...modern, sleeveEnd: 188 }
+    case 'hoodie':
+    case 'jacket':
+      return { ...modern, sleeveEnd: 194, cuff: true }
     case 'pinafore':
       return { top: UNIFORM_SHIRT, legs: SOCKS, shoe: SCHOOL_SHOE, shoeKind: 'school', sleeveEnd: 134 }
     case 'kurta':
@@ -274,7 +314,71 @@ function Torso({ outfit, paint, look, skin }: { outfit: string; paint: Paint; lo
     </g>
   )
 
+  // Modern tops are a little longer and worn untucked, over the jeans or trousers.
+  const longShirt = <path d={SHIRT.replace(/196/g, '202')} fill={paint('top')} {...line(top)} />
+  const crewNeck = (
+    <g>
+      <path d="M51 86 Q60 95 69 86 Z" fill={paint('skin')} {...line(skin, 0.6)} />
+      <path d="M50.5 86 Q60 96.5 69.5 86" stroke={shade(top, 0.25)} strokeWidth="1.8" fill="none" />
+    </g>
+  )
+
   switch (outfit) {
+    case 'tshirt':
+      return (
+        <g>
+          {longShirt}
+          {armShadows}
+          {crewNeck}
+          <path d="M44 130 Q51 135 57 131 M41 180 Q50 185 57 181 M63 184 Q72 188 79 182" {...foldLine} opacity="0.7" />
+        </g>
+      )
+    case 'shirt':
+      return (
+        <g>
+          {longShirt}
+          {armShadows}
+          {collar}
+          {/* Button placket down the front, and a chest pocket. */}
+          <path d="M58.8 99 L58.8 201 M61.2 99 L61.2 201" stroke={shade(top, 0.22)} strokeWidth="0.7" />
+          {[112, 132, 152, 172, 192].map((y) => (
+            <circle key={y} cx="60" cy={y} r="0.9" fill={lighten(top, 0.5)} {...line(top, 0.4)} />
+          ))}
+          <path d="M66.5 110 L76 110 L76 121 Q71.2 123 66.5 121 Z" fill="none" {...line(top, 0.6)} />
+          <path d="M44 132 Q50 136 56 133 M42 180 Q48 186 54 188 M66 188 Q73 186 78 180" {...foldLine} opacity="0.7" />
+        </g>
+      )
+    case 'hoodie':
+      return (
+        <g>
+          {/* The hood lies around the back of the neck. */}
+          <path d="M42 90 C41 79 49 75.5 60 75.5 C71 75.5 79 79 78 90 C73 94 67 95.5 60 95.5 C53 95.5 47 94 42 90 Z" fill={shade(top, 0.22)} {...line(top, 0.8)} />
+          {longShirt}
+          {armShadows}
+          {crewNeck}
+          <path d="M48 87 Q60 102 72 87" stroke={shade(top, 0.3)} strokeWidth="1" fill="none" />
+          {/* Drawstrings, the front pocket and a ribbed hem. */}
+          <path d="M56.5 95 L56 113 M63.5 95 L64 113" stroke={lighten(top, 0.55)} strokeWidth="1.1" strokeLinecap="round" />
+          <path d="M45 164 L75 164 L79 189 L41 189 Z" fill={shade(top, 0.06)} {...line(top, 0.6)} />
+          <path d="M36.4 195 L83.6 195 L83.6 202 L36.4 202 Z" fill={shade(top, 0.12)} {...line(top, 0.6)} />
+          <path d="M44 132 Q51 137 57 133" {...foldLine} opacity="0.7" />
+        </g>
+      )
+    case 'jacket':
+      return (
+        <g>
+          {longShirt}
+          {/* An open jacket over a plain white T-shirt. */}
+          <path d="M51 86.5 Q60 96 69 86.5 L66 202 L54 202 Z" fill="#ece8e1" {...line('#ece8e1', 0.6)} />
+          <path d="M51 86 Q60 95 69 86 Z" fill={paint('skin')} {...line(skin, 0.6)} />
+          <path d="M51 86 L54 202 M69 86 L66 202" stroke={ink(top)} strokeWidth="1" />
+          {armShadows}
+          {/* Ribbed collar and hem, and a zip pull. */}
+          <path d="M46 86 Q51 83.5 53 88 L51.5 93 Q49 89.5 45.5 90.5 Z M74 86 Q69 83.5 67 88 L68.5 93 Q71 89.5 74.5 90.5 Z" fill={shade(top, 0.15)} {...line(top, 0.5)} />
+          <path d="M36.4 195 L54 195 L54 202 L36.4 202 Z M66 195 L83.6 195 L83.6 202 L66 202 Z" fill={shade(top, 0.15)} {...line(top, 0.6)} />
+          <rect x="52.4" y="140" width="2" height="5" rx="0.6" fill="#b8b2a8" />
+        </g>
+      )
     case 'kurta':
       return (
         <g>
@@ -400,8 +504,9 @@ function Leg({ side, outfit, paint, look, skin }: { side: 'l' | 'r'; outfit: str
     const [s1, s2, s3, s4] = P([[64.4, 296], [78.6, 296], [74, 339], [65.6, 339]])
     wear = <path d={`M${s1} L${s2} C${P([[78.2, 318]])} ${P([[75.5, 330]])} ${s3} L${s4} C${P([[65.3, 330]])} ${P([[64, 318]])} ${s1} Z`} fill={paint('legs')} {...line(SOCKS, 0.6)} />
   } else {
-    // Trousers, jeans or pyjama: a little wider than the leg, with a crease and knee folds.
-    const loose = outfit === 'kurta' ? 2.2 : outfit === 'casual' ? 0.4 : 1
+    // Trousers, jeans, joggers or pyjama: a little wider than the leg, with a crease and knee folds.
+    const isJeans = outfit === 'casual' || outfit === 'jeans'
+    const loose = outfit === 'kurta' ? 2.2 : isJeans ? 0.4 : outfit === 'joggers' ? 1.8 : 1
     const [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11] = P([
       [59.8, 182], [82 + loose, 182], [83 + loose, 214], [81.5 + loose, 246], [79.8 + loose, 272], [78.4 + loose, 340],
       [63.6 - loose * 0.6, 340], [62.8 - loose * 0.6, 272], [62.2 - loose * 0.4, 246], [61 - loose * 0.2, 214], [79 + loose, 306],
@@ -411,7 +516,15 @@ function Leg({ side, outfit, paint, look, skin }: { side: 'l' | 'r'; outfit: str
         <path d={`M${t1} L${t2} C${t3} ${t4} ${t5} C${t11} ${t11} ${t6} L${t7} C${P([[63.2, 306]])} ${t8} ${t8} C${t9} ${t10} ${t1} Z`} fill={paint('legs')} {...line(legs)} />
         <path d={`M${P([[71.5, 200]])} L${P([[71, 336]])}`} stroke={shade(legs, 0.25)} strokeWidth="0.6" opacity="0.7" />
         <path d={`M${P([[64, 268]])} Q${P([[71, 273]])} ${P([[78, 266]])} M${P([[66, 330]])} Q${P([[71, 334]])} ${P([[77, 329]])}`} stroke={shade(legs, 0.35)} strokeWidth="0.8" fill="none" />
-        {outfit === 'casual' && <path d={`M${P([[63.6, 333]])} L${P([[78.8, 333]])}`} stroke={lighten(legs, 0.3)} strokeWidth="1.2" />}
+        {isJeans && <path d={`M${P([[63.6, 333]])} L${P([[78.8, 333]])}`} stroke={lighten(legs, 0.3)} strokeWidth="1.2" />}
+        {isJeans && <path d={`M${P([[80.4, 204]])} L${P([[79.2, 330]])}`} stroke={mix(legs, '#d9a85a', 0.45)} strokeWidth="0.5" strokeDasharray="1.4 1.2" opacity="0.8" />}
+        {outfit === 'joggers' && (
+          <>
+            {/* A ribbed cuff at the ankle and a stripe down the side. */}
+            <path d={`M${P([[63.4, 328]])} L${P([[79.8, 328]])} L${P([[78.6, 340]])} L${P([[63.8, 340]])} Z`} fill={shade(legs, 0.18)} {...line(legs, 0.6)} />
+            <path d={`M${P([[82.4, 204]])} L${P([[80, 327]])}`} stroke={lighten(legs, 0.45)} strokeWidth="1.3" />
+          </>
+        )}
       </g>
     )
   }
@@ -508,6 +621,7 @@ function Arm({ side, look, paint, skin }: { side: 'l' | 'r'; look: OutfitLook; p
       {e < 190 && <path d={`M${P(outer, e + 1.2)} Q${P((outer + inner) / 2, e + 4.6)} ${P(inner, e + 1.2)} L${P(inner, e + 3.4)} Q${P((outer + inner) / 2, e + 6.4)} ${P(outer, e + 3.4)} Z`} {...castShadow(skin, 0.4)} />}
       {e > 160 && <path d={`M${P(83, 152)} Q${P(88, 156)} ${P(94.5, 151)}`} stroke={shade(top, 0.35)} strokeWidth="0.8" fill="none" />}
       <path d={`M${P(outer + 1.6, e - 1)} Q${P((outer + inner) / 2, e + 1.6)} ${P(inner - 1.4, e - 1)}`} stroke={shade(top, 0.3)} strokeWidth="0.8" fill="none" />
+      {look.cuff && <path d={`M${P(outer + 1.4, e - 6)} L${P(inner - 1.2, e - 6)} L${P(inner - 1.4, e)} Q${P((outer + inner) / 2, e + 2.4)} ${P(outer + 1.6, e)} Z`} fill={shade(top, 0.14)} {...line(top, 0.6)} />}
     </g>
   )
 }
@@ -600,7 +714,7 @@ function Head(props: {
         <ellipse cx="71.5" cy="55" rx="4.4" ry="2.6" fill={mix(skin, '#c2463a', 0.5)} opacity="0.07" />
       </g>
 
-      <Eyes mood={mood} uid={uid} skin={skin} />
+      <Eyes mood={mood} uid={uid} skin={skin} lashes={spec.gender === 'girl'} />
       <Brows mood={mood} color={shade(hair, 0.15)} />
       <Nose skin={skin} />
       {pose === 'talk' ? (
@@ -629,7 +743,45 @@ function Head(props: {
   )
 }
 
-function Eyes({ mood, uid, skin }: { mood: Mood; uid: string; skin: string }) {
+/** Hairstyles that cover the back of the head down to the neck (the others stop above the nape). */
+const LONG_HAIR = ['long', 'long-curly', 'bob', 'ponytail', 'bun', 'plait', 'two-plaits']
+// Short hair from behind: covers the crown and stops above the nape.
+const SHORT_BACK = 'M40.5 44 C38 22 48 14 60 14 C72 14 82 22 79.5 44 C79 52 76 58 72 60 C66 62 54 62 48 60 C44 58 41 52 40.5 44 Z'
+
+/** The head seen from behind: ears, the back of the neck, and hair or a head covering. */
+function HeadBack(props: { spec: CharacterSpec; paint: Paint; skin: string; hair: string; scarf: string }) {
+  const { spec, paint, skin, hair, scarf } = props
+  if (spec.headwear === 'hijab') {
+    return (
+      <g>
+        <HijabBack paint={paint} scarf={scarf} />
+        <path d={FACE} fill={paint('scarf')} {...line(scarf)} />
+        <path d="M44 24 Q60 16 76 24 M42 44 Q60 38 78 44" stroke={shade(scarf, 0.3)} strokeWidth="0.9" fill="none" />
+      </g>
+    )
+  }
+  const long = LONG_HAIR.includes(spec.hair)
+  return (
+    <g>
+      <g fill={paint('skin')} {...line(skin, 0.7)}>
+        <path d="M42 41 C38.2 39.6 36.8 43.5 37.4 47.5 C38 51.5 39.4 55 42.6 55.6 Z" />
+        <path d="M78 41 C81.8 39.6 83.2 43.5 82.6 47.5 C82 51.5 80.6 55 77.4 55.6 Z" />
+      </g>
+      <path d={FACE} fill={paint('skin')} {...line(skin, 0.8)} />
+      {spec.headwear === 'patka' ? (
+        <Patka paint={paint} scarf={scarf} />
+      ) : (
+        <g>
+          <path d={long ? FACE : SHORT_BACK} fill={paint('hair')} {...line(hair)} />
+          {long && <HairBack style={spec.hair} paint={paint} hair={hair} />}
+          {strands(hair, 'M50 22 Q48 36 50 52 M60 20 L60 56 M70 22 Q72 36 70 52', 'M48 24 Q60 18 72 24')}
+        </g>
+      )}
+    </g>
+  )
+}
+
+function Eyes({ mood, uid, skin, lashes }: { mood: Mood; uid: string; skin: string; lashes: boolean }) {
   // How open the eyes are: wide when surprised, a little narrowed in a smile.
   const open = mood === 'surprised' ? 1.35 : mood === 'happy' ? 0.82 : mood === 'sad' ? 0.88 : 1
   const lid = shade(skin, 0.62)
@@ -662,6 +814,15 @@ function Eyes({ mood, uid, skin }: { mood: Mood; uid: string; skin: string }) {
               fill="none"
               strokeLinecap="round"
             />
+            {/* Girls get a small flick of lashes at the outer corner. */}
+            {lashes && (
+              <path
+                d={i === 0 ? `M${cx - 4.6} ${cy + 0.2} l-1.6 -1.4 M${cx - 3.9} ${cy - 1} l-1.2 -1.7` : `M${cx + 4.7} ${cy - 0.4} l1.6 -1.4 M${cx + 4} ${cy - 1.4} l1.2 -1.7`}
+                stroke="#1a100c"
+                strokeWidth="0.8"
+                strokeLinecap="round"
+              />
+            )}
             <path d={`M${cx - 3.8} ${cy - h - 1.4} Q${cx} ${cy - h - 2.8} ${cx + 3.8} ${cy - h - 1.4}`} stroke={lid} strokeWidth="0.55" fill="none" opacity="0.6" />
             <path d={`M${cx - 3} ${cy + h * 0.78 + 0.5} Q${cx} ${cy + h * 0.95 + 0.8} ${cx + 3} ${cy + h * 0.7 + 0.4}`} stroke={lid} strokeWidth="0.45" fill="none" opacity="0.45" />
             {mood === 'happy' && <path d={`M${cx - 3.6} ${cy + 2.6} Q${cx} ${cy + 0.8} ${cx + 3.6} ${cy + 2.4}`} stroke={lid} strokeWidth="0.6" fill="none" opacity="0.7" />}
@@ -803,8 +964,8 @@ function HairBehind({ style, paint, hair }: HairProps) {
   if (style === 'ponytail') {
     return (
       <g>
-        <path d="M70 24 C88 26 93 44 91 64 C90 82 86 96 82 104 C82 88 81 72 78 58 C76 46 73 36 68 30 Z" fill={paint('hair')} {...line(hair)} />
-        {strands(hair, 'M80 40 Q86 60 84 92 M76 46 Q81 66 81 90', 'M84 36 Q89 50 88 66')}
+        <path d="M58 8 C76 3 95 17 94 42 C93 62 91 80 87 97 C85 107 80 114 75 110 C78 96 80 80 79 64 C78 50 73 36 63 26 Z" fill={paint('hair')} {...line(hair)} />
+        {strands(hair, 'M84 30 Q90 52 86 92 M79 40 Q84 62 81 100', 'M80 18 Q90 30 90 50')}
       </g>
     )
   }
@@ -820,6 +981,32 @@ function HairBack({ style, paint, hair }: HairProps) {
         <g>
           <ellipse cx="60" cy="9" rx="10" ry="8.4" fill={paint('hair')} {...outline} />
           {strands(hair, 'M52 9 Q60 3 68 9 M54 13 Q60 9 66 13', 'M54 6 Q58 3 63 4')}
+        </g>
+      )
+    case 'long':
+      // Long open hair, falling past the shoulders on both sides of the face.
+      return (
+        <g>
+          <path
+            d="M37 40 C35 16 85 16 83 40 C84 58 86 78 88.5 98 Q84 103 77 101 C76 86 76 70 76 56 L44 56 C44 70 44 86 43 101 Q36 103 31.5 98 C34 78 36 58 37 40 Z"
+            fill={paint('hair')}
+            {...outline}
+          />
+          {strands(hair, 'M38 60 Q36 80 35 96 M82 60 Q84 80 85 96', 'M40 56 Q39 74 38 90')}
+        </g>
+      )
+    case 'long-curly':
+      return (
+        <g fill={paint('hair')} {...outline}>
+          <path d="M37 42 C35 18 85 18 83 42 L84 62 L36 62 Z" />
+          {/* A loose mass of curls on each side, staggered so they read as one shape. */}
+          <path d="M33 46 C30 66 30 84 34 98 L48 98 C46 82 45 64 45 46 Z M87 46 C90 66 90 84 86 98 L72 98 C74 82 75 64 75 46 Z" />
+          {[44, 54, 64, 74, 84, 94].flatMap((cy, i) => [
+            <circle key={`a${cy}`} cx={i % 2 ? 33 : 36} cy={cy} r="6.2" />,
+            <circle key={`b${cy}`} cx={i % 2 ? 42 : 44} cy={cy + 4} r="5" />,
+            <circle key={`c${cy}`} cx={i % 2 ? 87 : 84} cy={cy} r="6.2" />,
+            <circle key={`d${cy}`} cx={i % 2 ? 78 : 76} cy={cy + 4} r="5" />,
+          ])}
         </g>
       )
     case 'bob':
@@ -843,15 +1030,26 @@ function HairBack({ style, paint, hair }: HairProps) {
           ))}
         </g>
       )
+    case 'ponytail':
+      // Pulled back: a little shows behind the ears, with volume at the crown and a hair tie.
+      return (
+        <g>
+          <path d="M39 44 C37 24 83 24 81 44 L80 62 L40 62 Z" fill={shade(hair, 0.25)} {...outline} />
+          <ellipse cx="63" cy="11" rx="12" ry="8.5" fill={paint('hair')} {...outline} />
+          <rect x="70" y="7.5" width="5" height="7" rx="2" fill="#c0533a" transform="rotate(-20 72.5 11)" />
+        </g>
+      )
     case 'plait':
     case 'two-plaits':
-    case 'ponytail':
       // Long hair pulled back: a little shows behind the ears.
       return <path d="M39 44 C37 24 83 24 81 44 L80 62 L40 62 Z" fill={shade(hair, 0.25)} {...outline} />
     default:
       return null
   }
 }
+
+// A close crop that follows the skull (the buzz cut, and the faded sides of the fade).
+const BUZZ = 'M40.6 43 C38.8 24 48 14.5 60 14.5 C72 14.5 81.2 24 79.4 43 C78 37.5 76 34.5 73 33 C69 31.5 64.5 31 60 31 C55.5 31 51 31.5 47 33 C44 34.5 42 37.5 40.6 43 Z'
 
 /** Hair over the forehead. Each style has its own hairline, clumps and highlight. */
 function HairFront({ style, paint, hair }: HairProps) {
@@ -907,6 +1105,57 @@ function HairFront({ style, paint, hair }: HairProps) {
           )}
         </g>
       )
+    case 'buzz':
+      return (
+        <g>
+          <path d={BUZZ} fill={fill} {...outline} opacity="0.92" />
+          {strands(hair, 'M50 18 Q48 24 48.5 30 M60 16 L60 30 M70 18 Q72 24 71.5 30', 'M50 19 Q60 15.5 70 19')}
+        </g>
+      )
+    case 'fade':
+      // Short faded sides with more length on top, brushed up at the front.
+      return (
+        <g>
+          <path d={BUZZ} fill={fill} {...outline} opacity="0.6" />
+          <path d="M44.5 33 C43 20 51 10 62 10 C73 10 79.5 17 77.5 31 C73 27.5 68 26.5 62.5 27.5 C56 28.5 50 30 44.5 33 Z" fill={fill} {...outline} />
+          {strands(hair, 'M50 18 Q53 24 51 30 M58 13 Q61 20 59 28 M67 13 Q70 20 68 27', 'M50 16 Q60 10.5 72 14')}
+        </g>
+      )
+    case 'long':
+      return (
+        <g>
+          <path
+            d="M39.5 46 C36 20 50 11.5 61 11.5 C73 11.5 84.5 20 80.5 48 C79 40 77 34.5 72.5 31.5 C66 33 58 31 52 26.5 C48 31 44 36 41.6 42 Z"
+            fill={fill}
+            {...outline}
+          />
+          {/* Side locks over the ears. */}
+          <path d="M39.6 44 C37.5 56 38 72 40 88 Q43 90 45.5 88 C44.5 72 44 58 44.2 46 Z M80.4 44 C82.5 56 82 72 80 88 Q77 90 74.5 88 C75.5 72 76 58 75.8 46 Z" fill={fill} {...outline} />
+          {strands(hair, 'M52 26.5 Q62 31 72.5 31.5 M55 17 Q65 22 77 26 M47 22 Q43 32 41.6 42', 'M55 16 Q64 13.5 74 17.5 M41 56 Q40.5 70 42 84')}
+        </g>
+      )
+    case 'long-curly':
+      return (
+        <g>
+          <g fill={fill} {...outline}>
+            {[
+              [44, 33, 6.4],
+              [49, 25, 7],
+              [56.5, 19.5, 7.4],
+              [65, 19, 7.4],
+              [72.5, 23.5, 7],
+              [77.5, 31.5, 6.4],
+              [40.5, 43, 5],
+              [79.5, 43, 5],
+              [40.5, 53, 4.8],
+              [79.5, 53, 4.8],
+            ].map(([cx, cy, r]) => (
+              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} />
+            ))}
+          </g>
+          {strands(hair, 'M45 31 q2 -3 4 0 M54 24 q2 -3 4 0 M63 23 q2 -3 4 0 M71 27 q2 -3 4 0', 'M47 22 q3 -3 6 -2 M56 16 q3 -3 6 -2 M66 16 q3 -2 6 0')}
+        </g>
+      )
     case 'bob':
       return (
         <g>
@@ -918,7 +1167,17 @@ function HairFront({ style, paint, hair }: HairProps) {
           {strands(hair, 'M48 15 Q46 24 46 33 M56 13 Q55 23 55.5 33 M64 13 Q65 23 64.5 33 M72 15 Q74 24 74 33', 'M46 18 Q60 12.5 74 18')}
         </g>
       )
-    default: // ponytail, plait, two plaits, bun: hair pulled back, with a middle parting
+    case 'ponytail':
+      // Sleek and pulled back, with a side parting, a sweep across the forehead and loose strands by the face.
+      return (
+        <g>
+          <path d="M39.6 46 C36 20 50 12 61 12 C72 12 84 20 80.4 46 C79.2 38 76.6 32.4 72 29.8 C66 27.6 55 27.6 48.6 29.6 C43.8 32 40.8 38 39.6 46 Z" fill={fill} {...outline} />
+          <path d="M67 13 Q58 21 45 33" stroke={shade(hair, 0.55)} strokeWidth="0.9" fill="none" strokeLinecap="round" />
+          <path d="M41.2 40 Q39.4 50 41.6 60 M78.8 40 Q80.6 49 78.6 57" stroke={hair} strokeWidth="1.6" fill="none" strokeLinecap="round" />
+          {strands(hair, 'M64 14 Q56 20 47 30 M70 15 Q76 20 78 32 M58 15 Q50 22 43.5 36', 'M54 16 Q48 20 45.5 26 M71 17 Q75 21 76.5 27')}
+        </g>
+      )
+    default: // plait, two plaits, bun: hair pulled back, with a middle parting
       return (
         <g>
           <path d="M39.6 46 C36 20 50 12 60 12 C70 12 84 20 80.4 46 C79.2 38 76.2 32 71.4 29.6 C65.6 28 54.4 28 48.6 29.6 C43.8 32 40.8 38 39.6 46 Z" fill={fill} {...outline} />

@@ -4,6 +4,31 @@
 import type { SceneDef } from '@content/types'
 
 export const WALK_SPEED = 360 // design units per second
+export const DEPTH_SPEED = 0.8 // depth (0 to 1) per second, for W and S
+
+// Where feet stand: depth 0 is the far edge of the walkway, 1 the near edge (D-036).
+export const FEET_FAR = 850
+export const FEET_NEAR = 962
+
+/** The y of the feet, in scene units, for a depth from 0 (far) to 1 (near). */
+export function feetY(depth: number): number {
+  return FEET_FAR + (FEET_NEAR - FEET_FAR) * depth
+}
+
+/** How tall a person is drawn: a little bigger when nearer. `base` is their height at mid depth. */
+export function personHeight(base: number, depth: number): number {
+  return base * (0.9 + 0.2 * depth)
+}
+
+/** Keeps a depth between 0 and 1. */
+export const clampDepth = (d: number) => Math.min(1, Math.max(0, d))
+
+/** One step of walking nearer or further: by `dd`, or toward `target` by at most `maxStep`. */
+export function moveDepthToward(depth: number, target: number, maxStep: number): number {
+  const distance = target - depth
+  if (Math.abs(distance) <= 0.005) return target
+  return clampDepth(depth + Math.sign(distance) * Math.min(Math.abs(distance), maxStep))
+}
 /** How close the player stops to a blocker edge. */
 const BLOCKER_GAP = 4
 

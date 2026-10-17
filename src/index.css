@@ -5,6 +5,8 @@
    automatically for Hindi characters because it is next in the font stack. */
 @import '@fontsource-variable/noto-serif';
 @import '@fontsource-variable/noto-serif-devanagari';
+/* Inter: a clean sans for the menus and forms before the game (D-034). */
+@import '@fontsource-variable/inter';
 
 /* ------------------------------------------------------------------
    Design tokens (art direction: BUILD_PLAN §2)
@@ -29,6 +31,15 @@
   --color-ink-soft: #5c4a3a;       /* secondary text */
   --color-focus: #1d4ed8;          /* focus ring: blue stands out on warm colours */
 
+  /* Palette: cover screens (title menu, new game, customiser, players). Quiet beige
+     with dark espresso text and one rich accent, rust (D-034). */
+  --color-cream: #f4eee3;          /* cover background */
+  --color-linen: #e9dfce;          /* panels, the circle behind the characters */
+  --color-oat: #d6c7ae;            /* borders on the cover screens */
+  --color-espresso: #2b2119;       /* cover text, primary buttons */
+  --color-umber: #6e5a49;          /* secondary cover text */
+  --color-rust: #9a4b2c;           /* the one accent: selection, the rule under the logo */
+
   /* Palette: Help Centre only. Calm, cool, quiet. Never red. */
   --color-help-bg: #eef3f1;
   --color-help-surface: #ffffff;
@@ -39,6 +50,7 @@
   /* Type: one serif family covering Latin and Devanagari */
   --font-serif: 'Noto Serif Variable', 'Noto Serif Devanagari Variable', Georgia, serif;
   --font-sans: var(--font-serif);
+  --font-ui: 'Inter Variable', system-ui, sans-serif;
 
   /* Type scale: a little larger than usual, for young readers */
   --text-sm: 1rem;
@@ -101,9 +113,10 @@
    (and, from Phase 1, by the "Calm motion" setting).
    Calm mode stops all CSS animation and transitions. Scene code also
    checks it to turn off parallax, ambient loops, screen movement and
-   confetti.
+   confetti. One exception (D-038, D-039): a character's legs while the
+   child walks them, or the character would slide along without stepping.
    ------------------------------------------------------------------ */
-html[data-calm] *,
+html[data-calm] *:not(.ch[data-pose='walk'] *),
 html[data-calm] *::before,
 html[data-calm] *::after {
   animation-duration: 0.01ms !important;

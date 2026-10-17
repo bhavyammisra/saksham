@@ -43,6 +43,16 @@ export interface BuildingResult {
   score: Score // the game score
 }
 
+// ---------------------------------------------------------------- Ask an Expert
+
+export const QUESTION_MAX = 280
+
+/** An Ask an Expert question, tidied (spaces collapsed), or null if it is empty or too long. */
+export function cleanQuestion(text: string): string | null {
+  const clean = text.trim().replace(/\s+/g, ' ')
+  return clean.length > 0 && clean.length <= QUESTION_MAX ? clean : null
+}
+
 // ---------------------------------------------------------------- scores
 
 /** True when score is at least `percent` %. Uses whole numbers to avoid rounding surprises. */
@@ -77,11 +87,17 @@ export function cardTextForBand(card: Card, band: Band): { text: string; more: s
  * Game score = correct on the first attempt / questions shown.
  * Only the first attempt at each question counts, so hint-round answers
  * (which come later) can never change the score. Unanswered questions count as wrong.
+ * A sort game is scored the same way, one attempt per item.
  */
-export function scoreQuiz(shown: QuizQuestion[], attempts: Attempt[]): Score {
+export function scoreQuiz(shown: { id: string }[], attempts: Attempt[]): Score {
   const first = firstAttempts(attempts)
   const correct = shown.filter((q) => first.get(q.id) === true).length
   return { correct, total: shown.length }
+}
+
+/** A building's game score: every game it played, added together. */
+export function addScores(scores: Score[]): Score {
+  return scores.reduce((sum, s) => ({ correct: sum.correct + s.correct, total: sum.total + s.total }), { correct: 0, total: 0 })
 }
 
 /** The hint round is offered when the quiz score is under 60%. */

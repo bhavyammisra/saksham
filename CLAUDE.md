@@ -6,9 +6,10 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Where we are (update this at the end of every session)
 
-- **Phase:** 3 of 0–7 (School end to end, MILESTONE A) is **done** on branch `p3-school` (pushed, PR not opened yet). Next: open the P3 PR, merge after green CI, then Phase 4 on a new branch. The School card's legal text waits for the owner's fact check (SETUP.md §6).
-- **Merged to `main`:** P0 (PR #1), P1 (PR #2) and P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026).
-- **Latest session notes:** bottom of `docs/BUILD_PLAN.md`. **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-029).
+- **Phase:** 4 of 0–7 (Town and all buildings), on branch `p4-town` (pushed, no PR yet). Done in P4: the walkable town (D-030), its guidance, celebration and decorations (D-031), the Book, Me, Credits and demo mode (D-032), and the Dhaba scene (D-033). Then, from owner feedback, a new title menu, new-game flow and modern customiser (D-034), and the full-screen game with modern scenes (prototype D-035, built D-036). The owner approved it, the Home scene is done (D-037), a knee-bending walk and no voice (D-038), and going in through doors, with the scale kept as in D-036 (D-039), the Panchayat scene (D-040), so all four buildings are written, the sort game at the Dhaba and the Panchayat (D-041), and Community (D-042), so every P4 task is done. **Next: open the P4 pull request (with the owner's go-ahead) and merge it once CI is green; then Phase 5, which starts at a 🛑 gate (the owner creates the Supabase project).** The Lab Eval I report is built from `tmp-report/` (git-ignored; see the handoff note).
+- **Checkpoints:** the table at the top of `docs/BUILD_PLAN.md` shows every phase, 🛑 gate and owner-only task at a glance. All gates so far are approved. Owner still to do: fact-check the School, Dhaba, Home and Panchayat cards (SETUP.md §6) and the Help Centre and Community places (§5), confirm the font licences.
+- **Merged to `main`:** P0 (PR #1), P1 (PR #2), P2 (PR #3, including the owner's redesign of the cover screens, character, customiser and School scene style; D-024 to D-026) and P3 (PR #4, School end to end, MILESTONE A; D-027 to D-029).
+- **Latest session notes:** bottom of `docs/BUILD_PLAN.md` (the "Handoff" note has the exact next task and the rules learned so far). **Every decision so far:** `docs/DECISIONS.md` (D-001 to D-042).
 
 ## Start of every session
 
@@ -19,22 +20,25 @@ A web game that teaches Indian children (8 to 16) their legal rights. The child 
 
 ## Map of the code (details in docs/ARCHITECTURE.md)
 
-- `content/`: typed JSON. `types.ts` is the contract, plus `strings.en.json`, `help.json`, `npcs.json`, `buildings.json` and `scenes/*.json` (`sandbox` and `school`).
+- `content/`: typed JSON. `types.ts` is the contract, plus `strings.en.json`, `help.json`, `npcs.json`, `buildings.json`, `credits.json`, `community.json` and `scenes/*.json` (`sandbox`, `school`, `dhaba`, `home`, `panchayat`, and the `town` hub).
 - `src/lib/`: `rules.ts` (pure game rules), `store.ts` (persisted zustand, version 2), `i18n.ts`, `calm.ts`, `sound.ts`.
 - `src/character/`: the SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), `CharacterBuilder`, `Portrait`, `Mitthu`.
-- `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`), plus `Scene.tsx` (draws it), `Dialogue.tsx` and `WalkPad.tsx`.
-- `src/art/`: scene art by key (`index.ts` registry, `sandbox.tsx`, `school.tsx`, `cover.tsx`).
-- `src/play/`: `CardReveal`, `Quiz`, `Results` (the end of a building). `src/lib/scenes.ts`: building id → scene.
-- `src/screens/` (Onboarding, Profiles, Town, Play, Me, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog, Button, Page, CoverScreen).
+- `src/engine/`: the pure scene logic (`movement.ts`, `story.ts`, `sceneState.ts` = `sceneReducer`; the player has `x` and a `depth`), plus `Scene.tsx` (the full-screen frame: camera, HUD, menu words, History, map), `Dialogue.tsx` (the strip) and `WalkPad.tsx`. The hosting screen can pass `locked` exits, `startX`, `startFlags`, `skipIntro`, a Mitthu `guide` and the `map` places; the engine never knows why.
+- `src/art/`: scene art by key (`index.ts` registry; `modern.tsx` the shared kit and lighting rules: sky, clouds, distance, paving, trees, windows; `school.tsx`, `dhaba.tsx`, `home.tsx`, `panchayat.tsx`, `town.tsx`; `sandbox.tsx` and `style.tsx` are the old style, kept for the dev sandbox). The cover screens are plain CSS (`src/components/cover.css`).
+- `src/play/`: `CardReveal`, `Quiz`, `Sort`, `Results` (the end of a building; its games play in order), `RightsCard` (card front, back and details, shared with the Book), `badgeText`, `useMap` (the map's places and travel). `src/lib/scenes.ts`: building id → scene, `cardsInTown()`.
+- `src/screens/` (Title (the main menu at `/`), Onboarding, Profiles, Town, Play, Book, Me, Community, Credits, HelpCentre, dev pages), `src/components/` (Shell, HelpButton, SettingsDialog + SettingsControls, DemoMode, Button, Page, CoverScreen, ReturnCelebration, AreaMap, GameFrame).
 - `scripts/validate-content.ts`: `npm run validate`, also run in CI.
-- Dev pages: `/#/dev/characters` (every character combination), `/#/dev/scene` (engine sandbox), `/#/dev/look` (School look-dev).
+- Dev pages: `/#/dev/characters` (every character combination), `/#/dev/scene` (engine sandbox).
 
 ## Tooling notes (Windows machine)
 
-- GitHub CLI is installed at `C:Program FilesGitHub CLIgh.exe`. Old terminals may not have it on PATH, so call it by full path if `gh` isn't found. Auto-merge is turned off for this repo: after CI is green, merge with `gh pr merge <n> --merge`. The owner prefers merge commits, so the `P<n>:` commits stay in history.
+- GitHub CLI is installed at `C:\Program Files\GitHub CLI\gh.exe`. Old terminals may not have it on PATH, so call it by full path if `gh` isn't found. Auto-merge is turned off for this repo: after CI is green, merge with `gh pr merge <n> --merge`. The owner prefers merge commits, so the `P<n>:` commits stay in history.
 - In Git Bash, arguments that start with `/` (such as `/dev/characters`) are rewritten into Windows paths. Prefix the command with `MSYS_NO_PATHCONV=1`, and pass Windows paths (`cygpath -w`) for output files.
 - The browser pane's screenshots can be stale or time out. For reliable visual checks, take screenshots with a small throwaway Playwright script against `npm run dev` (keep such scripts out of the repo).
 - Vite's file watcher can miss two writes to the same file in quick succession. If the page shows old code, restart the dev server.
+- Scale (D-039): the owner prefers the D-036 scale (people 400 units, buildings fully in view). Keep new scenes at that scale.
+- Calm mode stops every animation except a character's walk (`:not(.ch[data-pose='walk'] *)` in `index.css`, `scene.css`, `character.css`). Keep that exception in all three if you touch them.
+- Performance rule (D-030): no full-screen `mix-blend-mode`, no `backdrop-filter`, no `filter: blur` on animated pictures, and no animations inside very wide SVG layers. Without a GPU each one halves the frame rate.
 
 ## Owner and ownership
 
@@ -55,7 +59,7 @@ This project is being built from scratch and must end up **fully understood by i
 - `npm run typecheck`: `tsc -b` (app, configs and e2e tests)
 - `npm run test`: Vitest unit tests (`src/**/*.test.ts`, `scripts/*.test.ts`)
 - `npm run validate`: content validator (scene graphs, flags, NPCs, UI string keys, Help Centre sources)
-- `npm run e2e`: Playwright against the built app (`tests/e2e/`). It builds and serves on port 4173 itself.
+- `npm run e2e`: Playwright against the built app (`tests/e2e/`). It builds and serves on port 4173 itself. Locally it runs 3 browsers at once; close heavy apps if tests time out.
 
 Before saying a task is done: lint, typecheck, test and build must all pass.
 

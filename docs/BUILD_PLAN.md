@@ -12,6 +12,59 @@ Put this file at `docs/BUILD_PLAN.md` in a **new, empty repo**. `CLAUDE.md` in t
 - Record every significant choice in `docs/DECISIONS.md` (context, choice, why, alternatives). Never add a dependency without saying why.
 - There is no deadline. Quality and understanding beat speed. Do not cut corners to go faster, and do not add features that are not in this plan.
 
+## Checkpoints (keep this current: it is the one-glance status)
+
+Where the project stands against every phase, owner gate and owner-only task. Details are in the phase checklists (§9) and the session notes at the bottom.
+
+**Phases**
+
+| Phase | Status | Pull request | Decisions |
+| --- | --- | --- | --- |
+| P0 Foundation | ✅ merged | #1 | D-001 to D-012 |
+| P1 Core | ✅ merged | #2 | D-013 to D-018 |
+| P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
+| P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
+| P4 Town and all buildings | ✅ all 6 tasks done on `p4-town`; **pull request next** | not opened | D-030 to D-042 |
+| P5 Backend | ⬜ | | |
+| P6 Experience and Hindi | ⬜ | | |
+| P7 Hardening and documentation | ⬜ | | |
+
+**🛑 Owner gates**
+
+| Gate | Status |
+| --- | --- |
+| Character look (P2) | ✅ approved 2026-10-14; reopened on feedback; ✅ re-approved 2026-10-15 after the redesign (D-024) |
+| Cover screens (owner feedback, P2) | ✅ approved 2026-10-15 (D-025) |
+| Title menu, new game and customiser redesign (owner feedback, P4) | ✅ owner moved on to gameplay 2026-10-16 (D-034) |
+| New gameplay frame: prototype (owner feedback, P4) | ✅ approved 2026-10-16 after one revision (D-035) |
+| New gameplay frame and modern scenes, built (P4) | ✅ approved 2026-10-16 (D-036) |
+| Owner's play-test feedback: walk, doors, scale, voice (P4) | ✅ applied 2026-10-16 (D-038, D-039); the owner confirmed the walk and the door entry on their laptop 2026-10-18 |
+| Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
+| Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
+
+**Owner-only tasks still open** (none of these block P4; all must be done before children use the app)
+
+| Task | Where |
+| --- | --- |
+| Fact-check the School rights card (Article 21A matched the Ministry of Education page; the rest is unverified) | SETUP.md §6, `content/scenes/school.json` › `card.review` |
+| Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
+| Fact-check the Home rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/home.json` › `card.review` |
+| Fact-check the Panchayat rights card (quotes matched PRS and Indian Kanoon) | SETUP.md §6, `content/scenes/panchayat.json` › `card.review` |
+| Fact-check the Help Centre numbers and sentences, and the Community page's places that help | SETUP.md §5, `content/help.json` and `content/community.json` › `review` |
+| Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
+| Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
+
+**Phase 4 tasks** (detail in §9)
+
+| Task | Status |
+| --- | --- |
+| Walkable town scene (doors, locked replies, teasers, Help door) | ✅ D-030 |
+| Mitthu's guidance, return celebration, town changing with progress | ✅ D-031 |
+| Book, Me, Credits, badges, demo mode | ✅ D-032 |
+| Dhaba, Home and Panchayat scenes | ✅ Dhaba (D-033), Home (D-037), Panchayat (D-040). Each needs its legal text fact-checked |
+| Sort game, in at least two buildings | ✅ D-041 (the Dhaba and the Panchayat) |
+| Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ✅ D-042 |
+
 ## 1. Context
 
 - Saksham is a web game that teaches Indian children (8 to 16) their legal rights. It started as a Smart India Hackathon idea (SIH1281, Ministry of Law and Justice).
@@ -208,7 +261,7 @@ Done when: CI is green and the app shows an empty shell.
 - [x] Character builder screen (preview, rows of choices, "Surprise me"), added to onboarding and Me. Dev route `/dev/characters` showing every outfit and headwear combination for alignment checks.
 - [x] Portrait renderer (head and shoulders with a mood) for dialogue and results.
 
-🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14. ⚠️ **Reopened 2026-10-15:** the owner no longer likes the character design (see "Owner feedback rework" below).
+🛑 **Gate:** owner approves the character look before scene art starts. ✅ Approved 2026-10-14. ⚠️ Reopened 2026-10-15 on owner feedback (see "Owner feedback rework" below). ✅ **Re-approved 2026-10-15** after the redesign (D-024).
 
 #### Scene engine and look development
 
@@ -244,18 +297,18 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Town hub and progression
 
-- [ ] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door.
-- [ ] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers).
-- [ ] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode.
+- [x] Walkable town scene using the same engine: buildings are `exit` hotspots, locked buildings stay shut with a gentle reply, teasers show "Coming soon", Help has its own door. ✅ 2026-10-15 (D-030).
+- [x] Recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed (lanterns, bunting, more villagers). ✅ 2026-10-15 (D-031).
+- [x] Book (card album), Me (character, badges, settings, switch player), Credits (assets and the legal source of every card), badges, demo mode. ✅ 2026-10-15 (D-032).
 
 #### Remaining buildings
 
-- [ ] Dhaba, Home and Panchayat as scenes. This should be content and art only. If one needs engine changes, fix the engine, not the content. Home and any heavy story use `gentle` tone and are handled through conversation and witnessing, never by showing harm.
-- [ ] Sort game (drag plus a tap alternative) and add one to at least two buildings.
+- [x] Dhaba, Home and Panchayat as scenes. ✅ 2026-10-18 (D-033, D-037, D-040). This should be content and art only. If one needs engine changes, fix the engine, not the content. Home and any heavy story use `gentle` tone and are handled through conversation and witnessing, never by showing harm.
+- [x] Sort game (drag plus a tap alternative) and add one to at least two buildings. ✅ 2026-10-18 (D-041).
 
 #### Community
 
-- [ ] Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help. Labelled "Sample" where the data is not live.
+- [x] Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help. Labelled "Sample" where the data is not live. ✅ 2026-10-18 (D-042).
 
 ### Phase 5: Backend
 
@@ -393,7 +446,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: the look-dev page reuses the sandbox story and placeholder props (the box and notice). The real School story and props come in P3. Phone walk pad is only checked through `pointer: coarse`, not on a real device yet. No per-frame performance profiling yet (P7).
 - Waiting for: owner approval of the visual style at `/dev/look`. Then the next task is P3 › author `content/scenes/school.json`.
 
-**Handoff (2026-10-15): start of the next session**
+**Handoff (2026-10-15), superseded: use "Handoff for the next session (updated 2026-10-17)" below**
 - State: P0 and P1 are merged to `main` (PRs #1, #2). All of P2 is built and pushed on branch `p2-character-scene` (no PR yet). 155 unit and 34 e2e tests green locally.
 - Owner feedback: they do **not like the cover page or the character design**. The character gate is reopened, and the look-dev gate is not approved. Phase 3 must not start until both are redesigned and approved.
 - Exact next task: P2 › Owner feedback rework › "Clarify the feedback first". Ask the owner before changing any art.
@@ -427,4 +480,104 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P3 School end to end: done (MILESTONE A, 2026-10-15)**
 - Done: every P3 task. "Done when" is met: School plays from start to results, progress survives a reload, and the demo-path test passes (`tests/e2e/demo-path.spec.ts`; shared School steps now live in `tests/e2e/helpers.ts`). 171 unit and 41 e2e tests, lint, typecheck, validate and build all green. Sprint log, test report and architecture map updated.
 - Hacky / watch: the School card's legal text is still `unverified` (SETUP.md §6). The hub is temporary (Phase 4 makes the town walkable). Demo mode exists in the store but has no on-screen switch yet (Phase 4). One badge icon for every badge.
-- Next task: open the P3 pull request (`p3-school` → `main`), merge with a merge commit after green CI, then P4 › walkable town scene on a new branch.
+- Next task: open the P3 pull request (`p3-school` → `main`), merge with a merge commit after green CI, then P4 › walkable town scene on a new branch. ✅ PR #4 merged 2026-10-15.
+
+**P3 merged, P4 started (2026-10-15)**
+- Done: PR #4 (all of Phase 3) merged to `main` with a merge commit after green CI (lint, unit, build and e2e in both the push and pull-request runs; deploy skipped until Vercel is set up). Branch `p4-town` created from `main`; lint, typecheck, validate, 171 unit and 41 e2e tests green.
+- Next task: P4 › walkable town scene (buildings as `exit` hotspots, locked buildings stay shut with a gentle reply, teasers say "Coming soon", Help has its own door). It replaces the temporary list at `/town`.
+
+**P4: walkable town (2026-10-15)**
+- Done: `/town` is now a walkable street (`content/scenes/town.json`, art `src/art/town.tsx`) with a door per building plus a calm teal Help kiosk. Locked doors show a padlock and Mitthu's gentle reply; teasers say "Coming soon"; the Help door opens the Help Centre, and Back returns to the town. Coming back from a building starts you outside its door. The building cards stay below the street as a summary. Engine: `hub` scenes, host-controlled `locked` exits, `startX`. Validator: hub rules and hub door targets.
+- Performance: removed two full-screen blend modes (light shafts, film grain). Town 33 → 59 fps and School 30 → 47 fps in headless Chromium, with no visible change (D-030).
+- Performance, cover screens (my own P2 redesign): no blur behind forms or on glass panels, the picture holds still behind forms, and the tiny twinkles are still. Forms 10–15 → 60 fps, welcome 21 → 36 fps (D-030). This, not the town, was why journey tests timed out: they spend most of their time on those screens.
+- Tests: `src/engine/town.test.ts` (7), validator tests for hubs, `tests/e2e/town.spec.ts` (4). The two long journey tests (`play.spec.ts`, `demo-path.spec.ts`) allow 60 s and run in calm mode (no typewriter or ambient motion; same game logic, motion is covered by `scene.spec.ts` and `town.spec.ts`). Locally, Playwright runs at most 3 browsers at once: with up to 6, a busy laptop (another app was using a lot of CPU) starved them into timeouts, even on trivial steps. After these changes: 45/45 e2e in two consecutive full runs.
+- Hacky / watch: the engine's hotspot markers (soft glowing circles) show on every door, open or locked. The Dhaba, Home and Panchayat doors stay locked with "isn't open yet" until their stories exist. No real-device frame-rate check yet (P7).
+- Next task: P4 › recommended-building guidance (Mitthu points the way), return celebration, town changes as buildings are completed.
+
+**P4: a living town (2026-10-15)**
+- Done: Mitthu bobs above the suggested door, "Mitthu suggests" shows in "Things to do here", and his 20-second hint says where to go. Coming back from a building: you start outside its door without the welcome repeating, and Mitthu celebrates once (stars, any newly open place; confetti, gentle sparkles, or nothing in calm mode). Finished buildings get a marigold garland and lanterns, the bunting fills in, and Lata stands outside the School after you help her. Engine: `startFlags`/`hostFlags`, `guide`, `skipIntro`; layer art receives flags. "A new place is open" now appears only when that place's story exists.
+- Tests: town engine tests (flags, Lata, skip intro, host flags), validator test for host flags, e2e for the celebration (shown once, not after reload), Lata, and "Mitthu suggests".
+- Hacky / watch: more villagers come with each new building (only Lata so far). Mitthu's marker sits at a fixed height above doors.
+- Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
+
+**Handoff for the next session (updated 2026-10-17)**
+- **State:** branch `p4-town`, everything committed and pushed; the last app commit is Community (D-042), so every P4 task is done. P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** open the P4 pull request (`p4-town` into `main`, with the owner's go-ahead), wait for CI, and merge with `gh pr merge <n> --merge`. Then Phase 5 starts with a 🛑 gate: the owner creates the Supabase project (SETUP.md §4). (Community is done, D-042: `src/screens/Community.tsx`, `content/community.json`, `questions` in `ProfileData`.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
+- **How the game is put together now (D-036 to D-039):**
+  - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
+  - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
+  - `Character` has a `back` view and knees (`ch-shin-*`, `ch-knee` in `character.css`). The voice is gone (no `speech.ts`, no narration setting).
+- **Rules learned the hard way (keep them):**
+  - No full-screen `mix-blend-mode`, no `backdrop-filter`, and no `filter: blur` on animated pictures (D-030). Moving things go in their own small layer (clouds: `"drift": true`).
+  - Calm mode is set by the system's "reduce motion" too, and three files stop animations in it (`index.css`, `scene.css`, `character.css`). All three keep the walk exception `:not(.ch[data-pose='walk'] *)`; `scene.spec.ts` tests it.
+  - Scale: the owner tried true scale (D-038) and preferred the D-036 scale. Don't change it again without asking.
+  - Long journey e2e tests run in calm mode; motion is tested by `scene.spec.ts` and `town.spec.ts`. If tests time out everywhere at once, the laptop is busy; re-run first.
+  - Screenshots: a throwaway Playwright script against the dev server (port 5174 when 5173 is taken).
+  - Tooling on this machine: the Bash tool mangles heredocs (and `python -` waits for input forever), so write scripts to the scratchpad with the Write tool and run them. Write files with `newline='\n'` (the repo is LF).
+- **The Lab Eval I report** (not in git): `tmp-report/` (ignored via `.git/info/exclude`), built with `node tmp-report/build.ts "C:\SEM 5\Software Engineering\Project"`; notes in `tmp-report/NEXT.md`. Diagrams are SVG drawn in `tmp-report/figures.js` with helpers in `diagrams.js`; `node tmp-report/shot-uc.ts <figure-id>...` screenshots figures into `tmp-report/prev/`.
+- **Owner:** the fact checks (School, Dhaba, Home cards; Help Centre) are the most important open items before any child plays.
+
+**P4: Book, Me, Credits and demo mode (2026-10-15)**
+- Done: `/book` (card album, read any collected card again), Me (stars, all badges earned or not yet, settings, switch player, link to Credits), `/credits` (made-in-code art, fonts from `content/credits.json`, every card's source exactly as written), and demo mode (type "demo" or hold the logo 2 s; a top-bar chip turns it off). Shared card pieces in `src/play/RightsCard.tsx`; badge names in `src/play/badgeText.ts`; `SettingsControls` shared by the dialog and Me. Removed the last live blurs (D-030 rule).
+- Tests: `tests/e2e/collection.spec.ts` (7: Book collected and empty, Me, Credits, demo by typing, by long press, not from a text box), `src/lib/scenes.test.ts` (3), and a `seedPlayer` e2e helper that loads a saved player without playing.
+- Hacky / watch: the Book has only one real card until the other buildings exist. Badges use one shared icon. `/community` is still a placeholder (its own P4 task).
+- Next task: P4 › Dhaba, Home and Panchayat as scenes (content and art only; Home uses the `gentle` tone; every legal claim goes to the owner's fact check, like School in SETUP.md §6).
+
+**P4: the Dhaba (2026-10-15)**
+- Done: `content/scenes/dhaba.json` (gentle tone): Raju, 12, works at the dhaba instead of school; the player listens, finds his notebook, and tells Sunita Didi (anganwadi worker). Two gentle retries, a good ending, a rights card (Article 24 and section 3(1) of the 2016-amended Act; no penalties), and a 4 + 2 question quiz. New characters (Raju, Mohan Bhaiya, Sunita Didi), stage art `src/art/dhaba.tsx` and a notebook prop. Registered in `src/lib/scenes.ts`, so the town's Dhaba door now opens after the School, and the results and celebration say so. D-033.
+- Tests: `src/engine/dhaba.test.ts` (6), a Dhaba play-through e2e in `play.spec.ts` (gentle note links to Help), and updated expectations now that the Dhaba exists (Book shows 2 cards, the Dhaba is "Visit", not "Being built").
+- Owner: fact-check the Dhaba card (SETUP.md §6). The official PDFs did not open from Claude's tools; the quotes match secondary sources only.
+- Next task: P4 › the Home scene (`gentle` tone, safety at home; handled only through conversation and witnessing, never by showing harm). Then the Panchayat.
+
+**P4: owner feedback, title menu and customiser (2026-10-16)**
+- Done: `/` is now a title menu (`src/screens/Title.tsx`): logo, one line, and Continue / New game / Change character / Switch player / Settings on the left, the character on the right. New game is two steps: name with age under it, then the customiser. The customiser is rebuilt with Boy / Girl, modern hair, tops (T-shirt, shirt, hoodie, jacket) and bottoms (jeans, trousers, joggers). Beige look with Inter for menus; the dusk cover art is deleted. D-034.
+- Tests: spec unit tests (modern lists, gender, older saves), e2e updated for the new flow (title menu, age required, gender and bottoms in the customiser, Continue after reload). Me's "Switch player" no longer clears the player first (the screen's guard jumped to `/` before the list opened).
+- Watch: the game screens (town, scenes, Me, Book) still use the old warm serif look; the owner reviews them next. The Me › character page is narrower than the new-game one.
+- Next task: wait for the owner's review of these screens and their gameplay changes (🛑). Then, unless they say otherwise, the Home scene.
+
+**P4: the full-screen game and the modern scenes (2026-10-16)**
+- Done: the owner approved the prototype (D-035), and the real game now plays full screen (D-036): W A S D walking (with depth), the dialogue strip, the menu words (Back, History, Things to do, Map, Book, Settings, Exit), the area map with travel, and the School, Dhaba and town redrawn in the modern look (`src/art/modern.tsx` kit). Card, quiz and results sit in `GameFrame`. The title picture is the real School.
+- Tests: reducer tests for depth, Back and History; e2e helpers `thingsToDo` (opens the panel), `doThing` and `openMap`; town and play tests now check places on the map; a new test for W/S, Back and History. 202 unit and 55 e2e tests green.
+- Watch: the sandbox (`/dev/scene`) still uses its old flat art. People in the stories keep their traditional clothes (the owner only asked about the player). The Book, Me and Credits pages still have the old warm look; the owner may want them restyled next.
+- Next task: 🛑 the owner reviews the new game. Then, unless they say otherwise, the Home scene (gentle tone), drawn with the modern kit.
+
+**P4: Home (2026-10-16)**
+- Done: the owner approved the full-screen game (D-036) and it is pushed. `content/scenes/home.json` (gentle tone): Anu tells the player that her uncle hits her and told her to keep it secret; the player listens, sees her drawing, and tells Farida Aunty, who explains that no one may hurt a child and makes a plan (1098 if needed). Two gentle retries, a good ending, a rights card (Article 39(f) and section 75 of the JJ Act, 2015; no penalties), and a 4 + 2 question quiz. New characters Anu, Kabir and Farida Aunty; art `src/art/home.tsx`. Registered in `src/lib/scenes.ts`, so the Home door and map pin open after the Dhaba. D-037.
+- Tests: `src/engine/home.test.ts` (6), a Home play-through in `play.spec.ts` (with a new `dhaba` option for `seedPlayer`), and the Book now counts 3 written cards.
+- Owner: fact-check the Home card (SETUP.md §6), and read the story once for tone.
+- Next task: P4 › the Panchayat (child marriage, `gentle` tone), the same way.
+
+**P4: owner feedback after playing (2026-10-16)**
+- Done: true scale (children 300 units, doors 400, every scene and the town redrawn; camera closer), a walk with bending knees (and walking still animates in calm mode), a new ponytail, and the read-aloud voice removed. D-038.
+- Tests: all 208 unit and 56 e2e tests green; no test needed changing.
+- Next task: P4 › the Panchayat (child marriage, `gentle` tone), drawn at true scale with the modern kit.
+
+**P4: owner feedback, round 2 (2026-10-16)**
+- Done: scale back to D-036; the player walks to a door, turns (new back view) and goes in; the walk now steps with "reduce motion" on (a global calm rule was stopping it); the locked-building page has Need help? and says which place to finish first. D-039.
+- Tests: reducer tests for going in, town and sandbox tests wait for the player to go in, an e2e test for the walk with reduced motion, and the locked page shows Need help?. 210 unit and 57 e2e tests green.
+- Next task: P4 › the Panchayat (child marriage, `gentle` tone).
+
+**Lab Eval I report fixes (2026-10-17, report only, not in git)**
+- Done: the three use case diagrams became one (Figure 5, page 11), with «include» and «extend», arrows on associations, the class backend as a «system» box (not a stick figure) and no "System" actor; the Actors table and UC-18 template were corrected to match. Figure 7 (swimlane: joining a class) now labels the offline loop "on reconnect: check again"; Figure 8 (swimlane: content review) has a straight, labelled arrow from "Status: published" to the Child app's hash check. PDF rebuilt (41 pages) in `C:\SEM 5\Software Engineering\Project\`.
+- Next task: unchanged, P4 › the Panchayat.
+
+**Lab Eval I report: new screenshots (2026-10-17, report only, not in git)**
+- Done: every app screenshot retaken after the redesign (title menu, new game, customiser, full-screen town and School, card, quiz, results, Book, Me, Help Centre) plus a new Map figure; section 3.1.1, UC-01, UC-02, the Help use case, FR-02 and the 1.2.6 status rewritten to match. Still 41 pages. Old shots in `tmp-report/shots-pre-redesign/`.
+
+**P4: the Panchayat (2026-10-18)**
+- Done: the owner chose to finish Phase 4 before Phase 5. `content/scenes/panchayat.json` (gentle tone): Pooja, 15, tells the player her wedding has been fixed for after her exams; Sonu (her brother) and her admit card are the clues; the player tells Sarpanch Kavita ji, who explains the ages and visits the family with the Child Marriage Prohibition Officer. Two gentle retries, a good ending (the wedding is called off), a card quoting sections 2(a), 2(b) and 13(1) of the Prohibition of Child Marriage Act, 2006 (no penalties), and a 4 + 2 question quiz. Art `src/art/panchayat.tsx`, three new people. D-040. All four written buildings now open in order.
+- Tests: `src/engine/panchayat.test.ts` (6), a Panchayat play-through in `play.spec.ts` (`seedPlayer` has a `home` option now), the Book counts 4 cards, and demo mode opens the Panchayat. 216 unit and 58 e2e tests green.
+- Owner: fact-check the Panchayat card (SETUP.md §6) and read the story once for tone. Still to confirm from last time: the walk and going in through doors (D-039) on your laptop.
+- Next task: P4 › the Sort game, then Community.
+
+**P4: the sort game (2026-10-18)**
+- Done: the owner confirmed the walk and going in through doors (D-039) on their laptop. A sort game (`SortGame` in `content/types.ts`, `src/play/Sort.tsx`): one card at a time, dragged or tapped into one of two boxes, with the explanation after each card. A building plays its games in order and adds their scores (`addScores` in `rules.ts`). Added to the Dhaba ("Is this work allowed for this child?") and the Panchayat ("Is this wedding allowed?"), five cards each, with each card's claims added to its fact-check list. The validator checks sort games. D-041.
+- Tests: rules (sort scoring, adding scores), validator (a good sort game, wrong or unused boxes, too few cards or boxes, a sort game alone), and the Dhaba and Panchayat play-throughs now sort every card (the Panchayat drags its first card with the mouse). 222 unit and 58 e2e tests green; checked by screenshot at 1280 and 390 wide.
+- Watch: the "Quiz whiz" badge now needs every quiz and sort answer right on the first try in that building.
+- Next task: P4 › Community (the last P4 task), then open the P4 pull request.
+
+**P4: Community (2026-10-18)**
+- Done: `/community` (`src/screens/Community.tsx`, words in `content/community.json`): a Pledge Wall of six preset pledges (saved in `extras.pledges`), a cooperative Class Mission (all this device's stars as one total, no names, labelled "Sample"), Ask an Expert (questions saved only for the player who wrote them, at most 280 letters, removable, never sent anywhere, with a link to Need help?), and Places that help (with a fact-check `review`). D-042. Every Phase 4 task is now done.
+- Tests: `cleanQuestion` (rules), questions per player and removal (store), and `tests/e2e/community.spec.ts` (4): a pledge survives a reload and there is no free-text pledge; the mission is labelled Sample, counts the stars, and names nobody; a question is refused when empty, saved, hidden from another player on the same device, and removed; places are shown exactly as written. 226 unit and 62 e2e tests green; checked by screenshot at 1280 and 390 wide.
+- Owner: fact-check the places that help (SETUP.md §5).
+- Next task: open the P4 pull request (with the owner's go-ahead), then Phase 5's first 🛑 gate.

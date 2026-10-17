@@ -37,4 +37,17 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
   - Temporary town hub from `buildings.json` (D-029).
   - 171 unit and 41 e2e tests (including the demo path), all green. Found and fixed the real cause of a flaky walking test.
 - **Waiting on the owner:** fact-check the School card (SETUP.md §6).
-- **Next:** open and merge the P3 PR, then P4 Town and all buildings.
+- **Merged:** PR #4, 2026-10-15.
+- **Next:** P4 Town and all buildings, on branch `p4-town`.
+
+## P4 Town and all buildings (from 2026-10-15), in progress
+
+- **Goal:** A walkable town linking every building, all four buildings playable, plus the Book, Me, Credits, demo mode, the sort game and the community screens.
+- **Done so far:**
+  - Walkable town on the same engine: hub scenes, host-controlled locked doors with gentle replies, teasers, a Help door, start outside the last door (D-030).
+  - Mitthu points the way; a once-only return celebration; finished places get garlands, lanterns and more bunting; Lata appears after the School (D-031).
+  - Performance: removing full-screen blend modes and live blurs took the town from 33 to 59 fps, the School from 30 to 47, and the cover forms from 10–15 to 60 (headless Chromium).
+  - Book, Me (badges, settings, switch player), Credits and demo mode (D-032).
+  - The Dhaba: child labour, told gently (D-033).
+  - 195 unit and 53 e2e tests green (as of the Dhaba, 2026-10-16).
+- **Next:** the Home scene, then the Panchayat.

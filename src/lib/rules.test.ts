@@ -7,11 +7,13 @@ import {
   bestProgress,
   cardTextForBand,
   cleanFirstName,
+  cleanQuestion,
   hintRoundQuestions,
   isDemoCode,
   isUnlocked,
   isValidFirstName,
   mergeExtras,
+  addScores,
   mergeProgress,
   needsHintRound,
   nextDemoBuffer,
@@ -246,6 +248,21 @@ describe('FR-06 quiz score', () => {
     expect(scoreQuiz(shown, [])).toEqual({ correct: 0, total: 5 })
   })
 
+  it('FR-06 scores a sort game the same way: first placement of each card', () => {
+    const cards = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+    const placed = [
+      { questionId: 'a', correct: true },
+      { questionId: 'b', correct: false },
+      { questionId: 'c', correct: true },
+    ]
+    expect(scoreQuiz(cards, placed)).toEqual({ correct: 2, total: 3 })
+  })
+
+  it('FR-06 adds the quiz and sort scores into one game score', () => {
+    expect(addScores([{ correct: 3, total: 4 }, { correct: 5, total: 5 }])).toEqual({ correct: 8, total: 9 })
+    expect(addScores([])).toEqual({ correct: 0, total: 0 })
+  })
+
   it('rounds the stored percentage to a whole number', () => {
     expect(scorePercent({ correct: 1, total: 3 })).toBe(33)
     expect(scorePercent({ correct: 0, total: 0 })).toBe(0)
@@ -360,5 +377,17 @@ describe('FR-07 badges', () => {
 
   it('every badge id is known', () => {
     expect(badgesFor(result(0, 4), done('school', 'dhaba', 'home'), order).every((b) => BADGES.includes(b))).toBe(true)
+  })
+})
+
+describe('FR-10 Ask an Expert question rule', () => {
+  it('tidies spaces and accepts up to 280 letters', () => {
+    expect(cleanQuestion('  Who   can help? ')).toBe('Who can help?')
+    expect(cleanQuestion('a'.repeat(280))).toHaveLength(280)
+  })
+
+  it('refuses an empty or too long question', () => {
+    expect(cleanQuestion(' \n ')).toBeNull()
+    expect(cleanQuestion('a'.repeat(281))).toBeNull()
   })
 })
