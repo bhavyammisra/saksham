@@ -5,6 +5,7 @@
 import { dhabaLayers, dhabaProps } from './dhaba'
 import { homeLayers, homeProps } from './home'
 import { modernLayers } from './modern'
+import { panchayatLayers, panchayatProps } from './panchayat'
 import { sandboxLayers, sandboxProps } from './sandbox'
 import { schoolLayers, schoolProps } from './school'
 import { townLayers } from './town'
@@ -17,6 +18,7 @@ export const layerArt: Record<string, LayerArt> = {
   ...townLayers,
   ...dhabaLayers,
   ...homeLayers,
+  ...panchayatLayers,
 }
 
 export const propArt: Record<string, PropArt> = {
@@ -24,6 +26,7 @@ export const propArt: Record<string, PropArt> = {
   ...schoolProps,
   ...dhabaProps,
   ...homeProps,
+  ...panchayatProps,
 }
 
 export { GROUND_Y, SCENE_HEIGHT } from './types'

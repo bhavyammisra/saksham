@@ -126,5 +126,51 @@
       "glasses": true,
       "bag": false
     }
+  },
+  "pooja": {
+    "name": "Pooja",
+    "look": {
+      "gender": "girl",
+      "skin": "skin-6",
+      "hair": "plait",
+      "hairColor": "black",
+      "outfit": "shirt",
+      "outfitColor": "sage",
+      "bottom": "trousers",
+      "bottomColor": "charcoal",
+      "headwear": "none",
+      "bag": true
+    }
+  },
+  "sonu": {
+    "name": "Sonu",
+    "look": {
+      "gender": "boy",
+      "skin": "skin-6",
+      "hair": "buzz",
+      "hairColor": "black",
+      "outfit": "tshirt",
+      "outfitColor": "navy",
+      "bottom": "joggers",
+      "bottomColor": "khaki",
+      "headwear": "none",
+      "bag": false
+    }
+  },
+  "sarpanch-kavita": {
+    "name": "Sarpanch Kavita ji",
+    "adult": true,
+    "look": {
+      "gender": "girl",
+      "skin": "skin-7",
+      "hair": "bun",
+      "hairColor": "black",
+      "outfit": "salwar",
+      "outfitColor": "maroon",
+      "headwear": "dupatta",
+      "headwearColor": "saffron",
+      "glasses": false,
+      "bag": false
+    }
   }
 }

@@ -3,6 +3,7 @@
 
 import dhabaJson from '@content/scenes/dhaba.json'
 import homeJson from '@content/scenes/home.json'
+import panchayatJson from '@content/scenes/panchayat.json'
 import schoolJson from '@content/scenes/school.json'
 import townJson from '@content/scenes/town.json'
 import buildingsJson from '@content/buildings.json'
@@ -14,6 +15,7 @@ const scenes: Record<string, SceneDef> = {
   school: schoolJson as SceneDef,
   dhaba: dhabaJson as SceneDef,
   home: homeJson as SceneDef,
+  panchayat: panchayatJson as SceneDef,
 }
 
 /** The town: the walkable hub that links to every building. */

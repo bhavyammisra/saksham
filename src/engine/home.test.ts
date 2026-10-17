@@ -1,4 +1,4 @@
-// The real Dhaba scene (content/scenes/home.json), played through the pure engine.
+// The real Home scene (content/scenes/home.json), played through the pure engine.
 // The child is the helper: they listen to Anu, notice her drawing and tell a trusted adult. Nothing harmful is shown.
 
 import { describe, expect, it } from 'vitest'

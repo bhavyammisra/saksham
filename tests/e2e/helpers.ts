@@ -96,18 +96,20 @@ export async function seedPlayer(
     band = 'young',
     school = false,
     dhaba = false,
+    home = false,
     badges = [] as string[],
     demo = false,
-  }: { band?: 'young' | 'teen'; school?: boolean; dhaba?: boolean; badges?: string[]; demo?: boolean } = {},
+  }: { band?: 'young' | 'teen'; school?: boolean; dhaba?: boolean; home?: boolean; badges?: string[]; demo?: boolean } = {},
 ) {
   await page.goto('/')
   await page.evaluate(
-    ({ band, school, dhaba, badges, demo }) => {
+    ({ band, school, dhaba, home, badges, demo }) => {
       const avatar = { skin: 'skin-4', hair: 'two-plaits', hairColor: 'black', outfit: 'salwar', outfitColor: 'peacock', headwear: 'none', headwearColor: 'navy', glasses: false, bag: false }
-      // `dhaba` means the School and the Dhaba are both finished (the Dhaba opens after the School).
+      // Each place opens after the one before: `dhaba` means the School and the Dhaba are finished, `home` adds Home.
       const done = { stars: 2, bestScore: 75, completed: true }
-      const progress = dhaba ? { school: done, dhaba: done } : school ? { school: done } : {}
-      const cards = dhaba ? ['right-to-education', 'freedom-from-child-labour'] : school ? ['right-to-education'] : []
+      const finished = home ? 3 : dhaba ? 2 : school ? 1 : 0
+      const progress = Object.fromEntries(['school', 'dhaba', 'home'].slice(0, finished).map((id) => [id, done]))
+      const cards = ['right-to-education', 'freedom-from-child-labour', 'right-to-be-safe'].slice(0, finished)
       localStorage.setItem(
         'saksham',
         JSON.stringify({
@@ -122,7 +124,7 @@ export async function seedPlayer(
         }),
       )
     },
-    { band, school, dhaba, badges, demo },
+    { band, school, dhaba, home, badges, demo },
   )
   await page.goto('about:blank')
   await page.goto(`/#${path}`)

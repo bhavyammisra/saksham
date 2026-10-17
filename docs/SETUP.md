@@ -84,3 +84,13 @@ Claude compared both quotes with secondary sources only, and both match word for
 3. Confirm that section 75 covers anyone having "the actual charge of, or control over, a child", which includes family members (the card and quiz say so), and that Article 39(f) is described fairly: a Directive Principle, something the State is asked to do.
 4. Read the card text (`kid`, `teen`, `ifItHappens`), Farida Aunty's lines (`farida-good` to `farida-good-3`) and the six quiz questions. Each must agree with points 1 to 3. Also read the whole story once for tone, with an 8-year-old in mind: harm is only told, never shown.
 5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
+**Panchayat (`content/scenes/panchayat.json`), freedom from child marriage:**
+
+Claude compared both quotes word for word with two copies of the Act, and both match: [PRS Legislative Research](https://prsindia.org/files/bills_acts/acts_parliament/2006/the-prohibition-of-child-marriage-act-2006.pdf) and [Indian Kanoon](https://indiankanoon.org/doc/790355/). India Code did not load from Claude's tools.
+
+1. `card.law` quotes section 2(a) and 2(b) of the Prohibition of Child Marriage Act, 2006 (who is a "child", and what a "child marriage" is). Check the wording on India Code (https://www.indiacode.nic.in).
+2. `card.law` also quotes section 13(1) (a magistrate who is satisfied that a child marriage has been arranged or is about to happen must issue an injunction prohibiting it). Check the wording.
+3. In the same Act, confirm: anyone with personal knowledge or reason to believe can complain (section 13(2)); the State appoints Child Marriage Prohibition Officers whose duty includes preventing child marriages (section 16(1), 16(3)(a)); and the State may ask an officer of the Gram Panchayat to assist them (section 16(2)), which is why the Sarpanch goes with the officer in the story.
+4. Read the card text (`kid`, `teen`, `ifItHappens`), Sarpanch Kavita ji's lines (`sarpanch-good` to `sarpanch-good-3`) and the six quiz questions. Each must agree with points 1 to 3. Penalties are deliberately not mentioned anywhere. Also read the whole story once for tone, with an 8-year-old in mind: no wedding is shown, Pooja only tells the player.
+5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
