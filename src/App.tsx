@@ -9,6 +9,7 @@ import { RequireProfile } from '@/screens/guards'
 import { HelpCentre } from '@/screens/HelpCentre'
 import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
+import { Community } from '@/screens/Community'
 import { Placeholder } from '@/screens/Placeholder'
 import { Play } from '@/screens/Play'
 import { Profiles } from '@/screens/Profiles'
@@ -49,7 +50,7 @@ export default function App() {
           <Route path="/credits" element={<Credits />} />
           <Route element={<RequireProfile />}>
             <Route path="/book" element={<Book />} />
-            <Route path="/community" element={<Placeholder title="community.title" />} />
+            <Route path="/community" element={<Community />} />
             <Route path="/me" element={<Me />} />
             <Route path="/me/character" element={<MeCharacter />} />
           </Route>

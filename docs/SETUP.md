@@ -53,6 +53,8 @@ Filled in during Phase 5: create the project, enable anonymous sign-ins and emai
 
 Claude could not open 112.gov.in, cybercrime.gov.in or telemanas.mohfw.gov.in from its tools (connection refused or JavaScript-only pages). The numbers were cross-checked against PIB press releases instead.
 
+**Community page (`content/community.json`), places that help:** read the six places and their descriptions, and check the items in `review.checks` (each place is fair for children across India; 112 and 1098 match the Help Centre). When done, set `review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
 ## 6. Fact-check each rights card ⬜ (owner, before any child uses the app)
 
 Every scene's rights card (`card` in `content/scenes/<id>.json`) has a `review` block, which is never shown in the app. `review.checks` lists each claim to verify. The validator refuses `"verified"` unless `checkedBy` and `checkedOn` are filled in.

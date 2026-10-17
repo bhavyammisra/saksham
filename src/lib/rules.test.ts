@@ -7,6 +7,7 @@ import {
   bestProgress,
   cardTextForBand,
   cleanFirstName,
+  cleanQuestion,
   hintRoundQuestions,
   isDemoCode,
   isUnlocked,
@@ -376,5 +377,17 @@ describe('FR-07 badges', () => {
 
   it('every badge id is known', () => {
     expect(badgesFor(result(0, 4), done('school', 'dhaba', 'home'), order).every((b) => BADGES.includes(b))).toBe(true)
+  })
+})
+
+describe('FR-10 Ask an Expert question rule', () => {
+  it('tidies spaces and accepts up to 280 letters', () => {
+    expect(cleanQuestion('  Who   can help? ')).toBe('Who can help?')
+    expect(cleanQuestion('a'.repeat(280))).toHaveLength(280)
+  })
+
+  it('refuses an empty or too long question', () => {
+    expect(cleanQuestion(' \n ')).toBeNull()
+    expect(cleanQuestion('a'.repeat(281))).toBeNull()
   })
 })

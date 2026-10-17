@@ -24,7 +24,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | 🔄 in progress on `p4-town` (5 of 6 tasks; the game is full screen since D-036) | not opened | D-030 to D-041 |
+| P4 Town and all buildings | ✅ all 6 tasks done on `p4-town`; **pull request next** | not opened | D-030 to D-042 |
 | P5 Backend | ⬜ | | |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
@@ -50,7 +50,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
 | Fact-check the Home rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/home.json` › `card.review` |
 | Fact-check the Panchayat rights card (quotes matched PRS and Indian Kanoon) | SETUP.md §6, `content/scenes/panchayat.json` › `card.review` |
-| Fact-check the Help Centre numbers and sentences | SETUP.md §5, `content/help.json` › `review` |
+| Fact-check the Help Centre numbers and sentences, and the Community page's places that help | SETUP.md §5, `content/help.json` and `content/community.json` › `review` |
 | Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
 
@@ -63,7 +63,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Book, Me, Credits, badges, demo mode | ✅ D-032 |
 | Dhaba, Home and Panchayat scenes | ✅ Dhaba (D-033), Home (D-037), Panchayat (D-040). Each needs its legal text fact-checked |
 | Sort game, in at least two buildings | ✅ D-041 (the Dhaba and the Panchayat) |
-| Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ⬜ **next** |
+| Community: Pledge Wall, Class Mission, Ask an Expert, Places that help | ✅ D-042 |
 
 ## 1. Context
 
@@ -308,7 +308,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Community
 
-- [ ] Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help. Labelled "Sample" where the data is not live.
+- [x] Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help. Labelled "Sample" where the data is not live. ✅ 2026-10-18 (D-042).
 
 ### Phase 5: Backend
 
@@ -501,8 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** branch `p4-town`, everything committed and pushed; the last app commit is the sort game (D-041). P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 222 unit tests (14 files) and 58 e2e tests (8 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** P4 › **Community**: Pledge Wall (preset pledges only), Class Mission (cooperative), Ask an Expert (private, stays on device), Places that help, labelled "Sample" where the data is not live. `/community` is still a `Placeholder`. It is the last P4 task; then open the P4 pull request. (The sort game is done, D-041: `SortGame` in `content/types.ts`, `src/play/Sort.tsx`, games played in order in `Play.tsx`, `sortCards` in the e2e helpers.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
+- **State:** branch `p4-town`, everything committed and pushed; the last app commit is Community (D-042), so every P4 task is done. P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** open the P4 pull request (`p4-town` into `main`, with the owner's go-ahead), wait for CI, and merge with `gh pr merge <n> --merge`. Then Phase 5 starts with a 🛑 gate: the owner creates the Supabase project (SETUP.md §4). (Community is done, D-042: `src/screens/Community.tsx`, `content/community.json`, `questions` in `ProfileData`.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -575,3 +575,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: rules (sort scoring, adding scores), validator (a good sort game, wrong or unused boxes, too few cards or boxes, a sort game alone), and the Dhaba and Panchayat play-throughs now sort every card (the Panchayat drags its first card with the mouse). 222 unit and 58 e2e tests green; checked by screenshot at 1280 and 390 wide.
 - Watch: the "Quiz whiz" badge now needs every quiz and sort answer right on the first try in that building.
 - Next task: P4 › Community (the last P4 task), then open the P4 pull request.
+
+**P4: Community (2026-10-18)**
+- Done: `/community` (`src/screens/Community.tsx`, words in `content/community.json`): a Pledge Wall of six preset pledges (saved in `extras.pledges`), a cooperative Class Mission (all this device's stars as one total, no names, labelled "Sample"), Ask an Expert (questions saved only for the player who wrote them, at most 280 letters, removable, never sent anywhere, with a link to Need help?), and Places that help (with a fact-check `review`). D-042. Every Phase 4 task is now done.
+- Tests: `cleanQuestion` (rules), questions per player and removal (store), and `tests/e2e/community.spec.ts` (4): a pledge survives a reload and there is no free-text pledge; the mission is labelled Sample, counts the stars, and names nobody; a question is refused when empty, saved, hidden from another player on the same device, and removed; places are shown exactly as written. 226 unit and 62 e2e tests green; checked by screenshot at 1280 and 390 wide.
+- Owner: fact-check the places that help (SETUP.md §5).
+- Next task: open the P4 pull request (with the owner's go-ahead), then Phase 5's first 🛑 gate.

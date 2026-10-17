@@ -104,3 +104,23 @@ describe('FR-01 the player character', () => {
     expect(selectActiveProfile(store())?.avatar.skin).toBe(defaultSpec.skin)
   })
 })
+
+describe('FR-10 Ask an Expert questions stay with their player', () => {
+  it('saves a tidied question for the active player only', () => {
+    const asha = store().addProfile('Asha', 'young')!
+    expect(store().addQuestion('  Can my   school ask for fees? ')).toBe(true)
+    expect(store().data[asha.id]?.questions?.map((q) => q.text)).toEqual(['Can my school ask for fees?'])
+    store().addProfile('Ravi', 'teen')
+    expect(selectActiveData(store())?.questions ?? []).toEqual([])
+  })
+
+  it('refuses an empty or too long question, and removes one', () => {
+    store().addProfile('Asha', 'young')
+    expect(store().addQuestion('   ')).toBe(false)
+    expect(store().addQuestion('a'.repeat(281))).toBe(false)
+    store().addQuestion('Who can I call?')
+    const id = selectActiveData(store())!.questions![0]!.id
+    store().removeQuestion(id)
+    expect(selectActiveData(store())?.questions).toEqual([])
+  })
+})

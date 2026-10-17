@@ -43,6 +43,16 @@ export interface BuildingResult {
   score: Score // the game score
 }
 
+// ---------------------------------------------------------------- Ask an Expert
+
+export const QUESTION_MAX = 280
+
+/** An Ask an Expert question, tidied (spaces collapsed), or null if it is empty or too long. */
+export function cleanQuestion(text: string): string | null {
+  const clean = text.trim().replace(/\s+/g, ' ')
+  return clean.length > 0 && clean.length <= QUESTION_MAX ? clean : null
+}
+
 // ---------------------------------------------------------------- scores
 
 /** True when score is at least `percent` %. Uses whole numbers to avoid rounding surprises. */

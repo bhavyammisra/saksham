@@ -1,0 +1,33 @@
+{
+  "pledges": [
+    { "id": "tell-adult", "text": "I will tell a grown-up I trust if a friend is in trouble." },
+    { "id": "school-friend", "text": "I will help a friend who isn't going to school." },
+    { "id": "never-fault", "text": "I will remember that when someone hurts a child, it is never the child's fault." },
+    { "id": "wedding", "text": "I will tell a grown-up I trust if I hear that a child's wedding is being planned." },
+    { "id": "helpline", "text": "I will remember that 1098 is free and open at any time." },
+    { "id": "kind", "text": "I will be kind to everyone, at school and at home." }
+  ],
+  "mission": {
+    "goal": "Together, collect 20 stars by helping people around the town.",
+    "target": 20
+  },
+  "places": [
+    { "id": "teacher", "name": "A teacher or your head teacher", "what": "At school. They can help with school, and with worries about home or friends." },
+    { "id": "anganwadi", "name": "The anganwadi centre", "what": "In many villages and towns. The anganwadi worker helps young children and their families, and knows who else can help." },
+    { "id": "panchayat", "name": "The Gram Panchayat office", "what": "In a village. The sarpanch and the panchayat help solve problems in the village, and can help stop a child marriage." },
+    { "id": "health", "name": "A hospital or health centre", "what": "If someone is hurt or ill. Doctors and nurses help children too." },
+    { "id": "police", "name": "A police station", "what": "If someone is in danger or a crime is happening. In an emergency, call 112." },
+    { "id": "childline", "name": "Child Helpline 1098", "what": "Free, at any time. The people there help children who need care or protection." }
+  ],
+  "review": {
+    "status": "unverified",
+    "checkedBy": null,
+    "checkedOn": null,
+    "note": "Written by Claude, 2026-10-18. Not shown in the app. The places are general descriptions; check that each is fair for children across India, and that the numbers match the Help Centre (SETUP.md §5). Then set status to \"verified\" with your name and the date.",
+    "checks": [
+      "places: each description is accurate and fair for children across India (teacher, anganwadi, Gram Panchayat, hospital or health centre, police station, Child Helpline).",
+      "places (panchayat): a Gram Panchayat can help stop a child marriage (section 16(2) of the Prohibition of Child Marriage Act, 2006; see the Panchayat card).",
+      "places (police, childline) and pledges (helpline): 112 and 1098 are the right numbers, and 1098 is free and open at any time (same check as the Help Centre, SETUP.md §5)."
+    ]
+  }
+}

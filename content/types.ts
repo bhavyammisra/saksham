@@ -173,6 +173,15 @@ export interface Helpline {
   sources: { title: string; url: string }[] // official pages that state this number
 }
 
+// The Community page (content/community.json, D-042). Every word shown comes from this file.
+export interface CommunityContent {
+  pledges: { id: string; text: string }[] // preset pledges only: children never write their own (safety rule)
+  mission: { goal: string; target: number } // the cooperative class goal, in stars
+  places: { id: string; name: string; what: string }[] // places that help
+  // Not shown in the app. Tracks the owner's fact-check.
+  review: ContentReview
+}
+
 // People (and Mitthu) who appear in scenes and dialogue (content/npcs.json).
 // A hotspot's `npc` and a node's `speaker` refer to these ids; "player" means the child.
 export interface NpcDef {

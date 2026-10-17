@@ -11,6 +11,7 @@ import type { Lang } from './i18n'
 import {
   bestProgress,
   cleanFirstName,
+  cleanQuestion,
   isValidFirstName,
   progressFromResult,
   type BuildingResult,
@@ -35,10 +36,18 @@ export interface Settings {
   lang: Lang
 }
 
+/** An Ask an Expert question. It stays on this device and is never synced (safety rule). */
+export interface Question {
+  id: string
+  text: string
+  at: number
+}
+
 /** Everything saved for one profile. */
 export interface ProfileData {
   progress: ProgressMap
   extras: Extras
+  questions?: Question[] // missing in saves from before D-042
 }
 
 export type ExtraKind = keyof Extras
@@ -61,6 +70,9 @@ export interface SakshamState {
   recordResult: (buildingId: string, result: BuildingResult) => void
   /** Adds a card, badge, marigold or pledge id to the active profile (no duplicates). */
   addExtra: (kind: ExtraKind, id: string) => void
+  /** Saves an Ask an Expert question for the active profile. Returns false if it is empty or too long. */
+  addQuestion: (text: string) => boolean
+  removeQuestion: (id: string) => void
   setDemo: (on: boolean) => void
 }
 
@@ -180,6 +192,28 @@ export const useStore = create<SakshamState>()(
           if (current.extras[kind].includes(itemId)) return {}
           const extras = { ...current.extras, [kind]: [...current.extras[kind], itemId] }
           return { data: { ...s.data, [id]: { ...current, extras } } }
+        })
+      },
+
+      addQuestion: (text) => {
+        const id = get().activeProfileId
+        const clean = cleanQuestion(text)
+        if (!id || !clean) return false
+        set((s) => {
+          const current = s.data[id] ?? emptyData()
+          const questions = [...(current.questions ?? []), { id: newId(), text: clean, at: Date.now() }]
+          return { data: { ...s.data, [id]: { ...current, questions } } }
+        })
+        return true
+      },
+
+      removeQuestion: (questionId) => {
+        const id = get().activeProfileId
+        if (!id) return
+        set((s) => {
+          const current = s.data[id] ?? emptyData()
+          const questions = (current.questions ?? []).filter((q) => q.id !== questionId)
+          return { data: { ...s.data, [id]: { ...current, questions } } }
         })
       },
 
