@@ -3,7 +3,7 @@
 // The real views and the class-total function are tested in supabase/tests/rls.test.sql.
 import { expect, test, type Page, type Route } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { strings } from './helpers.ts'
+import { skipWithoutBackend, strings } from './helpers.ts'
 
 const part = (o: object) => Buffer.from(JSON.stringify(o)).toString('base64url')
 function session(userId: string, anonymous: boolean) {
@@ -66,8 +66,7 @@ async function fakeClass(page: Page) {
 }
 
 async function openDashboard(page: Page) {
-  await page.goto('/#/teacher')
-  test.skip(await page.getByText(strings['teacher.offline']).isVisible(), 'built without Supabase settings')
+  await skipWithoutBackend(page)
   await page.getByLabel(strings['teacher.email']).fill('teacher@example.test')
   await page.getByLabel(strings['teacher.password']).fill('a-long-password')
   await page.getByRole('button', { name: strings['teacher.signIn'] }).last().click()
@@ -124,6 +123,7 @@ test('FR-10 a player in a class sees the real class total on Community, with no 
   await page.route(/supabase\.co\/auth\/v1\//, (route) => json(route, session('child-1', true)))
   await page.route(/supabase\.co\/rest\/v1\/rpc\/my_class_mission/, (route) => json(route, [{ class_name: 'Class 6B', mission_target: 30, total_stars: 14 }]))
   await page.route(/supabase\.co\/rest\/v1\/(?!rpc)/, (route) => route.fulfill({ status: 201 })) // background sync: not checked here
+  await skipWithoutBackend(page)
   await page.goto('/')
   await page.evaluate(() => {
     const avatar = { skin: 'skin-4', hair: 'two-plaits', hairColor: 'black', outfit: 'salwar', outfitColor: 'peacock', headwear: 'none', headwearColor: 'navy', glasses: false, bag: false }

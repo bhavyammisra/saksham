@@ -2,7 +2,10 @@
 // As in teacher.spec.ts, the app's requests to Supabase are answered by a fake in the browser,
 // so no real accounts are made. The real join_class rules are tested in supabase/tests/rls.test.sql.
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { seedPlayer, strings } from './helpers.ts'
+import { seedPlayer, skipWithoutBackend, strings } from './helpers.ts'
+
+// The class features only exist in a build with the Supabase settings.
+test.beforeEach(({ page }) => skipWithoutBackend(page))
 
 const CODE = 'ABC234'
 const CLASS = 'Class 6B'

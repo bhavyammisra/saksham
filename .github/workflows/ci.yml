@@ -73,11 +73,27 @@ jobs:
           path: playwright-report
           retention-days: 7
 
+  e2e-local-only:
+    # The same tests on a build WITHOUT the Supabase settings: the game must work with no
+    # backend at all (local-first rule, D-048). Tests of the class features skip themselves.
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ''
+      VITE_SUPABASE_ANON_KEY: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+
   deploy:
     # Only pushes to main, and only once the owner has set up Vercel (docs/SETUP.md).
     # Without the VERCEL_PROJECT_ID variable this job is skipped, not failed.
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.VERCEL_PROJECT_ID != ''
-    needs: [lint, unit, build, e2e]
+    needs: [lint, unit, build, e2e, e2e-local-only]
     runs-on: ubuntu-latest
     env:
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}

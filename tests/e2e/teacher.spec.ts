@@ -3,7 +3,7 @@
 // fake below, so these tests need no accounts and work in CI. The database's own rules are tested
 // separately, against the real project (supabase/tests/rls.test.sql).
 import { expect, test, type Page, type Route } from '@playwright/test'
-import { strings } from './helpers.ts'
+import { skipWithoutBackend, strings } from './helpers.ts'
 
 const PASSWORD = 'right-password'
 const USER = { id: '00000000-0000-0000-0000-0000000000a1', email: 'teacher@example.test', aud: 'authenticated', role: 'authenticated', is_anonymous: false, app_metadata: {}, user_metadata: {}, created_at: '2026-10-18T00:00:00Z' }
@@ -64,11 +64,6 @@ async function fakeSupabase(page: Page) {
   return classes
 }
 
-/** These tests need a build with the Supabase settings (CI and .env.local have them); skip otherwise. */
-const skipIfOffline = async (page: Page) => {
-  test.skip(await page.getByText(strings['teacher.offline']).isVisible(), 'built without Supabase settings')
-}
-
 const signIn = async (page: Page, password = PASSWORD) => {
   await page.getByLabel(strings['teacher.email']).fill(USER.email)
   await page.getByLabel(strings['teacher.password']).fill(password)
@@ -77,10 +72,10 @@ const signIn = async (page: Page, password = PASSWORD) => {
 
 test('FR-13 a teacher signs up, then signs in; a wrong password says so', async ({ page }) => {
   await fakeSupabase(page)
+  await skipWithoutBackend(page)
   await page.goto('/')
   await page.getByRole('link', { name: strings['title.forTeachers'] }).click()
   await expect(page).toHaveURL(/#\/teacher$/)
-  await skipIfOffline(page)
   await expect(page.getByTestId('help-button')).toBeVisible()
 
   await page.getByRole('button', { name: strings['teacher.signUp'] }).click()
@@ -105,8 +100,7 @@ test.describe('FR-13 classes', () => {
 
   test('create, rename, copy the code, turn it off, get a new code, and delete', async ({ page }) => {
     const classes = await fakeSupabase(page)
-    await page.goto('/#/teacher')
-    await skipIfOffline(page)
+    await skipWithoutBackend(page)
     await signIn(page)
 
     await page.getByLabel(strings['teacher.newClass']).fill('Class 6B')

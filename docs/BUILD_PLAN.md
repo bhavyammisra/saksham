@@ -25,7 +25,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | 🔄 branch `p5-backend`; backend core, teacher page, joining a class, sync and the dashboard done (D-043 to D-047), next: the offline check | | D-043 to D-047 |
+| P5 Backend | 🔄 branch `p5-backend`; backend core done (D-043 to D-048), next: content review | | D-043 to D-048 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -325,7 +325,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 - [x] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file. ✅ 2026-10-18 (D-045; "My class" on Me).
 - [x] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures. ✅ 2026-10-18 (D-046).
 - [x] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty. ✅ 2026-10-18 (D-047; an empty class says how to join instead of showing sample rows).
-- [ ] Verify the whole demo path works with env vars unset and with the network off.
+- [x] Verify the whole demo path works with env vars unset and with the network off. ✅ 2026-10-18 (D-048; CI now runs e2e on a build without the settings too).
 
 #### Content review workflow
 
@@ -501,8 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core (D-043), the teacher page (D-044), joining a class (D-045), sync (D-046) and the dashboard with the real Class Mission (D-047) are done. 237 unit tests (16 files) and 75 e2e tests (13 files, 16 of them safety) are green; lint, typecheck, validate and build pass; the RLS test has 42 checks, all passing. See **Checkpoints** at the top.
-- **Exact next task:** P5 › verify the whole demo path works with the env vars unset and with the network off. The game must not change at all without Supabase (`supabase` is null, `startSync` never starts, Me has no "My class", `/teacher` says classes aren't available). CI and `.env.local` build WITH the settings, so this needs a build without them (for example an e2e run with the two `VITE_SUPABASE_*` variables set to empty) and a run with the browser offline. Then the content review box (hash-and-seed script, `/reviewer`, the "Reviewed" tick).
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core is done (D-043 to D-048). 237 unit tests (16 files) and 77 e2e tests (14 files, 16 of them safety) are green with the Supabase settings (one test only runs without them); without them 64 pass and the 13 class tests skip; lint, typecheck, validate and build pass; the RLS test has 42 checks, all passing. See **Checkpoints** at the top.
+- **Exact next task:** P5 › Content review, first box: a hash-and-seed script for reviewable items (English now, Hindi later). Each rights card, quiz and the Help Centre becomes a `content_items` row (`card:school:en` and so on) holding only a SHA-256 hash of its exact text, sent through `submit_content_for_review` (reviewer or admin only, D-043). It must run as a signed-in reviewer, never with the service-role key; the owner makes their own account a reviewer with one SQL line (put it in SETUP.md). Then `/reviewer` and the "Reviewed ✓" tick. New backend tests: add `skipWithoutBackend` (tests/e2e/helpers.ts) so they skip on a build without the settings (CI job `e2e-local-only`).
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -619,3 +619,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: "Show class progress" on each class in `/teacher`: stars by place for every student (shaded, and in words for screen readers), class averages, the five questions most often wrong on the first try (words from content), removing a student, and the Class Mission; it reloads every 30 seconds and with Refresh. New function `my_class_mission()` gives a child their class's total only, so Community shows the real class mission (no "Sample") for a player in a class. D-047.
 - Tests: 42 RLS checks (5 new), `tests/e2e/dashboard.spec.ts` (4, including the 30-second poll with a fake clock). Fixed a timing slip in `sync.spec.ts` (it now waits for the cards to arrive). 237 unit and 75 e2e tests green. Checked by screenshot at 1280 and 390 wide; a screen-reader-only label had made the phone page scroll sideways, fixed by making the table's box `relative`.
 - Next task: P5 › verify the demo path with no Supabase settings and with the network off.
+
+**P5: works without the backend (2026-10-18)**
+- Done: `tests/e2e/offline.spec.ts` plays the demo path with the network off, and checks that a build without the Supabase settings has no class features; backend tests skip themselves on such a build (`skipWithoutBackend`); CI job `e2e-local-only` runs the whole suite on a build with empty settings. Run locally: with the settings 76 passed and 1 skipped; without them 64 passed and 13 skipped, and the build had no project address in it. D-048.
+- Known limit: the app can't be opened or reloaded with no network (no service worker); once open, it works offline.
+- Next task: P5 › Content review (hash-and-seed script, `/reviewer`, "Reviewed ✓").

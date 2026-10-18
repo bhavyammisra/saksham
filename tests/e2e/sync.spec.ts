@@ -4,7 +4,10 @@
 // supabase/tests/rls.test.sql; this fake applies the same rules.
 import { expect, test, type Page, type Route } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, playStory, strings } from './helpers.ts'
+import { answerQuiz, playStory, skipWithoutBackend, strings } from './helpers.ts'
+
+// The class features only exist in a build with the Supabase settings.
+test.beforeEach(({ page }) => skipWithoutBackend(page))
 
 const USER = 'child-1'
 
