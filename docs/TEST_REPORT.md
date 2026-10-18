@@ -6,11 +6,11 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 
 | Type | Tool | Files | Tests | Where |
 | --- | --- | --- | --- | --- |
-| Unit | Vitest | 16 | 237 | `src/**/*.test.ts`, `scripts/*.test.ts` |
-| End-to-end | Playwright (Chromium) | 13 | 61 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts`, `community.spec.ts`, `teacher.spec.ts`, `class.spec.ts`, `sync.spec.ts`, `dashboard.spec.ts`, `offline.spec.ts`. CI runs them twice: with the Supabase settings (job `e2e`) and without (job `e2e-local-only`, where the 13 class tests skip themselves) |
+| Unit | Vitest | 17 | 241 | `src/**/*.test.ts`, `scripts/*.test.ts` |
+| End-to-end | Playwright (Chromium) | 14 | 64 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts`, `community.spec.ts`, `teacher.spec.ts`, `class.spec.ts`, `sync.spec.ts`, `dashboard.spec.ts`, `offline.spec.ts`, `reviewer.spec.ts`. CI runs them twice: with the Supabase settings (job `e2e`) and without (job `e2e-local-only`, where the 16 backend tests skip themselves) |
 | Safety invariants | Playwright (Chromium) | 1 | 16 | `tests/e2e/safety.spec.ts` |
 | Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` |
-| RLS (database) | SQL script on the Supabase project | 1 | 42 checks | `supabase/tests/rls.test.sql` (run by hand or through the Supabase MCP after each migration; not in CI) |
+| RLS (database) | SQL script on the Supabase project | 1 | 45 checks | `supabase/tests/rls.test.sql` (run by hand or through the Supabase MCP after each migration; not in CI) |
 
 ## What the tests prove
 
@@ -27,6 +27,7 @@ Updated at the end of each phase. Test names start with the requirement IDs from
   - FR-07 badges: none for an unfinished building; first steps, right first time and quiz whiz when earned; kind helper after two buildings; town hero after every playable one (teasers don't count).
   - FR-01/NFR-01 first-name rule: English and Hindi names accepted; digits, symbols, emoji and more than 20 characters rejected.
 - **`validate-content.test.ts` (35).**
+  - FR-15 (`review.test.ts`, 4): the reviewable items (each card, each building's games, the Help Centre), a known SHA-256 hash, the text laid out for reading, and a hash that changes with the words but not with the review notes.
   - NFR-07: a valid scene passes, and one broken scene per rule fails (missing targets, no reachable good end, dead ends, unset flags, out-of-bounds hotspots, card and quiz errors). A sort game after the quiz passes; a card for a missing box, a box with no cards, one box, too few cards, or a sort game with no quiz fail.
   - NFR-09: every `t()` key in code exists.
   - NFR-06: `help.json` is valid, and sources must be https `.gov.in`/`.nic.in` pages.
@@ -64,6 +65,7 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 - **`play.spec.ts` (6).** FR-05/06/07, plays School at `/play/school`. The card flips, "Tell me more" shows the teen text, and the law matches content exactly. 3 of 4 right with one retry gives 2 stars, the first-steps badge and the Dhaba unlocked; back in the town Mitthu celebrates once (2 stars at The School), Lata stands outside, and it all survives a reload with no second celebration. A 25% score offers the hint round, which replays the 3 missed questions and leaves the score at 1 of 4. Teen players see the teen card and all 6 questions. A locked building can't be played. A new player's town has only School open. The Dhaba (after the School), Home (after the Dhaba) and the Panchayat (after Home) play in the gentle tone, the law on each card matches content exactly, and their results point to "Need help?". The Dhaba and the Panchayat end with the sort game: every card is sorted by tapping a box, and at the Panchayat the first card is dragged with the mouse; one card in the wrong box gives 8 of 9 and 2 stars.
 - **`town.spec.ts` (4).** FR-07/08 on `/town`: the School door is open, says "Mitthu suggests" and leads into the School; a locked door says "locked", replies gently and stays in the town; teasers say "Coming soon"; the Help door opens the Help Centre and Back returns to the town.
 - **`collection.spec.ts` (7).** FR-05 the Book: collected cards open and the law reads exactly as written; a new player's Book is empty and says how to collect the School card. FR-07 Me: the player's own stars, badges marked earned or not yet, settings working from Me (calm motion), and Switch player. Credits: the fonts and each card's source exactly as written, reached from Me. FR-17 demo mode: typing "demo" opens every playable place (Home and the Panchayat included) and the chip turns it off; holding the logo for 2 s turns it on without following the link; typing "demo" in a text box does nothing.
+- **`reviewer.spec.ts` (3).** FR-15 with Supabase answered by a fake: an account without the reviewer role is told so and sees no queue; a reviewer sends all 9 items, the app's hash for the School card equals the one Node works out from the same file, the text reads with real quotes, then publish, reject with a note, send back, and sending again says nothing has changed; a card shows "Reviewed on 18 October 2026" only while its exact text is the published one, and is never blocked when it isn't.
 - **`offline.spec.ts` (2).** NFR-03 with the network off, a new player plays the School to the end (card with its law, quiz, results), finds the card in the Book and reaches Need help?; on a build without the Supabase settings, Me has no "My class" and Community's mission stays "Sample" (this one runs only in that build).
 - **`dashboard.spec.ts` (4).** FR-14 with Supabase answered by a fake: each student's stars by place (and "Not finished yet") are read out in words, the class averages, a question to talk about with its words from content and how many got it wrong first time, and the Class Mission; removing a student asks once more and removes only that student; the dashboard reloads every 30 seconds (a fake clock moves time on) and at once with Refresh. FR-10 a player in a class sees the real class total on Community, with no "Sample" label.
 - **`sync.spec.ts` (4).** FR-12 against a fake class server that keeps what it is sent and applies the same merge rules: at start a player in a class sends their progress and cards, and the Dhaba card finished on another device appears in this device's Book; every quiz answer in a building reaches the class with the right question ids and right or wrong; while the server is down the game carries on with no error, and the waiting answer is sent once the connection is back; NFR-03 a player who is not in a class sends nothing at all.
@@ -96,13 +98,13 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |
 | 2026-10-18 | `p4-town` (PR #5) | ✅ green, merged | |
 
-### RLS and RPCs (`supabase/tests/rls.test.sql`, 42 checks, P5)
+### RLS and RPCs (`supabase/tests/rls.test.sql`, 45 checks, P5)
 Two teachers and two children, signed in by setting the JWT claims, inside one transaction that is rolled back. Last run 2026-10-18 on project `iggetuuoghdoyppdlppy`: all passed, and a deliberately false check stops the script (so a failure can't go unnoticed).
 - NFR-01/NFR-02: email users become teachers, anonymous children get no role; a teacher can't read another teacher's class, can't set a join code by hand, can't delete another teacher's class; removing a student never touches another class.
 - `join_class` rejects a wrong code, a name with digits, an unknown band and a teacher's account; it accepts a lower-case code, tidies the name, and accepts a Hindi name with vowel signs.
 - A child can't read another child, their progress or their quiz attempts; can't write another child's progress; can't create a class, rotate a code or call the reviewer RPCs; sees only the class they joined.
 - FR-12 merge rules: progress keeps the best result, extras merge by union.
 - FR-14: a teacher reads only their own students and progress; the class mission adds up the class's stars; question stats count first attempts.
-- Content review: a reviewer can submit and publish, a rejection needs a note, every step is logged; teachers and children can't review.
+- Content review: a teacher given the reviewer role is still a teacher; a reviewer can submit and publish, content waiting for review isn't published, a rejection needs a note, every step is logged; teachers and children can't review; anyone, even signed out, can read which content is published and its hash (`published_content`).
 - FR-10 the child's Class Mission (`my_class_mission`): it is the class total (a classmate's stars included), it names the child's own class, it never opens a classmate's progress, and a teacher has none.
 - Signed-out visitors can't read classes, the mission view or a class mission, or call `join_class`.

@@ -317,6 +317,14 @@ export type Database = {
         }[]
       }
       leave_class: { Args: never; Returns: undefined }
+      published_content: {
+        Args: never
+        Returns: {
+          id: string
+          content_hash: string
+          reviewed_at: string | null
+        }[]
+      }
       my_class_mission: {
         Args: never
         Returns: {

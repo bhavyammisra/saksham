@@ -25,7 +25,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | 🔄 branch `p5-backend`; backend core done (D-043 to D-048), next: content review | | D-043 to D-048 |
+| P5 Backend | ✅ all tasks done on `p5-backend` (D-043 to D-049); **pull request next** | not opened | D-043 to D-049 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -50,6 +50,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
 | Fact-check the Home rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/home.json` › `card.review` |
 | Fact-check the Panchayat rights card (quotes matched PRS and Indian Kanoon) | SETUP.md §6, `content/scenes/panchayat.json` › `card.review` |
+| Make your own account a reviewer, then publish the reviewed content from `/reviewer` | SETUP.md §4 |
 | Fact-check the Help Centre numbers and sentences, and the Community page's places that help | SETUP.md §5, `content/help.json` and `content/community.json` › `review` |
 | Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
@@ -329,9 +330,9 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Content review workflow
 
-- [ ] Hash-and-seed script for reviewable items (English now, Hindi later).
-- [ ] `/reviewer` screen (reviewer role only): list by status and language, bundled text next to its hash, approve, reject with a note, send back. Writes `content_events`.
-- [ ] "Reviewed ✓" with date on the card back when the hash matches a published row. Never block the card if offline or unmatched.
+- [x] Hash-and-seed script for reviewable items (English now, Hindi later). ✅ 2026-10-18 (D-049: `npm run content:hashes`; seeding from `/reviewer`).
+- [x] `/reviewer` screen (reviewer role only): list by status and language, bundled text next to its hash, approve, reject with a note, send back. Writes `content_events`. ✅ 2026-10-18 (D-049).
+- [x] "Reviewed ✓" with date on the card back when the hash matches a published row. Never block the card if offline or unmatched. ✅ 2026-10-18 (D-049; shown in the card details).
 
 ### Phase 6: Experience and Hindi
 
@@ -501,8 +502,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core is done (D-043 to D-048). 237 unit tests (16 files) and 77 e2e tests (14 files, 16 of them safety) are green with the Supabase settings (one test only runs without them); without them 64 pass and the 13 class tests skip; lint, typecheck, validate and build pass; the RLS test has 42 checks, all passing. See **Checkpoints** at the top.
-- **Exact next task:** P5 › Content review, first box: a hash-and-seed script for reviewable items (English now, Hindi later). Each rights card, quiz and the Help Centre becomes a `content_items` row (`card:school:en` and so on) holding only a SHA-256 hash of its exact text, sent through `submit_content_for_review` (reviewer or admin only, D-043). It must run as a signed-in reviewer, never with the service-role key; the owner makes their own account a reviewer with one SQL line (put it in SETUP.md). Then `/reviewer` and the "Reviewed ✓" tick. New backend tests: add `skipWithoutBackend` (tests/e2e/helpers.ts) so they skip on a build without the settings (CI job `e2e-local-only`).
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is complete on `p5-backend` (D-043 to D-049), not merged yet. 241 unit tests (17 files) and 80 e2e tests (15 files, 16 of them safety): with the Supabase settings 79 pass and 1 skips; without them 64 pass and 16 skip. Lint, typecheck, validate and build pass; the RLS test has 45 checks, all passing. See **Checkpoints** at the top.
+- **Exact next task:** open the P5 pull request (`p5-backend` into `main`, with the owner's go-ahead), wait for CI (jobs `e2e` and `e2e-local-only`), and merge with `gh pr merge <n> --merge`. Then Phase 6 (experience and Hindi). Owner tasks that don't block the merge: a real teacher sign-up with their own email, becoming a reviewer and publishing the content (SETUP.md §4), an email provider and the anonymous sign-in limit before real classes.
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -624,3 +625,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: `tests/e2e/offline.spec.ts` plays the demo path with the network off, and checks that a build without the Supabase settings has no class features; backend tests skip themselves on such a build (`skipWithoutBackend`); CI job `e2e-local-only` runs the whole suite on a build with empty settings. Run locally: with the settings 76 passed and 1 skipped; without them 64 passed and 13 skipped, and the build had no project address in it. D-048.
 - Known limit: the app can't be opened or reloaded with no network (no service worker); once open, it works offline.
 - Next task: P5 › Content review (hash-and-seed script, `/reviewer`, "Reviewed ✓").
+
+**P5: content review (2026-10-18)**
+- Done: `src/lib/review.ts` (reviewable items and SHA-256 hashes, shared by the app and `npm run content:hashes`), `/reviewer` (send new and changed items, read each item's text laid out for reading next to its hash, publish, reject with a note, send back; filters by status and language), the "Reviewed on <date>" tick in a card's details when its exact text is published, and a migration that lets one account hold several roles and adds `published_content()`. `Placeholder` deleted. D-049. Every Phase 5 box is now done.
+- Tests: `review.test.ts` (4), 45 RLS checks (3 new: a teacher who reviews is still a teacher; waiting content isn't published; anyone can read published hashes), `tests/e2e/reviewer.spec.ts` (3: not a reviewer; the whole review flow, with the app's hash equal to the one worked out in Node; the tick only for the exact published text). Checked by screenshot at 1280 and 390 wide (a long status option made the phone page scroll sideways; fixed).
+- Owner: sign up as a teacher with your own email, then make that account a reviewer (SETUP.md §4) and publish the content you have fact-checked.
+- Next task: open the P5 pull request.

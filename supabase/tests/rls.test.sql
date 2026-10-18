@@ -130,9 +130,11 @@ select pg_temp.fails($$ select public.review_content('card:school:en', 'publishe
 
 reset role;
 select pg_temp.act_as_admin();
-update public.user_roles set role = 'reviewer' where user_id = '00000000-0000-0000-0000-0000000000a2';
+insert into public.user_roles (user_id, role) values ('00000000-0000-0000-0000-0000000000a2', 'reviewer');
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a2', false);
+select pg_temp.ok((select count(*) from public.classes) = 1, 'a teacher who also reviews is still a teacher');
 select public.submit_content_for_review('card:school:en', 'card', 'en', repeat('a', 64));
+select pg_temp.ok(not exists (select 1 from public.published_content()), 'content waiting for review is not published');
 select pg_temp.fails($$ select public.review_content('card:school:en', 'rejected') $$, 'a rejection needs a note');
 select public.review_content('card:school:en', 'published');
 select pg_temp.ok((select status from public.content_items) = 'published', 'a reviewer can publish');
@@ -147,6 +149,8 @@ select pg_temp.fails($$ select * from public.classes $$, 'signed-out visitors ca
 select pg_temp.fails($$ select * from public.class_mission $$, 'signed-out visitors cannot read the mission view');
 select pg_temp.fails($$ select public.join_class('ZZZZZZ', 'Asha', 'young') $$, 'signed-out visitors cannot call join_class');
 select pg_temp.fails($$ select * from public.my_class_mission() $$, 'signed-out visitors cannot read a class mission');
+select pg_temp.ok((select content_hash from public.published_content() where id = 'card:school:en') = repeat('a', 64),
+  'anyone can see which content is published, and its hash (for the Reviewed tick)');
 
 reset role;
 select pg_temp.act_as_admin();

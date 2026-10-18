@@ -23,16 +23,23 @@ export function Teacher() {
   return <TeacherOnline db={supabase} />
 }
 
-function TeacherOnline({ db }: { db: Supabase }) {
-  const [session, setSession] = useState<Session | null | undefined>(undefined) // undefined: still checking
+/**
+ * The signed-in adult (teacher or reviewer), null when nobody is, undefined while still checking.
+ * A child's anonymous session on a shared device is not an adult: it counts as nobody.
+ */
+export function useAdultSession(db: Supabase): Session | null | undefined {
+  const [session, setSession] = useState<Session | null | undefined>(undefined)
   useEffect(() => {
     void db.auth.getSession().then(({ data }) => setSession(data.session))
     const { data } = db.auth.onAuthStateChange((_event, next) => setSession(next))
     return () => data.subscription.unsubscribe()
   }, [db])
+  return session && session.user.is_anonymous ? null : session
+}
 
-  // A child's anonymous session on a shared device is not a teacher: show the sign-in form.
-  const teacher = session && !session.user.is_anonymous ? session : null
+function TeacherOnline({ db }: { db: Supabase }) {
+  const session = useAdultSession(db)
+  const teacher = session ?? null
   return (
     <Page title={t('teacher.title')}>
       {session === undefined ? null : teacher ? <Classes db={db} email={teacher.user.email ?? ''} /> : <SignIn db={db} />}
@@ -52,7 +59,8 @@ const AUTH_ERRORS: Record<string, StringKey> = {
 }
 const authError = (code: string | undefined): StringKey => (code && AUTH_ERRORS[code]) || 'teacher.errorGeneral'
 
-function SignIn({ db }: { db: Supabase }) {
+/** Email sign-in and sign-up for adults (teachers and reviewers). */
+export function SignIn({ db }: { db: Supabase }) {
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
