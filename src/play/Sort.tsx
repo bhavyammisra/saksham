@@ -10,7 +10,7 @@ import { sound } from '@/lib/sound'
  * (the tap is the keyboard and screen-reader way too). After each card the explanation shows, and
  * the card lands in its right box. Only the first placement of each card counts (rules.ts).
  */
-export function Sort({ game, onDone }: { game: SortGame; onDone: (score: Score) => void }) {
+export function Sort({ game, onDone }: { game: SortGame; onDone: (score: Score, attempts: Attempt[]) => void }) {
   const [index, setIndex] = useState(0)
   const [picked, setPicked] = useState<string | null>(null) // the box chosen for the current card
   const [attempts, setAttempts] = useState<Attempt[]>([])
@@ -43,7 +43,7 @@ export function Sort({ game, onDone }: { game: SortGame; onDone: (score: Score) 
   const next = () => {
     setPicked(null)
     if (!last) return setIndex((i) => i + 1)
-    onDone(scoreQuiz(game.items, attempts))
+    onDone(scoreQuiz(game.items, attempts), attempts)
   }
 
   // Dragging: the card follows the pointer; letting go over a box places it there.

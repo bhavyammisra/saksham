@@ -147,3 +147,45 @@ describe('FR-11 each player keeps their own class login', () => {
     expect(store().data[asha.id]?.cloud?.refreshToken).toBe('t2')
   })
 })
+
+describe('FR-12 answers wait in a queue until they reach the class', () => {
+  const attempts = [
+    { questionId: 'age', correct: true },
+    { questionId: 'fees', correct: false },
+  ]
+
+  it('queues answers only for a player who is in a class', () => {
+    store().addProfile('Asha', 'young')
+    store().queueAttempts('school', attempts)
+    expect(selectActiveData(store())?.outbox ?? []).toEqual([])
+    store().setClassInfo({ id: 'c1', name: 'Class 6B' })
+    store().queueAttempts('school', attempts)
+    expect(selectActiveData(store())?.outbox).toEqual([
+      { buildingId: 'school', questionId: 'age', correct: true },
+      { buildingId: 'school', questionId: 'fees', correct: false },
+    ])
+  })
+
+  it('removes only the answers that were sent', () => {
+    store().addProfile('Asha', 'young')
+    store().setClassInfo({ id: 'c1', name: 'Class 6B' })
+    store().queueAttempts('school', attempts)
+    store().queueAttempts('dhaba', [{ questionId: 'raju', correct: true }]) // arrived while sending
+    store().dropSent(2)
+    expect(selectActiveData(store())?.outbox).toEqual([{ buildingId: 'dhaba', questionId: 'raju', correct: true }])
+  })
+
+  it('merges progress saved on another device with the merge rules', () => {
+    store().addProfile('Asha', 'young')
+    store().recordResult('school', { completed: true, retries: 1, score: { correct: 3, total: 4 } })
+    store().addExtra('cards', 'right-to-education')
+    store().mergeRemote(
+      { school: { stars: 1, bestScore: 50, completed: true }, dhaba: { stars: 3, bestScore: 100, completed: true } },
+      { cards: ['freedom-from-child-labour'], badges: [], marigolds: [], pledges: [] },
+    )
+    const data = selectActiveData(store())!
+    expect(data.progress.school?.stars).toBe(2) // the better local result stays
+    expect(data.progress.dhaba?.stars).toBe(3)
+    expect(data.extras.cards).toEqual(['right-to-education', 'freedom-from-child-labour'])
+  })
+})

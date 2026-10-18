@@ -25,7 +25,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | 🔄 branch `p5-backend`; backend core, the teacher page and joining a class done (D-043 to D-045), next: syncing progress | | D-043 to D-045 |
+| P5 Backend | 🔄 branch `p5-backend`; backend core, teacher page, joining a class and sync done (D-043 to D-046), next: the live teacher dashboard | | D-043 to D-046 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -323,7 +323,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 - [x] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it. ✅ 2026-10-18 (D-044).
 - [x] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file. ✅ 2026-10-18 (D-045; "My class" on Me).
-- [ ] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures.
+- [x] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures. ✅ 2026-10-18 (D-046).
 - [ ] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty.
 - [ ] Verify the whole demo path works with env vars unset and with the network off.
 
@@ -501,8 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core (D-043), the teacher page (D-044) and joining a class (D-045) are done. 233 unit tests (16 files) and 67 e2e tests (11 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** P5 › `src/lib/sync.ts`: queue progress and quiz attempts, send them on every change, on reconnect and on start, use the merge rule, never block the game and show no error messages for background failures. Only a player who has joined a class syncs (`classInfo` set); sign in as that player first, the way `src/lib/classroom.ts` does (each player has their own anonymous login, D-045). The database already applies the merge rules on update (max for progress, union for extras, D-043). Quiz attempts need the question ids, which the Quiz and Sort screens know. For e2e, answer Supabase with a fake in the browser, as `tests/e2e/class.spec.ts` does.
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core (D-043), the teacher page (D-044), joining a class (D-045) and sync (D-046) are done. 237 unit tests (16 files) and 71 e2e tests (12 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** P5 › the live teacher dashboard on `/teacher` (D-044): for each class, a heatmap of students by buildings, class averages, common mistakes (`class_question_stats`; show the question text from content, never a child's free text), remove a student, and the live Class Mission (`class_mission`, one class total). Manual refresh plus a 30-second poll. The views and policies exist (D-043); synced data arrives through `src/lib/sync.ts` (D-046). Show a "Sample" label only when signed out or empty, and make the Community page's Class Mission (D-042) use the real class total for a player in a class. For e2e, answer Supabase with a fake in the browser, as `tests/e2e/teacher.spec.ts` and `sync.spec.ts` do.
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -609,3 +609,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Not checked: joining the real project from the app (it would make a real anonymous account); the real `join_class` is covered by the RLS tests.
 - Owner, before a whole class joins at once: raise the anonymous sign-in rate limit (SETUP.md §4).
 - Next task: P5 › `src/lib/sync.ts` (send progress and quiz attempts to the class).
+
+**P5: sync (2026-10-18)**
+- Done: `src/lib/sync.ts` sends the active player's progress, extras and queued quiz and sort answers to their class (only when they are in one), then merges back what the server has (so two devices show the best of both). It runs at start, shortly after any change, and on reconnect; it never blocks the game or shows an error, and unsent answers wait in the player's `outbox`. Quiz and Sort now hand their answers to Play. The validator checks answer ids against the database's rule. D-046.
+- Tests: store (queue only in a class, drop only what was sent, merge from another device), validator (an id the server would refuse), and `tests/e2e/sync.spec.ts` (4, against a fake server that keeps what it's sent: start-up sync both ways, every quiz answer arrives, nothing lost while the server is down and sent on reconnect, nothing sent outside a class). 237 unit and 71 e2e tests green.
+- Next task: P5 › the live teacher dashboard and the real Class Mission.

@@ -6,6 +6,8 @@ import { followSystemCalm, setCalmSetting } from './lib/calm.ts'
 import { setLang, t } from './lib/i18n.ts'
 import { sound } from './lib/sound.ts'
 import { useStore } from './lib/store.ts'
+import { supabase } from './lib/supabase.ts'
+import { startSync } from './lib/sync.ts'
 import './index.css'
 
 const root = document.getElementById('root')
@@ -29,6 +31,9 @@ document.title = t('app.name')
 // A teacher's email confirmation link comes back as "?code=...": open the teacher page, where the
 // Supabase client swaps the code for a session (D-044).
 if (new URLSearchParams(location.search).has('code')) location.hash = '#/teacher'
+
+// Send progress to the player's class in the background, if this copy has a class server (D-046).
+if (supabase) startSync(supabase)
 
 // HashRouter keeps routes after "#", so any static host can serve the app
 // without server-side rewrite rules. See docs/DECISIONS.md.

@@ -18,7 +18,7 @@ export function problemFor(error: { code?: string; message?: string } | null | u
 }
 
 /** Makes sure the class server knows this player as themselves: their saved login, or a new anonymous one. */
-async function signInAsActivePlayer(db: Supabase): Promise<void> {
+export async function signInAsActivePlayer(db: Supabase): Promise<void> {
   const saved = selectActiveData(useStore.getState())?.cloud
   const { data } = await db.auth.getSession()
   if (saved && data.session?.user.id === saved.userId) return

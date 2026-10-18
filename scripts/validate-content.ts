@@ -212,6 +212,7 @@ export function validateScene(raw: unknown): string[] {
       game.questions.forEach((q, qi) => {
         const where = `quiz "${game.id}" question "${q?.id ?? qi}"`
         if (!isText(q?.id)) fail(`quiz "${game.id}" questions[${qi}] needs an "id"`)
+        else if (!ANSWER_ID.test(q.id)) fail(`${where} id must be lowercase letters, digits and dashes (the class server stores it)`)
         else if (ids.has(q.id)) fail(`${where} is duplicated`)
         else ids.add(q.id)
         if (!isText(q?.text)) fail(`${where} needs "text"`)
@@ -230,6 +231,9 @@ export function validateScene(raw: unknown): string[] {
   return errors
 }
 
+// Quiz question and sort card ids are sent to the class server, whose quiz_attempts table only takes these (D-043).
+const ANSWER_ID = /^[a-z0-9-]{1,60}$/
+
 /** A sort game: two boxes, at least 3 items, each item going into one of the boxes, and both boxes used. */
 function validateSort(game: SortGame, fail: (message: string) => void) {
   const where = `sort "${String(game.id)}"`
@@ -245,6 +249,7 @@ function validateSort(game: SortGame, fail: (message: string) => void) {
   game.items.forEach((item, i) => {
     const at = `${where} item "${item?.id ?? i}"`
     if (!isText(item?.id)) fail(`${where} items[${i}] needs an "id"`)
+    else if (!ANSWER_ID.test(item.id)) fail(`${at} id must be lowercase letters, digits and dashes (the class server stores it)`)
     else if (ids.has(item.id)) fail(`${at} is duplicated`)
     else ids.add(item.id)
     if (!isText(item?.text)) fail(`${at} needs "text"`)

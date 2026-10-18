@@ -257,6 +257,15 @@ describe('NFR-07 content validation: scenes', () => {
     expect(validateScene(withSort((g) => g.items.pop()))).toContain('sort "test-sort" needs at least 3 items')
   })
 
+  it('rejects a question or card id the class server would refuse', () => {
+    expect(validateScene(broken((s) => (s.games[0].questions[0].id = 'Q 1')))).toContain(
+      'quiz "test-quiz" question "Q 1" id must be lowercase letters, digits and dashes (the class server stores it)',
+    )
+    expect(validateScene(withSort((g) => (g.items[0]!.id = 'card_a')))).toContain(
+      'sort "test-sort" item "card_a" id must be lowercase letters, digits and dashes (the class server stores it)',
+    )
+  })
+
   it('rejects a scene with only a sort game', () => {
     expect(validateScene(broken((s) => (s.games = [structuredClone(sort)])))).toContain('"games" must include a quiz')
   })
