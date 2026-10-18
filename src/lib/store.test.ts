@@ -124,3 +124,26 @@ describe('FR-10 Ask an Expert questions stay with their player', () => {
     expect(selectActiveData(store())?.questions).toEqual([])
   })
 })
+
+describe('FR-11 each player keeps their own class login', () => {
+  it('saves the login and class for the active player only', () => {
+    const asha = store().addProfile('Asha', 'young')!
+    store().setCloud({ userId: 'u-asha', refreshToken: 't1' })
+    store().setClassInfo({ id: 'c1', name: 'Class 6B' })
+    store().addProfile('Ravi', 'teen')
+    expect(selectActiveData(store())?.cloud).toBeUndefined()
+    expect(store().data[asha.id]?.classInfo?.name).toBe('Class 6B')
+  })
+
+  it('a renewed login updates the player it belongs to, whoever is active', () => {
+    const asha = store().addProfile('Asha', 'young')!
+    store().setCloud({ userId: 'u-asha', refreshToken: 't1' })
+    const ravi = store().addProfile('Ravi', 'teen')!
+    store().setCloud({ userId: 'u-ravi', refreshToken: 'r1' })
+    store().refreshCloud('u-asha', 't2')
+    expect(store().data[asha.id]?.cloud?.refreshToken).toBe('t2')
+    expect(store().data[ravi.id]?.cloud?.refreshToken).toBe('r1')
+    store().refreshCloud('u-nobody', 'x') // a teacher's or unknown login changes nothing
+    expect(store().data[asha.id]?.cloud?.refreshToken).toBe('t2')
+  })
+})

@@ -43,11 +43,28 @@ export interface Question {
   at: number
 }
 
+/**
+ * This player's own anonymous account on the class server (D-045). Each player on a shared device
+ * has their own, so joining a class as one player never changes another player's class.
+ */
+export interface CloudLogin {
+  userId: string
+  refreshToken: string
+}
+
+/** The class this player joined (D-045). */
+export interface ClassInfo {
+  id: string
+  name: string
+}
+
 /** Everything saved for one profile. */
 export interface ProfileData {
   progress: ProgressMap
   extras: Extras
   questions?: Question[] // missing in saves from before D-042
+  cloud?: CloudLogin // missing until the player first joins a class
+  classInfo?: ClassInfo | null
 }
 
 export type ExtraKind = keyof Extras
@@ -73,6 +90,11 @@ export interface SakshamState {
   /** Saves an Ask an Expert question for the active profile. Returns false if it is empty or too long. */
   addQuestion: (text: string) => boolean
   removeQuestion: (id: string) => void
+  /** Saves the active player's class-server login, or their class (null after leaving). */
+  setCloud: (cloud: CloudLogin) => void
+  setClassInfo: (info: ClassInfo | null) => void
+  /** Keeps a saved login current when the class server renews it (each renewal replaces the old token). */
+  refreshCloud: (userId: string, refreshToken: string) => void
   setDemo: (on: boolean) => void
 }
 
@@ -216,6 +238,25 @@ export const useStore = create<SakshamState>()(
           return { data: { ...s.data, [id]: { ...current, questions } } }
         })
       },
+
+      setCloud: (cloud) => {
+        const id = get().activeProfileId
+        if (!id) return
+        set((s) => ({ data: { ...s.data, [id]: { ...(s.data[id] ?? emptyData()), cloud } } }))
+      },
+
+      setClassInfo: (classInfo) => {
+        const id = get().activeProfileId
+        if (!id) return
+        set((s) => ({ data: { ...s.data, [id]: { ...(s.data[id] ?? emptyData()), classInfo } } }))
+      },
+
+      refreshCloud: (userId, refreshToken) =>
+        set((s) => {
+          const owner = Object.keys(s.data).find((pid) => s.data[pid]?.cloud?.userId === userId)
+          if (!owner || s.data[owner]!.cloud!.refreshToken === refreshToken) return {}
+          return { data: { ...s.data, [owner]: { ...s.data[owner]!, cloud: { userId, refreshToken } } } }
+        }),
 
       setDemo: (on) => set({ demo: on }),
     }),

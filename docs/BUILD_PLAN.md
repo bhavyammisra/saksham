@@ -25,7 +25,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | 🔄 branch `p5-backend`; backend core and the teacher page done (D-043, D-044), next: children joining a class | | D-043, D-044 |
+| P5 Backend | 🔄 branch `p5-backend`; backend core, the teacher page and joining a class done (D-043 to D-045), next: syncing progress | | D-043 to D-045 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -322,7 +322,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 #### Teacher, class and sync
 
 - [x] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it. ✅ 2026-10-18 (D-044).
-- [ ] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file.
+- [x] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file. ✅ 2026-10-18 (D-045; "My class" on Me).
 - [ ] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures.
 - [ ] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty.
 - [ ] Verify the whole demo path works with env vars unset and with the network off.
@@ -501,8 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core (D-043) and the teacher page (D-044) are done. 228 unit tests (15 files) and 64 e2e tests (10 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** P5 › the optional "Join a class" step for children (class code plus first name, through `join_class` after an anonymous sign-in) and "Leave class" in Me, with calm, child-friendly messages for a wrong code, a switched-off code and no connection. The database is ready (D-043); the teacher page (D-044) makes classes and codes. Apply any new migration with the Supabase MCP `apply_migration` (and save the same SQL in `supabase/migrations/`), run `supabase/tests/rls.test.sql` through `execute_sql`, and check the advisors. For e2e, answer Supabase requests with a fake in the browser, as `tests/e2e/teacher.spec.ts` does.
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core (D-043), the teacher page (D-044) and joining a class (D-045) are done. 233 unit tests (16 files) and 67 e2e tests (11 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** P5 › `src/lib/sync.ts`: queue progress and quiz attempts, send them on every change, on reconnect and on start, use the merge rule, never block the game and show no error messages for background failures. Only a player who has joined a class syncs (`classInfo` set); sign in as that player first, the way `src/lib/classroom.ts` does (each player has their own anonymous login, D-045). The database already applies the merge rules on update (max for progress, union for extras, D-043). Quiz attempts need the question ids, which the Quiz and Sort screens know. For e2e, answer Supabase with a fake in the browser, as `tests/e2e/class.spec.ts` does.
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -602,3 +602,10 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Not checked: a real sign-up and confirmation email (Claude has no inbox and doesn't sign in on real services). Owner: try it once with your own email.
 - Owner, before real teachers use it: add an email provider (SMTP) in Supabase; the built-in one only sends to the project team, a few emails an hour (SETUP.md §4).
 - Next task: P5 › children join a class, and "Leave class" in Me.
+
+**P5: children join a class (2026-10-18)**
+- Done: "My class" on Me (only when the class server is set up): type the teacher's code to join with your first name, age band and character; "Leave class" asks once more. Each player on a device has their own anonymous login saved with their data, so two players are two students; background token renewals are saved for the right player. Calm messages for a wrong or switched-off code and for no connection (checked first, so it answers at once). D-045.
+- Tests: `classroom.test.ts` (3: problems in words), store tests for each player's login (2), and `tests/e2e/class.spec.ts` (3: join, reload, leave; two players are two students and leaving uses the right one; offline). 233 unit and 67 e2e tests green. Checked by screenshot at 1280 and 390 wide (the code box was widened so all six letters show).
+- Not checked: joining the real project from the app (it would make a real anonymous account); the real `join_class` is covered by the RLS tests.
+- Owner, before a whole class joins at once: raise the anonymous sign-in rate limit (SETUP.md §4).
+- Next task: P5 › `src/lib/sync.ts` (send progress and quiz attempts to the class).

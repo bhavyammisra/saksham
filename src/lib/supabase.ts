@@ -5,6 +5,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
+import { useStore } from './store'
 
 export type Supabase = SupabaseClient<Database>
 
@@ -16,3 +17,8 @@ export function makeSupabase(url: string | undefined, key: string | undefined): 
 }
 
 export const supabase = makeSupabase(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
+
+// When the client renews a child's login in the background, save the new token for that player (D-045).
+supabase?.auth.onAuthStateChange((_event, session) => {
+  if (session?.user.is_anonymous) useStore.getState().refreshCloud(session.user.id, session.refresh_token)
+})

@@ -44,6 +44,7 @@ The CI `deploy` job is **skipped** until these are set, so CI stays green withou
 
 **Still to do before real teachers sign up** (the teacher page works for you already):
 - **Try a real sign-up once:** open the app, "For teachers", "New account", with your own email; open the confirmation link (it brings you back to the teacher page, signed in) and make a class.
+- **Raise the anonymous sign-in limit:** Supabase allows 30 anonymous sign-ins an hour from one internet address, and a whole class on school Wi-Fi shares one address. Before a class joins together, go to **Authentication → Rate Limits** and raise "anonymous sign-ins" (for example to 200 an hour).
 - **Add an email provider:** Supabase's built-in email only sends to the people in your Supabase team, and only a few emails an hour, so other teachers would never get their confirmation link. In **Project Settings → Authentication → SMTP Settings**, connect a free email service (for example Resend or Brevo) and follow its steps. Tell Claude when it's done. The steps are kept below in case the project ever has to be made again.
 
 The backend only adds sync and the teacher side. The game keeps working without it, so nothing breaks while this is not done. It takes about 15 minutes. Supabase moves its menus around now and then: if a name below doesn't match, look for the nearest one and tell Claude.

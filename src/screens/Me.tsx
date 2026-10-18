@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { CharacterBuilder } from '@/character/CharacterBuilder'
 import { Portrait } from '@/character/Portrait'
+import { Button } from '@/components/Button'
 import { Page } from '@/components/Page'
 import { SettingsControls } from '@/components/SettingsDialog'
-import { t } from '@/lib/i18n'
+import { t, type StringKey } from '@/lib/i18n'
+import { joinClass, leaveClass, type ClassProblem } from '@/lib/classroom'
 import { BADGES } from '@/lib/rules'
+import { supabase, type Supabase } from '@/lib/supabase'
 import { BADGE_TEXT } from '@/play/badgeText'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 
@@ -64,6 +67,8 @@ export function Me() {
         </ul>
       </section>
 
+      {supabase && <MyClass db={supabase} firstName={profile.firstName} />}
+
       <section aria-labelledby="me-settings" className="mt-10 max-w-xl">
         <h2 id="me-settings" className="text-xl font-semibold">
           {t('me.settings')}
@@ -107,5 +112,94 @@ export function MeCharacter() {
         }}
       />
     </Page>
+  )
+}
+
+const PROBLEM_TEXT: Record<ClassProblem, StringKey> = {
+  code: 'class.problemCode',
+  offline: 'class.problemOffline',
+  general: 'class.problemGeneral',
+}
+
+/**
+ * My class (FR-11, D-045): joining is optional. The child types the code their teacher gives them;
+ * their first name, age band and character go with it, nothing else. Shown only when the class
+ * server is set up. Leaving asks once more first.
+ */
+function MyClass({ db, firstName }: { db: Supabase; firstName: string }) {
+  const classInfo = useStore((s) => selectActiveData(s)?.classInfo ?? null)
+  const [code, setCode] = useState('')
+  const [problem, setProblem] = useState<ClassProblem | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [confirmLeave, setConfirmLeave] = useState(false)
+
+  const run = async (action: () => Promise<ClassProblem | null>) => {
+    setBusy(true)
+    setProblem(null)
+    const result = await action()
+    setProblem(result)
+    setBusy(false)
+    if (!result) {
+      setCode('')
+      setConfirmLeave(false)
+    }
+  }
+
+  return (
+    <section aria-labelledby="me-class" className="mt-10 max-w-xl">
+      <h2 id="me-class" className="text-xl font-semibold">
+        {t('class.title')}
+      </h2>
+      {classInfo ? (
+        <>
+          <p className="mt-2 text-lg">{t('class.inClass', { name: classInfo.name })}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {confirmLeave ? (
+              <>
+                <Button disabled={busy} onClick={() => void run(() => leaveClass(db))}>
+                  {t('class.leaveYes')}
+                </Button>
+                <Button look="secondary" onClick={() => setConfirmLeave(false)}>
+                  {t('class.leaveNo')}
+                </Button>
+              </>
+            ) : (
+              <Button look="secondary" onClick={() => setConfirmLeave(true)}>
+                {t('class.leave')}
+              </Button>
+            )}
+          </div>
+          {confirmLeave && <p className="mt-2 text-ink-soft">{t('class.leaveNote')}</p>}
+        </>
+      ) : (
+        <form
+          className="mt-2"
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (code.trim()) void run(() => joinClass(db, code))
+          }}
+        >
+          <p className="text-ink-soft">{t('class.hint', { name: firstName })}</p>
+          <label className="mt-3 grid gap-1 font-semibold">
+            {t('class.code')}
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              maxLength={6}
+              autoCapitalize="characters"
+              autoComplete="off"
+              spellCheck={false}
+              className="min-h-tap w-64 max-w-full rounded-button border-2 border-sand bg-plaster px-3 font-mono text-2xl tracking-[0.3em]"
+            />
+          </label>
+          <Button type="submit" disabled={busy} className="mt-3">
+            {t('class.join')}
+          </Button>
+        </form>
+      )}
+      <p aria-live="polite" className="mt-2 font-semibold">
+        {problem && t(PROBLEM_TEXT[problem])}
+      </p>
+    </section>
   )
 }
