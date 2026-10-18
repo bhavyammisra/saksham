@@ -6,11 +6,11 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 
 | Type | Tool | Files | Tests | Where |
 | --- | --- | --- | --- | --- |
-| Unit | Vitest | 14 | 226 | `src/**/*.test.ts`, `scripts/*.test.ts` |
+| Unit | Vitest | 15 | 228 | `src/**/*.test.ts`, `scripts/*.test.ts` |
 | End-to-end | Playwright (Chromium) | 8 | 46 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts`, `community.spec.ts` |
 | Safety invariants | Playwright (Chromium) | 1 | 16 | `tests/e2e/safety.spec.ts` |
 | Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` |
-| RLS (database) | | 0 | 0 | from Phase 5 |
+| RLS (database) | SQL script on the Supabase project | 1 | 37 checks | `supabase/tests/rls.test.sql` (run by hand or through the Supabase MCP after each migration; not in CI) |
 
 ## What the tests prove
 
@@ -90,3 +90,13 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-15 | `p2-character-scene` (PR #3) | ✅ green, merged | |
 | 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |
 | 2026-10-18 | `p4-town` (PR #5) | ✅ green, merged | |
+
+### RLS and RPCs (`supabase/tests/rls.test.sql`, 37 checks, P5)
+Two teachers and two children, signed in by setting the JWT claims, inside one transaction that is rolled back. Last run 2026-10-18 on project `iggetuuoghdoyppdlppy`: all passed, and a deliberately false check stops the script (so a failure can't go unnoticed).
+- NFR-01/NFR-02: email users become teachers, anonymous children get no role; a teacher can't read another teacher's class, can't set a join code by hand, can't delete another teacher's class; removing a student never touches another class.
+- `join_class` rejects a wrong code, a name with digits, an unknown band and a teacher's account; it accepts a lower-case code, tidies the name, and accepts a Hindi name with vowel signs.
+- A child can't read another child, their progress or their quiz attempts; can't write another child's progress; can't create a class, rotate a code or call the reviewer RPCs; sees only the class they joined.
+- FR-12 merge rules: progress keeps the best result, extras merge by union.
+- FR-14: a teacher reads only their own students and progress; the class mission adds up the class's stars; question stats count first attempts.
+- Content review: a reviewer can submit and publish, a rejection needs a note, every step is logged; teachers and children can't review.
+- Signed-out visitors can't read classes or the mission view, or call `join_class`.

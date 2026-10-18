@@ -14,7 +14,8 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 | Folder | Holds | Status |
 | --- | --- | --- |
 | `content/` | Typed JSON: UI strings, scenes, help copy, people; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1); `npcs.json`, `scenes/sandbox.json` (P2); `credits.json`, `community.json`, the building scenes (P4) |
-| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, `scenes.ts` (content registry: building id → scene, `cardsInTown()`), later `sync.ts`, `supabase.ts` | P1, P3, P4 |
+| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, `scenes.ts` (content registry: building id → scene, `cardsInTown()`), `supabase.ts` (the client, or null when offline) and `database.types.ts` (generated), later `sync.ts` | P1, P3, P4, P5 |
+| `supabase/` | `migrations/` (the database schema, applied in order; D-043) and `tests/rls.test.sql` (the RLS and RPC checks) | P5 |
 | `src/engine/` | Pure scene logic (`movement.ts`: walking, depth, feet and heights; `story.ts`: hotspots, dialogue with Back; `sceneState.ts`: the reducer, with History) and the full-screen scene player (`Scene.tsx` with `ScenePicture`, `Dialogue.tsx` the strip, `WalkPad.tsx`, `hooks.ts`, `people.ts`) | P2, redone in P4 (D-036) |
 | `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), game-style `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (redesigned, D-024/D-025) |
 | `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Sort` (the sort game, D-041), `Results`; `RightsCard` (card front, back and details, shared with the Book) and `badgeText` | P3, P4 |

@@ -25,7 +25,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | 🔄 branch `p5-backend`; waiting at the first 🛑 gate (Supabase setup) | | |
+| P5 Backend | 🔄 branch `p5-backend`; backend core done (D-043), next: teacher accounts and classes | | D-043 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -40,7 +40,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | New gameplay frame and modern scenes, built (P4) | ✅ approved 2026-10-16 (D-036) |
 | Owner's play-test feedback: walk, doors, scale, voice (P4) | ✅ applied 2026-10-16 (D-038, D-039); the owner confirmed the walk and the door entry on their laptop 2026-10-18 |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
-| Supabase setup (P5, first task) | 🛑 **waiting for the owner**: SETUP.md §4 written 2026-10-18 |
+| Supabase setup (P5, first task) | ✅ done 2026-10-18: the owner created the project; Claude set the rest (D-043) |
 
 **Owner-only tasks still open** (none of these block P4; all must be done before children use the app)
 
@@ -314,10 +314,10 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Backend core
 
-- [x] `docs/SETUP.md` with the owner's manual steps: create the Supabase project, enable anonymous sign-ins, enable email auth, set the site URL, add the two GitHub repository variables. 🛑 **Stop and ask the owner to do these.** ✅ written 2026-10-18; waiting for the owner.
-- [ ] Migrations for §8: tables, constraints (stars 0..3, name length, code format), views, RPC, RLS policies.
-- [ ] `supabase/tests/`: RLS tests (a child cannot read another child, a teacher cannot read another teacher's class, a child cannot call reviewer RPCs, `join_class` rejects bad codes and names).
-- [ ] `src/lib/supabase.ts` returns `null` when env vars are missing; generated types.
+- [x] `docs/SETUP.md` with the owner's manual steps: create the Supabase project, enable anonymous sign-ins, enable email auth, set the site URL, add the two GitHub repository variables. 🛑 **Stop and ask the owner to do these.** ✅ done 2026-10-18 (the owner created the project; Claude did the rest).
+- [x] Migrations for §8: tables, constraints (stars 0..3, name length, code format), views, RPC, RLS policies. ✅ 2026-10-18 (D-043).
+- [x] `supabase/tests/`: RLS tests (a child cannot read another child, a teacher cannot read another teacher's class, a child cannot call reviewer RPCs, `join_class` rejects bad codes and names). ✅ 2026-10-18 (37 checks, all passing).
+- [x] `src/lib/supabase.ts` returns `null` when env vars are missing; generated types. ✅ 2026-10-18.
 
 #### Teacher, class and sync
 
@@ -502,7 +502,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 
 **Handoff for the next session (updated 2026-10-17)**
 - **State:** P0 to P4 are merged to `main` (PRs #1 to #5; P4 merged 2026-10-18 as `bf0240b`). Phase 5 has its branch, `p5-backend`, cut from `main`. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** 🛑 wait for the owner to finish SETUP.md §4 (Supabase project, anonymous sign-ins, email auth, site URL, the two GitHub variables, `.env.local`) and give the project reference. Then P5 › migrations for §8. Nothing else in P5 starts before the owner says it's done. (Community is done, D-042: `src/screens/Community.tsx`, `content/community.json`, `questions` in `ProfileData`.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
+- **Exact next task:** P5 › Teacher and class: teacher sign up, sign in, sign out; create, rename and delete a class; join code shown large and copyable; rotate or disable it (`/teacher`, still a `Placeholder`). The database is ready (D-043): project `iggetuuoghdoyppdlppy`, migrations in `supabase/migrations/`, apply new ones with the Supabase MCP `apply_migration` (and save the same SQL as a new file there), then run `supabase/tests/rls.test.sql` through `execute_sql` and check the advisors. `src/lib/supabase.ts` gives the client (null when offline).
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -589,3 +589,9 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P5: Supabase setup steps (2026-10-18)**
 - Done: SETUP.md §4 written: create the project (Free plan, Mumbai), turn on anonymous sign-ins, keep email sign-in with confirmation, set the site URL and redirect URLs, copy the public URL and publishable (or anon) key into two GitHub variables and `.env.local`, and give Claude the project reference. The service-role and secret keys never come near the project. Optional CAPTCHA noted.
 - Next task: 🛑 the owner does SETUP.md §4. Then P5 › migrations.
+
+**P5: the backend core (2026-10-18)**
+- Done: the owner created the Supabase project `saksham` (ref `iggetuuoghdoyppdlppy`, Free plan, Tokyo) after Claude's own attempt was blocked by the session's safety settings. Claude turned on anonymous sign-ins, set the site and redirect URLs, put the URL and publishable key in GitHub variables and `.env.local`, applied the schema (`supabase/migrations/`: core and hardening), and added `src/lib/supabase.ts` (null without env vars) with generated types. New dependency `@supabase/supabase-js`. D-043.
+- Tests: `supabase/tests/rls.test.sql` (37 checks, all passing, rolled back so nothing is left), `src/lib/supabase.test.ts` (2). 228 unit and 62 e2e tests green. Supabase advisors: only intended warnings left (anonymous children; RPCs that check their callers).
+- Watch: the RLS tests need the live project, so CI doesn't run them; run them after every migration. The project is in Tokyo, not Mumbai.
+- Next task: P5 › teacher sign up and classes (`/teacher`).

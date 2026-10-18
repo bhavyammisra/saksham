@@ -38,7 +38,9 @@ The CI `deploy` job is **skipped** until these are set, so CI stays green withou
    - Variable `VERCEL_PROJECT_ID` = the Project ID.
 6. The next push to `main` deploys.
 
-## 4. Supabase ⬜ (Phase 5: Claude has stopped and is waiting for these)
+## 4. Supabase ✅ (done 2026-10-18)
+
+**Status:** done. The owner created the project in the dashboard (name `saksham`, ref `iggetuuoghdoyppdlppy`, Free plan; it is in Tokyo, not Mumbai, which only adds a little delay). Claude did steps 2 to 7: anonymous sign-ins on, email sign-in with confirmation, site URL `http://localhost:5173`, redirect URLs for ports 5173 and 4173, the two GitHub variables (`VITE_SUPABASE_URL` and the publishable key in `VITE_SUPABASE_ANON_KEY`) and `.env.local`. The database schema is applied (D-043). CAPTCHA (the optional step) is not turned on yet. The steps are kept below in case the project ever has to be made again.
 
 The backend only adds sync and the teacher side. The game keeps working without it, so nothing breaks while this is not done. It takes about 15 minutes. Supabase moves its menus around now and then: if a name below doesn't match, look for the nearest one and tell Claude.
 
