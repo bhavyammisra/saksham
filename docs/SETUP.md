@@ -40,7 +40,11 @@ The CI `deploy` job is **skipped** until these are set, so CI stays green withou
 
 ## 4. Supabase ✅ (done 2026-10-18)
 
-**Status:** done. The owner created the project in the dashboard (name `saksham`, ref `iggetuuoghdoyppdlppy`, Free plan; it is in Tokyo, not Mumbai, which only adds a little delay). Claude did steps 2 to 7: anonymous sign-ins on, email sign-in with confirmation, site URL `http://localhost:5173`, redirect URLs for ports 5173 and 4173, the two GitHub variables (`VITE_SUPABASE_URL` and the publishable key in `VITE_SUPABASE_ANON_KEY`) and `.env.local`. The database schema is applied (D-043). CAPTCHA (the optional step) is not turned on yet. The steps are kept below in case the project ever has to be made again.
+**Status:** done. The owner created the project in the dashboard (name `saksham`, ref `iggetuuoghdoyppdlppy`, Free plan; it is in Tokyo, not Mumbai, which only adds a little delay). Claude did steps 2 to 7: anonymous sign-ins on, email sign-in with confirmation, site URL `http://localhost:5173`, redirect URLs for ports 5173 and 4173, the two GitHub variables (`VITE_SUPABASE_URL` and the publishable key in `VITE_SUPABASE_ANON_KEY`) and `.env.local`. The database schema is applied (D-043). CAPTCHA (the optional step) is not turned on yet.
+
+**Still to do before real teachers sign up** (the teacher page works for you already):
+- **Try a real sign-up once:** open the app, "For teachers", "New account", with your own email; open the confirmation link (it brings you back to the teacher page, signed in) and make a class.
+- **Add an email provider:** Supabase's built-in email only sends to the people in your Supabase team, and only a few emails an hour, so other teachers would never get their confirmation link. In **Project Settings → Authentication → SMTP Settings**, connect a free email service (for example Resend or Brevo) and follow its steps. Tell Claude when it's done. The steps are kept below in case the project ever has to be made again.
 
 The backend only adds sync and the teacher side. The game keeps working without it, so nothing breaks while this is not done. It takes about 15 minutes. Supabase moves its menus around now and then: if a name below doesn't match, look for the nearest one and tell Claude.
 

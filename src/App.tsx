@@ -13,6 +13,7 @@ import { Community } from '@/screens/Community'
 import { Placeholder } from '@/screens/Placeholder'
 import { Play } from '@/screens/Play'
 import { Profiles } from '@/screens/Profiles'
+import { Teacher } from '@/screens/Teacher'
 import { Title } from '@/screens/Title'
 import { Town } from '@/screens/Town'
 
@@ -40,7 +41,7 @@ export default function App() {
         </Route>
 
         <Route element={<Shell />}>
-          <Route path="/teacher" element={<Placeholder title="teacher.title" />} />
+          <Route path="/teacher" element={<Teacher />} />
           <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
           <Route path="/dev/characters" element={<DevCharacters />} />
         </Route>

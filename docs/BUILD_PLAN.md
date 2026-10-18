@@ -25,7 +25,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | 🔄 branch `p5-backend`; backend core done (D-043), next: teacher accounts and classes | | D-043 |
+| P5 Backend | 🔄 branch `p5-backend`; backend core and the teacher page done (D-043, D-044), next: children joining a class | | D-043, D-044 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -321,7 +321,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Teacher, class and sync
 
-- [ ] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it.
+- [x] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it. ✅ 2026-10-18 (D-044).
 - [ ] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file.
 - [ ] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures.
 - [ ] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty.
@@ -501,8 +501,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-17)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5; P4 merged 2026-10-18 as `bf0240b`). Phase 5 has its branch, `p5-backend`, cut from `main`. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** P5 › Teacher and class: teacher sign up, sign in, sign out; create, rename and delete a class; join code shown large and copyable; rotate or disable it (`/teacher`, still a `Placeholder`). The database is ready (D-043): project `iggetuuoghdoyppdlppy`, migrations in `supabase/migrations/`, apply new ones with the Supabase MCP `apply_migration` (and save the same SQL as a new file there), then run `supabase/tests/rls.test.sql` through `execute_sql` and check the advisors. `src/lib/supabase.ts` gives the client (null when offline).
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is on `p5-backend`: the backend core (D-043) and the teacher page (D-044) are done. 228 unit tests (15 files) and 64 e2e tests (10 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
+- **Exact next task:** P5 › the optional "Join a class" step for children (class code plus first name, through `join_class` after an anonymous sign-in) and "Leave class" in Me, with calm, child-friendly messages for a wrong code, a switched-off code and no connection. The database is ready (D-043); the teacher page (D-044) makes classes and codes. Apply any new migration with the Supabase MCP `apply_migration` (and save the same SQL in `supabase/migrations/`), run `supabase/tests/rls.test.sql` through `execute_sql`, and check the advisors. For e2e, answer Supabase requests with a fake in the browser, as `tests/e2e/teacher.spec.ts` does.
 - **How the game is put together now (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
@@ -595,3 +595,10 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `supabase/tests/rls.test.sql` (37 checks, all passing, rolled back so nothing is left), `src/lib/supabase.test.ts` (2). 228 unit and 62 e2e tests green. Supabase advisors: only intended warnings left (anonymous children; RPCs that check their callers).
 - Watch: the RLS tests need the live project, so CI doesn't run them; run them after every migration. The project is in Tokyo, not Mumbai.
 - Next task: P5 › teacher sign up and classes (`/teacher`).
+
+**P5: the teacher page (2026-10-18)**
+- Done: `/teacher` ("For teachers" under the title menu): sign up with email confirmation, sign in, sign out; create, rename and delete a class; the join code large, copyable and read out letter by letter; switch the code off and on; get a new code. PKCE sign-in so the email link works with hash routes. D-044.
+- Tests: `tests/e2e/teacher.spec.ts` (2), with Supabase answered by a fake in the browser. 228 unit and 64 e2e tests green. Checked by screenshot at 1280 and 390 wide, and the real page loads against the live project with no console errors.
+- Not checked: a real sign-up and confirmation email (Claude has no inbox and doesn't sign in on real services). Owner: try it once with your own email.
+- Owner, before real teachers use it: add an email provider (SMTP) in Supabase; the built-in one only sends to the project team, a few emails an hour (SETUP.md §4).
+- Next task: P5 › children join a class, and "Leave class" in Me.

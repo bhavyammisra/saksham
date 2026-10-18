@@ -20,7 +20,7 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 | `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), game-style `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (redesigned, D-024/D-025) |
 | `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Sort` (the sort game, D-041), `Results`; `RightsCard` (card front, back and details, shared with the Book) and `badgeText` | P3, P4 |
 | `src/art/` | Scene art registry by key (`index.ts`), `style.tsx` (shared drawing rules), `sandbox.tsx`, `modern.tsx` (the shared modern kit, D-036), `school.tsx`, `town.tsx` (the walkable town), `dhaba.tsx`, `home.tsx`, `panchayat.tsx` (the cover screens use plain CSS, `src/components/cover.css`, D-034) | P2 to P4 |
-| `src/screens/` | One component per route: Onboarding, Profiles, Title (the main menu at `/`), Town (the walkable town, full screen), Play (a building, full screen), Book, Me (+ character), Community (D-042), Credits, HelpCentre, guards, Placeholder (still used by `/teacher`, `/reviewer`); dev pages DevCharacters, DevScene | P1 to P4 |
+| `src/screens/` | One component per route: Onboarding, Profiles, Title (the main menu at `/`), Town (the walkable town, full screen), Play (a building, full screen), Book, Me (+ character), Community (D-042), Teacher (`/teacher`, D-044), Credits, HelpCentre, guards, Placeholder (still used by `/reviewer`); dev pages DevCharacters, DevScene | P1 to P5 |
 | `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
 | `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |

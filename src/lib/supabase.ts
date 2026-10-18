@@ -11,7 +11,8 @@ export type Supabase = SupabaseClient<Database>
 /** A client for this URL and key, or null if either is missing. Kept separate so it can be tested. */
 export function makeSupabase(url: string | undefined, key: string | undefined): Supabase | null {
   if (!url || !key) return null
-  return createClient<Database>(url, key)
+  // PKCE: the email link brings back a "?code=" instead of tokens after "#", which the app's hash routes use.
+  return createClient<Database>(url, key, { auth: { flowType: 'pkce' } })
 }
 
 export const supabase = makeSupabase(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)

@@ -77,6 +77,10 @@ export function Title() {
           {t('title.footer')} ·{' '}
           <Link to="/credits" className="underline underline-offset-4 hover:text-espresso">
             {t('credits.title')}
+          </Link>{' '}
+          ·{' '}
+          <Link to="/teacher" className="underline underline-offset-4 hover:text-espresso">
+            {t('title.forTeachers')}
           </Link>
         </p>
       </div>

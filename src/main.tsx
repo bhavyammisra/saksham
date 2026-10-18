@@ -26,6 +26,10 @@ useStore.subscribe(applySettings)
 sound.unlockOnFirstGesture()
 document.title = t('app.name')
 
+// A teacher's email confirmation link comes back as "?code=...": open the teacher page, where the
+// Supabase client swaps the code for a session (D-044).
+if (new URLSearchParams(location.search).has('code')) location.hash = '#/teacher'
+
 // HashRouter keeps routes after "#", so any static host can serve the app
 // without server-side rewrite rules. See docs/DECISIONS.md.
 createRoot(root).render(
