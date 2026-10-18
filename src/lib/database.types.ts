@@ -317,6 +317,14 @@ export type Database = {
         }[]
       }
       leave_class: { Args: never; Returns: undefined }
+      my_class_mission: {
+        Args: never
+        Returns: {
+          class_name: string
+          mission_target: number
+          total_stars: number
+        }[]
+      }
       review_content: {
         Args: { decision: string; item: string; note?: string }
         Returns: undefined

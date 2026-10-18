@@ -97,7 +97,7 @@ test('FR-12 on start, progress goes to the class, and progress saved on another 
   })
   await savedPlayer(page, '/book', { school: true })
   await expect.poll(() => server.progress.get('school')?.stars).toBe(2)
-  expect(server.extras.cards).toContain('right-to-education')
+  await expect.poll(() => server.extras.cards).toContain('right-to-education') // sent just after the progress
   // The Dhaba card, finished on another device, is now in this device's Book too.
   await expect(page.getByText(strings['book.count'].replace('{n}', '2').replace('{total}', '4'))).toBeVisible()
 })

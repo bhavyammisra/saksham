@@ -39,7 +39,8 @@ insert into auth.users (id, email, is_anonymous, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'teacher.a@example.test', false, 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000a2', 'teacher.b@example.test', false, 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000c1', null, true, 'authenticated', 'authenticated'),
-  ('00000000-0000-0000-0000-0000000000c2', null, true, 'authenticated', 'authenticated');
+  ('00000000-0000-0000-0000-0000000000c2', null, true, 'authenticated', 'authenticated'),
+  ('00000000-0000-0000-0000-0000000000c3', null, true, 'authenticated', 'authenticated');
 
 select pg_temp.ok((select count(*) from public.user_roles where role = 'teacher') = 2, 'email users become teachers');
 select pg_temp.ok(not exists (select 1 from public.user_roles where user_id::text like '%c_'), 'anonymous children get no role');
@@ -101,6 +102,14 @@ select pg_temp.ok((select count(*) from public.students) = 1, 'a child cannot re
 select pg_temp.ok((select count(*) from public.quiz_attempts) = 0, 'a child cannot read another child''s quiz attempts');
 select pg_temp.fails($$ select public.rotate_join_code((select id from public.classes)) $$, 'a child cannot rotate a join code');
 
+-- A classmate: the class mission counts everyone's stars, but each child still reads only their own.
+select pg_temp.act_as('00000000-0000-0000-0000-0000000000c3', true);
+select public.join_class(current_setting('test.code_b'), 'Ravi', 'young');
+insert into public.progress (building_id, stars, best_score, completed) values ('school', 1, 50, true);
+select pg_temp.ok((select total_stars from public.my_class_mission()) = 3, 'a child sees their class mission as the class total');
+select pg_temp.ok((select class_name from public.my_class_mission()) = 'Class B', 'the class mission names the child''s own class');
+select pg_temp.ok((select count(*) from public.progress) = 1, 'the class total never opens a classmate''s progress');
+
 -- ---------------------------------------------------------------- teachers read their own class only
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a1', false);
@@ -113,7 +122,8 @@ select pg_temp.ok(public.rotate_join_code((select id from public.classes)) <> cu
 delete from public.students; -- "remove student": only their own students are visible, so only they are removed
 
 select pg_temp.act_as('00000000-0000-0000-0000-0000000000a2', false);
-select pg_temp.ok((select count(*) from public.students) = 1, 'removing a student never touches another teacher''s class');
+select pg_temp.ok((select count(*) from public.students) = 2, 'removing a student never touches another teacher''s class');
+select pg_temp.ok(not exists (select 1 from public.my_class_mission()), 'a teacher has no child class mission');
 select pg_temp.fails($$ select public.review_content('card:school:en', 'published') $$, 'a teacher cannot call reviewer RPCs');
 
 -- ---------------------------------------------------------------- reviewers
@@ -136,6 +146,7 @@ select set_config('role', 'anon', true);
 select pg_temp.fails($$ select * from public.classes $$, 'signed-out visitors cannot read classes');
 select pg_temp.fails($$ select * from public.class_mission $$, 'signed-out visitors cannot read the mission view');
 select pg_temp.fails($$ select public.join_class('ZZZZZZ', 'Asha', 'young') $$, 'signed-out visitors cannot call join_class');
+select pg_temp.fails($$ select * from public.my_class_mission() $$, 'signed-out visitors cannot read a class mission');
 
 reset role;
 select pg_temp.act_as_admin();

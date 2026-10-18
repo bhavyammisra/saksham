@@ -4,6 +4,7 @@ import { Button } from '@/components/Button'
 import { Page } from '@/components/Page'
 import { t, type StringKey } from '@/lib/i18n'
 import { supabase, type Supabase } from '@/lib/supabase'
+import { TeacherDashboard } from './TeacherDashboard'
 
 /**
  * For teachers (FR-13, D-044): sign up, sign in and out, and manage classes with their join codes.
@@ -189,7 +190,7 @@ function Classes({ db, email }: { db: Supabase; email: string }) {
 
       <h2 className="mt-6 text-xl font-semibold">{t('teacher.classes')}</h2>
       {classes?.length === 0 && <p className="mt-2 text-ink-soft">{t('teacher.noClasses')}</p>}
-      <ul className="mt-3 grid gap-4">
+      <ul className="mt-3 grid grid-cols-1 gap-4">
         {classes?.map((c) => (
           <ClassCard key={c.id} row={c} db={db} change={change} />
         ))}
@@ -202,6 +203,7 @@ function ClassCard({ row, db, change }: { row: ClassRow; db: Supabase; change: (
   const [name, setName] = useState(row.name)
   const [copied, setCopied] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [showProgress, setShowProgress] = useState(false)
 
   const copy = async () => {
     try {
@@ -260,6 +262,11 @@ function ClassCard({ row, db, change }: { row: ClassRow; db: Supabase; change: (
           </Button>
         )}
       </div>
+
+      <Button className="mt-4" aria-expanded={showProgress} onClick={() => setShowProgress((v) => !v)}>
+        {t(showProgress ? 'dashboard.hide' : 'dashboard.show')}
+      </Button>
+      {showProgress && <TeacherDashboard db={db} classId={row.id} />}
     </li>
   )
 }

@@ -64,3 +64,16 @@ export async function leaveClass(db: Supabase): Promise<ClassProblem | null> {
   useStore.getState().setClassInfo(null)
   return null
 }
+
+/** The active player's Class Mission as one total for their whole class, or null (not in a class, offline, or it failed). */
+export async function classMission(db: Supabase): Promise<{ className: string; target: number; total: number } | null> {
+  if (!navigator.onLine || !selectActiveData(useStore.getState())?.classInfo) return null
+  try {
+    await signInAsActivePlayer(db)
+  } catch {
+    return null
+  }
+  const { data } = await db.rpc('my_class_mission')
+  const row = data?.[0]
+  return row ? { className: row.class_name, target: row.mission_target, total: row.total_stars } : null
+}
