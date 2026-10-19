@@ -12,8 +12,11 @@ import {
   bestProgress,
   cleanFirstName,
   cleanQuestion,
+  mergeExtras,
+  mergeProgress,
   isValidFirstName,
   progressFromResult,
+  type Attempt,
   type BuildingResult,
   type Extras,
   type ProgressMap,
@@ -43,11 +46,36 @@ export interface Question {
   at: number
 }
 
+/**
+ * This player's own anonymous account on the class server (D-045). Each player on a shared device
+ * has their own, so joining a class as one player never changes another player's class.
+ */
+export interface CloudLogin {
+  userId: string
+  refreshToken: string
+}
+
+/** The class this player joined (D-045). */
+export interface ClassInfo {
+  id: string
+  name: string
+}
+
+/** A quiz or sort answer waiting to be sent to the class (D-046). */
+export interface QueuedAttempt {
+  buildingId: string
+  questionId: string
+  correct: boolean
+}
+
 /** Everything saved for one profile. */
 export interface ProfileData {
   progress: ProgressMap
   extras: Extras
   questions?: Question[] // missing in saves from before D-042
+  cloud?: CloudLogin // missing until the player first joins a class
+  classInfo?: ClassInfo | null
+  outbox?: QueuedAttempt[] // answers not yet sent to the class
 }
 
 export type ExtraKind = keyof Extras
@@ -73,6 +101,17 @@ export interface SakshamState {
   /** Saves an Ask an Expert question for the active profile. Returns false if it is empty or too long. */
   addQuestion: (text: string) => boolean
   removeQuestion: (id: string) => void
+  /** Saves the active player's class-server login, or their class (null after leaving). */
+  setCloud: (cloud: CloudLogin) => void
+  setClassInfo: (info: ClassInfo | null) => void
+  /** Keeps a saved login current when the class server renews it (each renewal replaces the old token). */
+  refreshCloud: (userId: string, refreshToken: string) => void
+  /** Queues a game's answers for the class, only if the active player is in one. */
+  queueAttempts: (buildingId: string, attempts: Attempt[]) => void
+  /** Removes the first `count` queued answers once they have been sent. */
+  dropSent: (count: number) => void
+  /** Merges the active player's progress and extras saved on the class server into this device. */
+  mergeRemote: (progress: ProgressMap, extras: Extras) => void
   setDemo: (on: boolean) => void
 }
 
@@ -215,6 +254,50 @@ export const useStore = create<SakshamState>()(
           const questions = (current.questions ?? []).filter((q) => q.id !== questionId)
           return { data: { ...s.data, [id]: { ...current, questions } } }
         })
+      },
+
+      setCloud: (cloud) => {
+        const id = get().activeProfileId
+        if (!id) return
+        set((s) => ({ data: { ...s.data, [id]: { ...(s.data[id] ?? emptyData()), cloud } } }))
+      },
+
+      setClassInfo: (classInfo) => {
+        const id = get().activeProfileId
+        if (!id) return
+        set((s) => ({ data: { ...s.data, [id]: { ...(s.data[id] ?? emptyData()), classInfo } } }))
+      },
+
+      refreshCloud: (userId, refreshToken) =>
+        set((s) => {
+          const owner = Object.keys(s.data).find((pid) => s.data[pid]?.cloud?.userId === userId)
+          if (!owner || s.data[owner]!.cloud!.refreshToken === refreshToken) return {}
+          return { data: { ...s.data, [owner]: { ...s.data[owner]!, cloud: { userId, refreshToken } } } }
+        }),
+
+      queueAttempts: (buildingId, attempts) => {
+        const id = get().activeProfileId
+        const current = id ? get().data[id] : undefined
+        if (!id || !current?.classInfo || attempts.length === 0) return
+        const queued = attempts.map((a) => ({ buildingId, questionId: a.questionId, correct: a.correct }))
+        set((s) => ({ data: { ...s.data, [id]: { ...current, outbox: [...(current.outbox ?? []), ...queued] } } }))
+      },
+
+      dropSent: (count) => {
+        const id = get().activeProfileId
+        const current = id ? get().data[id] : undefined
+        if (!id || !current) return
+        set((s) => ({ data: { ...s.data, [id]: { ...current, outbox: (current.outbox ?? []).slice(count) } } }))
+      },
+
+      mergeRemote: (progress, extras) => {
+        const id = get().activeProfileId
+        const current = id ? get().data[id] : undefined
+        if (!id || !current) return
+        const merged = { ...current, progress: mergeProgress(current.progress, progress), extras: mergeExtras(current.extras, extras) }
+        // Only save when something changed, so a sync doesn't set off another one.
+        if (JSON.stringify(merged) === JSON.stringify(current)) return
+        set((s) => ({ data: { ...s.data, [id]: merged } }))
       },
 
       setDemo: (on) => set({ demo: on }),

@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
 import strings from '../../content/strings.en.json' with { type: 'json' }
 
@@ -13,6 +13,16 @@ export async function createPlayer(page: Page, name: string, band: 'young' | 'te
   await page.getByRole('button', { name: strings['onboarding.next'] }).click()
   await page.getByRole('button', { name: strings['builder.done'] }).click()
   await expect(page).toHaveURL(/#\/town$/)
+}
+
+/**
+ * Skips a test of the class features when the app was built without the Supabase settings (D-048):
+ * then the game hides them, which other tests check. The teacher page says which build this is.
+ */
+export async function skipWithoutBackend(page: Page) {
+  await page.goto('/#/teacher')
+  await page.getByRole('heading', { level: 1, name: strings['teacher.title'] }).waitFor()
+  test.skip(await page.getByText(strings['teacher.offline']).isVisible(), 'built without Supabase settings')
 }
 
 // ---------------------------------------------------------------- playing the School

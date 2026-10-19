@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { GameFrame } from '@/components/GameFrame'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
-import { addScores, badgesFor, isUnlocked, questionsForBand, starsFor, type BuildingResult, type Score } from '@/lib/rules'
+import { addScores, badgesFor, isUnlocked, questionsForBand, starsFor, type Attempt, type BuildingResult, type Score } from '@/lib/rules'
 import { buildings, getScene, nextBuilding, townScene } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { CardReveal } from '@/play/CardReveal'
@@ -73,7 +73,8 @@ function PlayBuilding({ id }: { id: string }) {
   const game = games[scores.length]
 
   /** One game is over: go on to the next one, or finish once every game is played. */
-  const gameDone = (score: Score) => {
+  const gameDone = (score: Score, attempts: Attempt[]) => {
+    useStore.getState().queueAttempts(id, attempts) // sent to the class later, if the player is in one (sync.ts)
     const all = [...scores, score]
     setScores(all)
     if (all.length === games.length) finish(addScores(all))

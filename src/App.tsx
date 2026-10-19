@@ -10,13 +10,14 @@ import { HelpCentre } from '@/screens/HelpCentre'
 import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
 import { Community } from '@/screens/Community'
-import { Placeholder } from '@/screens/Placeholder'
 import { Play } from '@/screens/Play'
 import { Profiles } from '@/screens/Profiles'
+import { Reviewer } from '@/screens/Reviewer'
+import { Teacher } from '@/screens/Teacher'
 import { Title } from '@/screens/Title'
 import { Town } from '@/screens/Town'
 
-// Every route in the app (BUILD_PLAN P1). Screens marked Placeholder are built in later phases.
+// Every route in the app (BUILD_PLAN P1).
 export default function App() {
   return (
     <>
@@ -40,8 +41,8 @@ export default function App() {
         </Route>
 
         <Route element={<Shell />}>
-          <Route path="/teacher" element={<Placeholder title="teacher.title" />} />
-          <Route path="/reviewer" element={<Placeholder title="reviewer.title" />} />
+          <Route path="/teacher" element={<Teacher />} />
+          <Route path="/reviewer" element={<Reviewer />} />
           <Route path="/dev/characters" element={<DevCharacters />} />
         </Route>
 

@@ -1,6 +1,7 @@
-import { useState, type ReactNode, type Ref } from 'react'
+import { useEffect, useState, type ReactNode, type Ref } from 'react'
 import type { Band, Card } from '@content/types'
 import { t } from '@/lib/i18n'
+import { reviewedOn } from '@/lib/published'
 import { cardTextForBand } from '@/lib/rules'
 import './play.css'
 
@@ -77,7 +78,27 @@ export function CardDetails({ card, band, detailsRef, children }: { card: Card; 
       <p className="mt-2 text-sm text-ink-soft">
         <span className="font-semibold">{t('card.source')}:</span> {card.source}
       </p>
+      <ReviewedTick card={card} />
       {children}
     </div>
+  )
+}
+
+/** "Reviewed ✓" with the date, only when a reviewer published exactly this text (D-049). Nothing otherwise. */
+function ReviewedTick({ card }: { card: Card }) {
+  const [date, setDate] = useState<string | null>(null)
+  useEffect(() => {
+    let live = true
+    void reviewedOn(card).then((d) => live && setDate(d))
+    return () => {
+      live = false
+    }
+  }, [card])
+  if (date === null) return null
+  return (
+    <p className="mt-2 text-sm font-semibold text-leaf">
+      <span aria-hidden="true">✓ </span>
+      {date ? t('card.reviewedOn', { date }) : t('card.reviewed')}
+    </p>
   )
 }

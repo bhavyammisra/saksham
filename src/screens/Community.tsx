@@ -1,12 +1,14 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import communityJson from '@content/community.json'
 import type { CommunityContent } from '@content/types'
 import { Button } from '@/components/Button'
 import { Page } from '@/components/Page'
 import { t } from '@/lib/i18n'
+import { classMission } from '@/lib/classroom'
 import { QUESTION_MAX } from '@/lib/rules'
 import { selectActiveData, useStore } from '@/lib/store'
+import { supabase } from '@/lib/supabase'
 
 const community = communityJson as CommunityContent
 // One shared empty list, so the store selectors below return the same value when there is nothing yet.
@@ -15,7 +17,8 @@ const NONE: never[] = []
 /**
  * Community (FR-10, D-042): the Pledge Wall, the Class Mission, Ask an Expert and Places that help.
  * All local. Pledges are presets and questions stay with the player who wrote them (safety rules).
- * The Class Mission is cooperative: one total for everyone, no names, labelled "Sample" until classes exist.
+ * The Class Mission is cooperative: one total for everyone, no names. For a player in a class it is the
+ * real class total (D-047); otherwise it counts this device's players and is labelled "Sample".
  * (RequireProfile guarantees there is an active profile here.)
  */
 export function Community() {
@@ -73,19 +76,30 @@ function Pledges() {
 
 function Mission() {
   // Every player on this device together: one total, never split by player (no comparing children).
-  const stars = useStore((s) => Object.values(s.data).reduce((sum, d) => sum + Object.values(d.progress).reduce((n, p) => n + p.stars, 0), 0))
-  const { goal, target } = community.mission
+  const deviceStars = useStore((s) => Object.values(s.data).reduce((sum, d) => sum + Object.values(d.progress).reduce((n, p) => n + p.stars, 0), 0))
+  const inClass = useStore((s) => Boolean(selectActiveData(s)?.classInfo))
+  const [live, setLive] = useState<{ className: string; target: number; total: number } | null>(null)
+  useEffect(() => {
+    let current = true
+    if (supabase && inClass) void classMission(supabase).then((m) => current && setLive(m))
+    return () => {
+      current = false
+    }
+  }, [inClass])
+
+  const stars = live?.total ?? deviceStars
+  const target = live?.target ?? community.mission.target
   const shown = Math.min(stars, target)
   return (
     <Section id="community-mission" title={t('community.mission')}>
       <div className="mt-3 rounded-card bg-plaster-deep p-4">
-        <p className="inline-block rounded-button border-2 border-brass px-2 text-sm font-semibold uppercase tracking-wider">{t('community.sample')}</p>
-        <p className="mt-2 text-lg font-semibold">{goal}</p>
+        {!live && <p className="inline-block rounded-button border-2 border-brass px-2 text-sm font-semibold uppercase tracking-wider">{t('community.sample')}</p>}
+        <p className="mt-2 text-lg font-semibold">{live ? t('community.classGoal', { name: live.className, target }) : community.mission.goal}</p>
         <div className="mt-3 h-3 rounded-pill bg-sand/50" aria-hidden="true">
           <div className="h-3 rounded-pill bg-marigold" style={{ width: `${(shown / target) * 100}%` }} />
         </div>
         <p className="mt-2">{stars >= target ? t('community.missionDone') : t('community.missionProgress', { n: shown, target })}</p>
-        <p className="mt-2 text-sm text-ink-soft">{t('community.sampleNote')}</p>
+        {!live && <p className="mt-2 text-sm text-ink-soft">{t('community.sampleNote')}</p>}
       </div>
     </Section>
   )

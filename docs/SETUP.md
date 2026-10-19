@@ -38,9 +38,39 @@ The CI `deploy` job is **skipped** until these are set, so CI stays green withou
    - Variable `VERCEL_PROJECT_ID` = the Project ID.
 6. The next push to `main` deploys.
 
-## 4. Supabase ⬜ (Phase 5, Claude will stop and ask)
+## 4. Supabase ✅ (done 2026-10-18)
 
-Filled in during Phase 5: create the project, enable anonymous sign-ins and email auth, set the site URL, and add the repository variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. The anon key is public by design. **The service-role key must never be put in this repository, in GitHub, or in Vercel for this project.**
+**Status:** done. The owner created the project in the dashboard (name `saksham`, ref `iggetuuoghdoyppdlppy`, Free plan; it is in Tokyo, not Mumbai, which only adds a little delay). Claude did steps 2 to 7: anonymous sign-ins on, email sign-in with confirmation, site URL `http://localhost:5173`, redirect URLs for ports 5173 and 4173, the two GitHub variables (`VITE_SUPABASE_URL` and the publishable key in `VITE_SUPABASE_ANON_KEY`) and `.env.local`. The database schema is applied (D-043). CAPTCHA (the optional step) is not turned on yet.
+
+**Still to do before real teachers sign up** (the teacher page works for you already):
+- **Try a real sign-up once:** open the app, "For teachers", "New account", with your own email; open the confirmation link (it brings you back to the teacher page, signed in) and make a class.
+- **Become a reviewer:** after your own teacher sign-up, run this once in **SQL Editor** (with your email), or ask Claude to run it: `insert into public.user_roles (user_id, role) select id, 'reviewer' from auth.users where email = 'YOUR EMAIL';`. You stay a teacher too. Then open `/#/reviewer`, press "Send new and changed items for review", read each item and publish the ones you have fact-checked (§5, §6). A card shows "Reviewed on <date>" only while its text still matches what you published.
+- **Raise the anonymous sign-in limit:** Supabase allows 30 anonymous sign-ins an hour from one internet address, and a whole class on school Wi-Fi shares one address. Before a class joins together, go to **Authentication → Rate Limits** and raise "anonymous sign-ins" (for example to 200 an hour).
+- **Add an email provider:** Supabase's built-in email only sends to the people in your Supabase team, and only a few emails an hour, so other teachers would never get their confirmation link. In **Project Settings → Authentication → SMTP Settings**, connect a free email service (for example Resend or Brevo) and follow its steps. Tell Claude when it's done. The steps are kept below in case the project ever has to be made again.
+
+The backend only adds sync and the teacher side. The game keeps working without it, so nothing breaks while this is not done. It takes about 15 minutes. Supabase moves its menus around now and then: if a name below doesn't match, look for the nearest one and tell Claude.
+
+**Never put the service-role key (or the "secret" key) in this repository, in GitHub, in Vercel, or in a chat with Claude.** It bypasses every safety rule in the database. The app only ever needs the public key.
+
+1. **Create the project.** Sign in at <https://supabase.com> and create a new project on the **Free** plan.
+   - Name: `saksham`.
+   - Region: **South Asia (Mumbai)**, the closest to the schools that will use it.
+   - Database password: let Supabase generate one and save it in your password manager. Claude never needs it; don't put it in the repository or in chat.
+2. **Turn on anonymous sign-ins** (children join a class without an email or password). Go to **Authentication → Sign In / Providers** and turn on **Allow anonymous sign-ins**. Save.
+3. **Check email sign-in** (teachers). On the same page, make sure the **Email** provider is on and **Confirm email** is on. Leave every other provider off.
+4. **Set the site URL.** Go to **Authentication → URL Configuration**.
+   - **Site URL:** `http://localhost:5173` for now. When the app has a public Vercel address (section 3), change it to that address.
+   - **Redirect URLs:** add `http://localhost:5173/**` and `http://localhost:4173/**` (the dev server and the test server). Add the Vercel address the same way later.
+5. **Copy the two public values.** Go to **Project Settings → API Keys** (or **Data API**):
+   - the **Project URL** (`https://<something>.supabase.co`);
+   - the **publishable** key (it starts with `sb_publishable_`). If your project only shows the older keys, use the one labelled **anon** / **public**. Do not copy the secret or service-role key.
+6. **Add them to GitHub**, so CI builds with them. In the repository, **Settings → Secrets and variables → Actions → Variables** (variables, not secrets: both values are public by design):
+   - `VITE_SUPABASE_URL` = the Project URL;
+   - `VITE_SUPABASE_ANON_KEY` = the publishable (or anon) key.
+7. **Add them on your laptop**, so `npm run dev` uses them: copy `.env.example` to `.env.local` in the repository folder and fill in the same two values. `.env.local` is ignored by Git; never commit it.
+8. **Tell Claude it's done**, and give the **project reference** (the `<something>` part of the Project URL). Claude will then write the database tables, rules and tests (the next P5 tasks) as migration files in the repository. To apply them to your project, Claude will ask you to run `npx supabase login` yourself (it opens your browser; Claude never sees your Supabase password or access token).
+
+Optional, recommended before real classes use it: in **Authentication → Attack Protection**, turn on CAPTCHA protection, which Supabase suggests for anonymous sign-ins. It needs a free hCaptcha or Cloudflare Turnstile account; tell Claude if you turn it on, because the app then has to show the check.
 
 ## 5. Fact-check the Help Centre ⬜ (owner, before any child uses the app)
 

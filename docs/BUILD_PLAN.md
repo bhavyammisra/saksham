@@ -24,8 +24,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P1 Core | ✅ merged | #2 | D-013 to D-018 |
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
-| P4 Town and all buildings | ✅ all 6 tasks done on `p4-town`; **pull request next** | not opened | D-030 to D-042 |
-| P5 Backend | ⬜ | | |
+| P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
+| P5 Backend | ✅ all tasks done on `p5-backend`; PR open, CI green, **merge next** (by the owner) | #6 | D-043 to D-049 |
 | P6 Experience and Hindi | ⬜ | | |
 | P7 Hardening and documentation | ⬜ | | |
 
@@ -40,7 +40,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | New gameplay frame and modern scenes, built (P4) | ✅ approved 2026-10-16 (D-036) |
 | Owner's play-test feedback: walk, doors, scale, voice (P4) | ✅ applied 2026-10-16 (D-038, D-039); the owner confirmed the walk and the door entry on their laptop 2026-10-18 |
 | Look development, School scene style (P2) | ✅ approved 2026-10-15 after the restyle (D-026) |
-| Supabase setup (P5, first task) | ⬜ not reached. Claude stops and asks the owner to do SETUP.md §4 |
+| Supabase setup (P5, first task) | ✅ done 2026-10-18: the owner created the project; Claude set the rest (D-043) |
 
 **Owner-only tasks still open** (none of these block P4; all must be done before children use the app)
 
@@ -50,6 +50,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Fact-check the Dhaba rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/dhaba.json` › `card.review` |
 | Fact-check the Home rights card (quotes matched secondary sources only) | SETUP.md §6, `content/scenes/home.json` › `card.review` |
 | Fact-check the Panchayat rights card (quotes matched PRS and Indian Kanoon) | SETUP.md §6, `content/scenes/panchayat.json` › `card.review` |
+| Make your own account a reviewer, then publish the reviewed content from `/reviewer` | SETUP.md §4 |
 | Fact-check the Help Centre numbers and sentences, and the Community page's places that help | SETUP.md §5, `content/help.json` and `content/community.json` › `review` |
 | Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
@@ -314,24 +315,24 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Backend core
 
-- [ ] `docs/SETUP.md` with the owner's manual steps: create the Supabase project, enable anonymous sign-ins, enable email auth, set the site URL, add the two GitHub repository variables. 🛑 **Stop and ask the owner to do these.**
-- [ ] Migrations for §8: tables, constraints (stars 0..3, name length, code format), views, RPC, RLS policies.
-- [ ] `supabase/tests/`: RLS tests (a child cannot read another child, a teacher cannot read another teacher's class, a child cannot call reviewer RPCs, `join_class` rejects bad codes and names).
-- [ ] `src/lib/supabase.ts` returns `null` when env vars are missing; generated types.
+- [x] `docs/SETUP.md` with the owner's manual steps: create the Supabase project, enable anonymous sign-ins, enable email auth, set the site URL, add the two GitHub repository variables. 🛑 **Stop and ask the owner to do these.** ✅ done 2026-10-18 (the owner created the project; Claude did the rest).
+- [x] Migrations for §8: tables, constraints (stars 0..3, name length, code format), views, RPC, RLS policies. ✅ 2026-10-18 (D-043).
+- [x] `supabase/tests/`: RLS tests (a child cannot read another child, a teacher cannot read another teacher's class, a child cannot call reviewer RPCs, `join_class` rejects bad codes and names). ✅ 2026-10-18 (37 checks, all passing).
+- [x] `src/lib/supabase.ts` returns `null` when env vars are missing; generated types. ✅ 2026-10-18.
 
 #### Teacher, class and sync
 
-- [ ] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it.
-- [ ] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file.
-- [ ] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures.
-- [ ] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty.
-- [ ] Verify the whole demo path works with env vars unset and with the network off.
+- [x] Teacher sign up, sign in, sign out. Create, rename and delete a class; join code shown large and copyable; rotate or disable it. ✅ 2026-10-18 (D-044).
+- [x] Optional "Join a class" step for children (code plus first name), "Leave class" in Me. Handle wrong code, inactive code and offline with calm, child-friendly messages in the strings file. ✅ 2026-10-18 (D-045; "My class" on Me).
+- [x] `src/lib/sync.ts`: queue progress and quiz attempts, flush on change, on reconnect and on start, apply the merge rule, never block the UI, no error toasts for background failures. ✅ 2026-10-18 (D-046).
+- [x] Live teacher dashboard (heatmap of students by buildings, class averages, common mistakes, remove student) and live Class Mission. Manual refresh plus a 30 s poll. Show a "Sample" label only when logged out or empty. ✅ 2026-10-18 (D-047; an empty class says how to join instead of showing sample rows).
+- [x] Verify the whole demo path works with env vars unset and with the network off. ✅ 2026-10-18 (D-048; CI now runs e2e on a build without the settings too).
 
 #### Content review workflow
 
-- [ ] Hash-and-seed script for reviewable items (English now, Hindi later).
-- [ ] `/reviewer` screen (reviewer role only): list by status and language, bundled text next to its hash, approve, reject with a note, send back. Writes `content_events`.
-- [ ] "Reviewed ✓" with date on the card back when the hash matches a published row. Never block the card if offline or unmatched.
+- [x] Hash-and-seed script for reviewable items (English now, Hindi later). ✅ 2026-10-18 (D-049: `npm run content:hashes`; seeding from `/reviewer`).
+- [x] `/reviewer` screen (reviewer role only): list by status and language, bundled text next to its hash, approve, reject with a note, send back. Writes `content_events`. ✅ 2026-10-18 (D-049).
+- [x] "Reviewed ✓" with date on the card back when the hash matches a published row. Never block the card if offline or unmatched. ✅ 2026-10-18 (D-049; shown in the card details).
 
 ### Phase 6: Experience and Hindi
 
@@ -446,7 +447,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: the look-dev page reuses the sandbox story and placeholder props (the box and notice). The real School story and props come in P3. Phone walk pad is only checked through `pointer: coarse`, not on a real device yet. No per-frame performance profiling yet (P7).
 - Waiting for: owner approval of the visual style at `/dev/look`. Then the next task is P3 › author `content/scenes/school.json`.
 
-**Handoff (2026-10-15), superseded: use "Handoff for the next session (updated 2026-10-17)" below**
+**Handoff (2026-10-15), superseded: use "Handoff for the next session (updated 2026-10-19)" below**
 - State: P0 and P1 are merged to `main` (PRs #1, #2). All of P2 is built and pushed on branch `p2-character-scene` (no PR yet). 155 unit and 34 e2e tests green locally.
 - Owner feedback: they do **not like the cover page or the character design**. The character gate is reopened, and the look-dev gate is not approved. Phase 3 must not start until both are redesigned and approved.
 - Exact next task: P2 › Owner feedback rework › "Clarify the feedback first". Ask the owner before changing any art.
@@ -500,22 +501,31 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Hacky / watch: more villagers come with each new building (only Lata so far). Mitthu's marker sits at a fixed height above doors.
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
-**Handoff for the next session (updated 2026-10-17)**
-- **State:** branch `p4-town`, everything committed and pushed; the last app commit is Community (D-042), so every P4 task is done. P0 to P3 are merged to `main` (PRs #1 to #4); the P4 PR is not opened yet. 226 unit tests (14 files) and 62 e2e tests (9 files, 16 of them safety) are green; lint, typecheck, validate and build pass. See **Checkpoints** at the top.
-- **Exact next task:** open the P4 pull request (`p4-town` into `main`, with the owner's go-ahead), wait for CI, and merge with `gh pr merge <n> --merge`. Then Phase 5 starts with a 🛑 gate: the owner creates the Supabase project (SETUP.md §4). (Community is done, D-042: `src/screens/Community.tsx`, `content/community.json`, `questions` in `ProfileData`.) The Panchayat (D-040) followed the pattern below; for any new building, follow Home: `content/scenes/home.json`, `src/art/home.tsx` (built from the `src/art/modern.tsx` kit, at the D-036 scale: people 400 units, buildings fully in view), new people in `content/npcs.json` (children in modern clothes), `src/engine/home.test.ts`, one line in `src/lib/scenes.ts` and one in `src/art/index.ts`, a play-through in `tests/e2e/play.spec.ts` (extend `seedPlayer` so Home is finished), the Book count in `collection.spec.ts`, and a card `review` plus a SETUP.md §6 entry. Quote the law exactly, stop before penalties, and check the quotes against at least two sources (curl the page text; WebFetch only returns short quotes). After the Panchayat: the Sort game, then Community (`/community` is still a `Placeholder`).
-- **How the game is put together now (D-036 to D-039):**
-  - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, quiz, results and the "still locked" page sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
+**Handoff for the next session (updated 2026-10-19)**
+- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is complete on `p5-backend` (D-043 to D-049) and its pull request, [PR #6](https://github.com/bhavyammisra/saksham/pull/6), is open and **CI is green** on it (lint, unit, build, `e2e`, `e2e-local-only`). It is not merged: Claude's attempt to merge was blocked by the session's safety settings ("merge without review"). 241 unit tests (17 files) and 80 e2e tests (15 files, 16 of them safety): with the Supabase settings 79 pass and 1 skips; without them 64 pass and 16 skip. The RLS test has 45 checks, all passing. See **Checkpoints** at the top.
+- **First thing:** PR #6. If it is still open, the owner merges it (GitHub › PR #6 › "Create a merge commit"), or tells Claude to and approves the merge when asked. Pushing a docs commit to `p5-backend` re-runs CI; merge only once both e2e jobs pass on the PR's own run (`gh pr checks 6`; the push run is listed too, don't confuse them). Then cut `p6-experience` from `main` and record the P5 merge in the docs (as `P5: start Phase 5; record P4 merge in docs` did for P4).
+- **Exact next task:** P6 › **Splash v2** (BUILD_PLAN §9, Phase 6): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across with the Saksham banner, tap to continue; about 4 s on the first load and 1 s after, a static fade in calm mode, always skippable, never over `/help`. Respect the performance rule (D-030) and the calm-mode walk exception. Phase 6 notes to keep in mind: **Sound v2** needs licensed or CC0 sounds listed in `ASSET_LICENSES.md` (if a licence can't be confirmed, synthesise and tell the owner); the Hindi task mentions read-aloud, but the voice was removed at the owner's request (D-038), so skip that part and say so.
+- **How the game is put together (D-036 to D-039):**
+  - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, games (quiz, then sort where a building has one, D-041) and results sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
   - The reducer (`sceneState.ts`) knows `depth` (W/S), `trail` (Back), `seen` (History) and `entering` (walk to an open door, turn, go in, then `exit`). Hotspots may set `depth` in content.
   - `Character` has a `back` view and knees (`ch-shin-*`, `ch-knee` in `character.css`). The voice is gone (no `speech.ts`, no narration setting).
+- **How the backend is put together (D-043 to D-049):**
+  - Supabase project `saksham`, ref `iggetuuoghdoyppdlppy` (Free plan, Tokyo). Anonymous sign-ins on (children), email sign-in with confirmation (teachers), site URL `http://localhost:5173`. The two public values are GitHub variables and in `.env.local` (git-ignored). Never the service-role or secret key.
+  - Schema in `supabase/migrations/` (core, hardening, class mission for children, content review). Change it with a **new** migration file, applied through the Supabase MCP (`apply_migration`, the same SQL as the file), then run `supabase/tests/rls.test.sql` through `execute_sql` (paste the whole file; it rolls back) and check `get_advisors`. Remaining advisor warnings are intended (anonymous children; RPCs that check their callers). Update `src/lib/database.types.ts` by hand or with `generate_typescript_types`.
+  - App side: `supabase.ts` (client or null; PKCE so email links work with hash routes), `classroom.ts` (each player on a device has their own anonymous login, `cloud`, plus `classInfo`), `sync.ts` (pushes state and the `outbox` of answers, merges back; never blocks, never shows errors), `review.ts`/`published.ts` (hashes and the "Reviewed" tick), screens `Teacher`, `TeacherDashboard`, `Reviewer`, "My class" on Me, the real Class Mission on Community.
+  - Local-first is enforced: every backend feature is null-safe, `skipWithoutBackend` (tests/e2e/helpers.ts) skips backend tests on a build without the settings, and CI's `e2e-local-only` runs the whole suite on such a build. Run it locally with `VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= npx playwright test`.
+  - e2e never touches the real project: each backend spec answers `*.supabase.co` requests with a small fake in the browser (`page.route`), with unsigned but well-formed JWTs (see `tests/e2e/class.spec.ts`, `sync.spec.ts`, `dashboard.spec.ts`, `reviewer.spec.ts`).
 - **Rules learned the hard way (keep them):**
   - No full-screen `mix-blend-mode`, no `backdrop-filter`, and no `filter: blur` on animated pictures (D-030). Moving things go in their own small layer (clouds: `"drift": true`).
   - Calm mode is set by the system's "reduce motion" too, and three files stop animations in it (`index.css`, `scene.css`, `character.css`). All three keep the walk exception `:not(.ch[data-pose='walk'] *)`; `scene.spec.ts` tests it.
   - Scale: the owner tried true scale (D-038) and preferred the D-036 scale. Don't change it again without asking.
-  - Long journey e2e tests run in calm mode; motion is tested by `scene.spec.ts` and `town.spec.ts`. If tests time out everywhere at once, the laptop is busy; re-run first.
-  - Screenshots: a throwaway Playwright script against the dev server (port 5174 when 5173 is taken).
-  - Tooling on this machine: the Bash tool mangles heredocs (and `python -` waits for input forever), so write scripts to the scratchpad with the Write tool and run them. Write files with `newline='\n'` (the repo is LF).
-- **The Lab Eval I report** (not in git): `tmp-report/` (ignored via `.git/info/exclude`), built with `node tmp-report/build.ts "C:\SEM 5\Software Engineering\Project"`; notes in `tmp-report/NEXT.md`. Diagrams are SVG drawn in `tmp-report/figures.js` with helpers in `diagrams.js`; `node tmp-report/shot-uc.ts <figure-id>...` screenshots figures into `tmp-report/prev/`.
-- **Owner:** the fact checks (School, Dhaba, Home cards; Help Centre) are the most important open items before any child plays.
+  - Long journey e2e tests run in calm mode; motion is tested by `scene.spec.ts` and `town.spec.ts`. If tests time out everywhere at once, the laptop is busy; re-run first. In e2e, wait for things that arrive in order (`expect.poll`), never assume a second request has landed because the first has.
+  - Phone layouts: check every new page at 390 wide for sideways scrolling. Two causes found so far: an auto-sized grid column (use `grid-cols-1`, or `min-w-0` on a grid item) and a screen-reader-only label inside an `overflow-x-auto` box that isn't `relative`.
+  - Screenshots: a throwaway Playwright script in `tmp-report/` (git-ignored) against the dev server, with a Windows output path in the scratchpad (`cygpath -w`); never a relative folder like `x`, which ends up in the repo.
+  - Tooling on this machine: write multi-line edit scripts to the scratchpad with the Write tool and run them with the scratchpad Python (path in `tmp-report/build.ts`); heredocs with quotes inside break in the Bash tool. Write files with `newline='\n'` (the repo is LF).
+  - Permissions: the session's safety settings block creating cloud resources (a Supabase project, its cost confirmation) and merging pull requests. Don't work around them: ask the owner to do it, or to approve it when asked.
+- **The Lab Eval I report** (not in git): `tmp-report/` (ignored via `.git/info/exclude`), built with `node tmp-report/build.ts "C:\SEM 5\Software Engineering\Project"`; notes in `tmp-report/NEXT.md`. Diagrams are SVG drawn in `tmp-report/figures.js` with helpers in `diagrams.js`; `node tmp-report/shot-uc.ts <figure-id>...` screenshots figures into `tmp-report/prev/`; `node tmp-report/shots.ts` retakes the app screenshots (they show the redesigned game, not yet the Phase 5 screens).
+- **Owner:** the fact checks (the four cards, the Help Centre, the Community places) are the most important open items before any child plays; then a real teacher sign-up, becoming a reviewer and publishing (SETUP.md §4); before real classes, an email provider and a higher anonymous sign-in limit.
 
 **P4: Book, Me, Credits and demo mode (2026-10-15)**
 - Done: `/book` (card album, read any collected card again), Me (stars, all badges earned or not yet, settings, switch player, link to Credits), `/credits` (made-in-code art, fonts from `content/credits.json`, every card's source exactly as written), and demo mode (type "demo" or hold the logo 2 s; a top-bar chip turns it off). Shared card pieces in `src/play/RightsCard.tsx`; badge names in `src/play/badgeText.ts`; `SettingsControls` shared by the dialog and Me. Removed the last live blurs (D-030 rule).
@@ -581,3 +591,56 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `cleanQuestion` (rules), questions per player and removal (store), and `tests/e2e/community.spec.ts` (4): a pledge survives a reload and there is no free-text pledge; the mission is labelled Sample, counts the stars, and names nobody; a question is refused when empty, saved, hidden from another player on the same device, and removed; places are shown exactly as written. 226 unit and 62 e2e tests green; checked by screenshot at 1280 and 390 wide.
 - Owner: fact-check the places that help (SETUP.md §5).
 - Next task: open the P4 pull request (with the owner's go-ahead), then Phase 5's first 🛑 gate.
+
+**P4 merged (2026-10-18)**
+- PR #5 (`p4-town` into `main`) merged with a merge commit (`bf0240b`) after CI went green (8 checks passing). Phase 4 is complete.
+- Next task: P5 › write SETUP.md §4 (Supabase), then 🛑 stop for the owner.
+
+**P5: Supabase setup steps (2026-10-18)**
+- Done: SETUP.md §4 written: create the project (Free plan, Mumbai), turn on anonymous sign-ins, keep email sign-in with confirmation, set the site URL and redirect URLs, copy the public URL and publishable (or anon) key into two GitHub variables and `.env.local`, and give Claude the project reference. The service-role and secret keys never come near the project. Optional CAPTCHA noted.
+- Next task: 🛑 the owner does SETUP.md §4. Then P5 › migrations.
+
+**P5: the backend core (2026-10-18)**
+- Done: the owner created the Supabase project `saksham` (ref `iggetuuoghdoyppdlppy`, Free plan, Tokyo) after Claude's own attempt was blocked by the session's safety settings. Claude turned on anonymous sign-ins, set the site and redirect URLs, put the URL and publishable key in GitHub variables and `.env.local`, applied the schema (`supabase/migrations/`: core and hardening), and added `src/lib/supabase.ts` (null without env vars) with generated types. New dependency `@supabase/supabase-js`. D-043.
+- Tests: `supabase/tests/rls.test.sql` (37 checks, all passing, rolled back so nothing is left), `src/lib/supabase.test.ts` (2). 228 unit and 62 e2e tests green. Supabase advisors: only intended warnings left (anonymous children; RPCs that check their callers).
+- Watch: the RLS tests need the live project, so CI doesn't run them; run them after every migration. The project is in Tokyo, not Mumbai.
+- Next task: P5 › teacher sign up and classes (`/teacher`).
+
+**P5: the teacher page (2026-10-18)**
+- Done: `/teacher` ("For teachers" under the title menu): sign up with email confirmation, sign in, sign out; create, rename and delete a class; the join code large, copyable and read out letter by letter; switch the code off and on; get a new code. PKCE sign-in so the email link works with hash routes. D-044.
+- Tests: `tests/e2e/teacher.spec.ts` (2), with Supabase answered by a fake in the browser. 228 unit and 64 e2e tests green. Checked by screenshot at 1280 and 390 wide, and the real page loads against the live project with no console errors.
+- Not checked: a real sign-up and confirmation email (Claude has no inbox and doesn't sign in on real services). Owner: try it once with your own email.
+- Owner, before real teachers use it: add an email provider (SMTP) in Supabase; the built-in one only sends to the project team, a few emails an hour (SETUP.md §4).
+- Next task: P5 › children join a class, and "Leave class" in Me.
+
+**P5: children join a class (2026-10-18)**
+- Done: "My class" on Me (only when the class server is set up): type the teacher's code to join with your first name, age band and character; "Leave class" asks once more. Each player on a device has their own anonymous login saved with their data, so two players are two students; background token renewals are saved for the right player. Calm messages for a wrong or switched-off code and for no connection (checked first, so it answers at once). D-045.
+- Tests: `classroom.test.ts` (3: problems in words), store tests for each player's login (2), and `tests/e2e/class.spec.ts` (3: join, reload, leave; two players are two students and leaving uses the right one; offline). 233 unit and 67 e2e tests green. Checked by screenshot at 1280 and 390 wide (the code box was widened so all six letters show).
+- Not checked: joining the real project from the app (it would make a real anonymous account); the real `join_class` is covered by the RLS tests.
+- Owner, before a whole class joins at once: raise the anonymous sign-in rate limit (SETUP.md §4).
+- Next task: P5 › `src/lib/sync.ts` (send progress and quiz attempts to the class).
+
+**P5: sync (2026-10-18)**
+- Done: `src/lib/sync.ts` sends the active player's progress, extras and queued quiz and sort answers to their class (only when they are in one), then merges back what the server has (so two devices show the best of both). It runs at start, shortly after any change, and on reconnect; it never blocks the game or shows an error, and unsent answers wait in the player's `outbox`. Quiz and Sort now hand their answers to Play. The validator checks answer ids against the database's rule. D-046.
+- Tests: store (queue only in a class, drop only what was sent, merge from another device), validator (an id the server would refuse), and `tests/e2e/sync.spec.ts` (4, against a fake server that keeps what it's sent: start-up sync both ways, every quiz answer arrives, nothing lost while the server is down and sent on reconnect, nothing sent outside a class). 237 unit and 71 e2e tests green.
+- Next task: P5 › the live teacher dashboard and the real Class Mission.
+
+**P5: the live teacher dashboard (2026-10-18)**
+- Done: "Show class progress" on each class in `/teacher`: stars by place for every student (shaded, and in words for screen readers), class averages, the five questions most often wrong on the first try (words from content), removing a student, and the Class Mission; it reloads every 30 seconds and with Refresh. New function `my_class_mission()` gives a child their class's total only, so Community shows the real class mission (no "Sample") for a player in a class. D-047.
+- Tests: 42 RLS checks (5 new), `tests/e2e/dashboard.spec.ts` (4, including the 30-second poll with a fake clock). Fixed a timing slip in `sync.spec.ts` (it now waits for the cards to arrive). 237 unit and 75 e2e tests green. Checked by screenshot at 1280 and 390 wide; a screen-reader-only label had made the phone page scroll sideways, fixed by making the table's box `relative`.
+- Next task: P5 › verify the demo path with no Supabase settings and with the network off.
+
+**P5: works without the backend (2026-10-18)**
+- Done: `tests/e2e/offline.spec.ts` plays the demo path with the network off, and checks that a build without the Supabase settings has no class features; backend tests skip themselves on such a build (`skipWithoutBackend`); CI job `e2e-local-only` runs the whole suite on a build with empty settings. Run locally: with the settings 76 passed and 1 skipped; without them 64 passed and 13 skipped, and the build had no project address in it. D-048.
+- Known limit: the app can't be opened or reloaded with no network (no service worker); once open, it works offline.
+- Next task: P5 › Content review (hash-and-seed script, `/reviewer`, "Reviewed ✓").
+
+**P5: content review (2026-10-18)**
+- Done: `src/lib/review.ts` (reviewable items and SHA-256 hashes, shared by the app and `npm run content:hashes`), `/reviewer` (send new and changed items, read each item's text laid out for reading next to its hash, publish, reject with a note, send back; filters by status and language), the "Reviewed on <date>" tick in a card's details when its exact text is published, and a migration that lets one account hold several roles and adds `published_content()`. `Placeholder` deleted. D-049. Every Phase 5 box is now done.
+- Tests: `review.test.ts` (4), 45 RLS checks (3 new: a teacher who reviews is still a teacher; waiting content isn't published; anyone can read published hashes), `tests/e2e/reviewer.spec.ts` (3: not a reviewer; the whole review flow, with the app's hash equal to the one worked out in Node; the tick only for the exact published text). Checked by screenshot at 1280 and 390 wide (a long status option made the phone page scroll sideways; fixed).
+- Owner: sign up as a teacher with your own email, then make that account a reviewer (SETUP.md §4) and publish the content you have fact-checked.
+- Next task: open the P5 pull request.
+
+**P5: pull request (2026-10-19)**
+- Done: PR #6 (`p5-backend` into `main`) opened; CI green on the PR's own run (both e2e jobs). Claude's merge was blocked by the session's safety settings, so the owner merges it. Handoff rewritten for a fresh session (backend map, test patterns, phone-layout and permission lessons).
+- Next task: merge PR #6, cut `p6-experience`, then P6 › Splash v2.

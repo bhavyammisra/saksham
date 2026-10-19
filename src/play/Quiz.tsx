@@ -13,7 +13,7 @@ type Stage = 'quiz' | 'offer' | 'hint'
  * Only first answers count (rules.ts). If the score is under 60%, Mitthu offers a hint round
  * that replays the missed questions with the explanation first. It never changes the score.
  */
-export function Quiz({ questions, onDone }: { questions: QuizQuestion[]; onDone: (score: Score) => void }) {
+export function Quiz({ questions, onDone }: { questions: QuizQuestion[]; onDone: (score: Score, attempts: Attempt[]) => void }) {
   const [stage, setStage] = useState<Stage>('quiz')
   const [attempts, setAttempts] = useState<Attempt[]>([])
   const [hintList, setHintList] = useState<QuizQuestion[]>([])
@@ -49,7 +49,7 @@ export function Quiz({ questions, onDone }: { questions: QuizQuestion[]; onDone:
     if (!last) return setIndex((i) => i + 1)
     const score = scoreQuiz(questions, attempts)
     if (stage === 'quiz' && needsHintRound(score)) return setStage('offer')
-    onDone(score)
+    onDone(score, attempts)
   }
 
   if (stage === 'offer') {
@@ -71,7 +71,7 @@ export function Quiz({ questions, onDone }: { questions: QuizQuestion[]; onDone:
           >
             {t('quiz.hintStart')}
           </Button>
-          <Button look="secondary" onClick={() => onDone(scoreQuiz(questions, attempts))}>
+          <Button look="secondary" onClick={() => onDone(scoreQuiz(questions, attempts), attempts)}>
             {t('quiz.hintSkip')}
           </Button>
         </div>
