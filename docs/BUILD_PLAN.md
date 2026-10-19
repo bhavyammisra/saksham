@@ -25,8 +25,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | ✅ all tasks done on `p5-backend`; PR open, CI green, **merge next** (by the owner) | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | ⬜ | | |
+| P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
+| P6 Experience and Hindi | 🔄 branch `p6-experience`; next: Splash v2 | | |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -502,8 +502,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-19)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is complete on `p5-backend` (D-043 to D-049) and its pull request, [PR #6](https://github.com/bhavyammisra/saksham/pull/6), is open and **CI is green** on it (lint, unit, build, `e2e`, `e2e-local-only`). It is not merged: Claude's attempt to merge was blocked by the session's safety settings ("merge without review"). 241 unit tests (17 files) and 80 e2e tests (15 files, 16 of them safety): with the Supabase settings 79 pass and 1 skips; without them 64 pass and 16 skip. The RLS test has 45 checks, all passing. See **Checkpoints** at the top.
-- **First thing:** PR #6. If it is still open, the owner merges it (GitHub › PR #6 › "Create a merge commit"), or tells Claude to and approves the merge when asked. Pushing a docs commit to `p5-backend` re-runs CI; merge only once both e2e jobs pass on the PR's own run (`gh pr checks 6`; the push run is listed too, don't confuse them). Then cut `p6-experience` from `main` and record the P5 merge in the docs (as `P5: start Phase 5; record P4 merge in docs` did for P4).
+- **State:** P0 to P5 are merged to `main` (PRs #1 to #6; P5 merged 2026-10-19 as `f4eebac`, after CI went green on both e2e jobs). Phase 6 has its branch, `p6-experience`, cut from `main`. 241 unit tests (17 files) and 80 e2e tests (15 files, 16 of them safety): with the Supabase settings 79 pass and 1 skips; without them 64 pass and 16 skip. The RLS test has 45 checks, all passing. See **Checkpoints** at the top.
+- **First thing:** run the start-of-session checks (CLAUDE.md). Merging works when the owner approves it in chat; check `gh pr checks <n>` on the latest commit first (a docs commit restarts CI).
 - **Exact next task:** P6 › **Splash v2** (BUILD_PLAN §9, Phase 6): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across with the Saksham banner, tap to continue; about 4 s on the first load and 1 s after, a static fade in calm mode, always skippable, never over `/help`. Respect the performance rule (D-030) and the calm-mode walk exception. Phase 6 notes to keep in mind: **Sound v2** needs licensed or CC0 sounds listed in `ASSET_LICENSES.md` (if a licence can't be confirmed, synthesise and tell the owner); the Hindi task mentions read-aloud, but the voice was removed at the owner's request (D-038), so skip that part and say so.
 - **How the game is put together (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, games (quiz, then sort where a building has one, D-041) and results sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
@@ -644,3 +644,7 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P5: pull request (2026-10-19)**
 - Done: PR #6 (`p5-backend` into `main`) opened; CI green on the PR's own run (both e2e jobs). Claude's merge was blocked by the session's safety settings, so the owner merges it. Handoff rewritten for a fresh session (backend map, test patterns, phone-layout and permission lessons).
 - Next task: merge PR #6, cut `p6-experience`, then P6 › Splash v2.
+
+**P5 merged (2026-10-19)**
+- PR #6 (`p5-backend` into `main`) merged with a merge commit (`f4eebac`) after every check passed on its latest commit, with the owner's approval in chat. Phase 5 is complete; `p6-experience` cut from `main`.
+- Next task: P6 › Splash v2.
