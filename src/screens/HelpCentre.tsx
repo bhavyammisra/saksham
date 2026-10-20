@@ -1,9 +1,7 @@
 import { Link, useLocation } from 'react-router'
-import helpJson from '@content/help.json'
-import type { HelpContent } from '@content/types'
 import { t } from '@/lib/i18n'
+import { getHelp } from '@/lib/scenes'
 
-const help = helpJson as HelpContent
 
 /**
  * The Help Centre (FR-08, NFR-06). Safety rules:
@@ -12,6 +10,7 @@ const help = helpJson as HelpContent
  * - it sits outside the Shell, so it has no "Need help?" button of its own.
  */
 export function HelpCentre() {
+  const help = getHelp()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/'
 

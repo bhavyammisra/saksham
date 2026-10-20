@@ -26,7 +26,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2, Sound v2, the voice pass and Living world done; next: Hindi | | D-050 to D-053 |
+| P6 Experience and Hindi | ✅ built on `p6-experience`; pull request next | | D-050 to D-054 |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -54,6 +54,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Fact-check the Help Centre numbers and sentences, and the Community page's places that help | SETUP.md §5, `content/help.json` and `content/community.json` › `review` |
 | Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
+| Have the Hindi checked by a fluent speaker, then publish it from `/reviewer` | SETUP.md §7 |
 
 **Phase 4 tasks** (detail in §9)
 
@@ -342,12 +343,12 @@ Done when: School plays from start to results, progress survives a reload, and t
 - [x] **Sound v2** (D-051, all synthesised; see the session note): layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
 - [x] **Dialogue voice pass** (D-052): a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
 - [x] **Living world** (D-053): ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
-- [ ] Re-check calm mode, gentle tone and Help Centre silence after each item.
+- [x] Re-check calm mode, gentle tone and Help Centre silence after each item.
 
 #### Hindi
 
-- [ ] `strings.hi.json` and Hindi overlays for scenes, cards, quizzes and help, laid over the English by a `localize()` function. Only text changes: ids, wiring, answers, `law`, `source` and helpline numbers always come from English. Read-aloud picks a `hi-IN` voice in Hindi. The typewriter types by grapheme (`Intl.Segmenter`).
-- [ ] The Hindi is machine-authored and **unreviewed**. Flag it that way in the session notes and in the app credits until a fluent speaker has reviewed it.
+- [x] (D-054) `strings.hi.json` and Hindi overlays for scenes, cards, quizzes and help, laid over the English by a `localize()` function. Only text changes: ids, wiring, answers, `law`, `source` and helpline numbers always come from English. Read-aloud picks a `hi-IN` voice in Hindi. The typewriter types by grapheme (`Intl.Segmenter`).
+- [x] The Hindi is machine-authored and **unreviewed**. Flag it that way in the session notes and in the app credits until a fluent speaker has reviewed it.
 
 ### Phase 7: Hardening and documentation
 
@@ -672,4 +673,12 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `src/engine/ambient.test.ts` (4), a validator test, and `tests/e2e/living.spec.ts` (4: the town at noon and at 7 pm, Home always evening, moving and paused when hidden, calm mode). 252 unit tests; e2e below. Checked by screenshot in all five places at 1366 wide (the town at noon and 7 pm) and the town at 390; 62 fps in the town and the Dhaba in headless Chromium.
 - Re-checked after each P6 item: calm mode (splash still, no ambient motion, no dust, no blips), gentle tone (half volume for every sound) and the Help Centre (no splash, no sound at all, nothing moving).
 - Next task: P6 › Hindi.
+
+**P6: Hindi (2026-10-20)**
+- Done: Hindi everywhere, chosen in Settings (हिन्दी): `content/strings.hi.json` (398 strings) and `content/hi/` (five scenes, buildings, names, Help Centre, Community: 825 texts in all, none missing), laid over the English by `localize()` (`src/lib/localize.ts`), which can only replace text fields, never ids, links, answers, the law, sources or numbers. Content getters in `scenes.ts`; the app remounts on a language change. Hindi review items are separate and stay unpublished; the Reviewed tick is per language. Credits say the Hindi is unreviewed. D-054.
+- **The Hindi is machine-authored and unreviewed.** It was written by Claude. A fluent speaker must check it before it is used with children (SETUP.md §7). The legal quotes on cards stay in English by design.
+- Skipped, as planned: read-aloud with a `hi-IN` voice (the voice was removed at the owner's request, D-038). The typewriter already types by grapheme.
+- Tests: `localize.test.ts` (5), `hindi.test.ts` (5: every UI string differs from English; every Hindi scene has the same wiring, law and sources; Help Centre numbers and sources unchanged; Hindi names; a Hindi twin for every review item), validator tests for Hindi strings, `tests/e2e/hindi.spec.ts` (2: switching and remembering; the law and helpline numbers in Hindi, and the Credits note); the reviewer test now sends 18 items. 264 unit tests. Checked by screenshot in Hindi (title, School, Book at 1366; Help Centre and town at 390, no sideways scroll); the wordmark lost its wide letter-spacing in Hindi so "सक्षम" joins up.
+- Every Phase 6 box is now done.
+- Next task: open the P6 pull request (with the owner's go-ahead), then Phase 7.
 

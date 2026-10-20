@@ -193,3 +193,9 @@ html[data-calm] .splash-cover {
 html[data-calm] .splash-lantern-body {
   fill: #e8a33d;
 }
+
+/* Devanagari letters join along their top line: no wide spacing in Hindi. */
+html[lang='hi'] .splash-cover-title,
+html[lang='hi'] .splash-banner-text {
+  letter-spacing: 0;
+}

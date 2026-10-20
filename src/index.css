@@ -50,7 +50,7 @@
   /* Type: one serif family covering Latin and Devanagari */
   --font-serif: 'Noto Serif Variable', 'Noto Serif Devanagari Variable', Georgia, serif;
   --font-sans: var(--font-serif);
-  --font-ui: 'Inter Variable', system-ui, sans-serif;
+  --font-ui: 'Inter Variable', 'Noto Serif Devanagari Variable', system-ui, sans-serif;
 
   /* Type scale: a little larger than usual, for young readers */
   --text-sm: 1rem;

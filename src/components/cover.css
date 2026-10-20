@@ -85,3 +85,8 @@ html[data-calm] .menu-item,
 html[data-calm] .menu-item::before {
   transition: none;
 }
+
+/* Devanagari letters join along their top line, so wide letter-spacing breaks the word apart. */
+html[lang='hi'] .cover-wordmark {
+  letter-spacing: 0;
+}

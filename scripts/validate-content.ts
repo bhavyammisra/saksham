@@ -7,10 +7,12 @@
 // Runs directly with Node 24 (which strips TypeScript types), so this file only
 // uses type annotations, nothing that needs compiling.
 
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { SceneDef, SortGame, StoryNode } from '../content/types.ts'
+import { overlayProblems, textPaths, type Overlay } from '../src/lib/localize.ts'
+import { CONTENT_OVERLAYS } from '../src/lib/overlays.ts'
 
 const TONES = ['normal', 'gentle']
 const MOODS = ['neutral', 'happy', 'worried', 'surprised', 'sad']
@@ -450,6 +452,18 @@ export function validateHelp(raw: unknown): string[] {
 
 // ---------------------------------------------------------------- command line
 
+/** Hindi UI strings (D-054): only keys English has, never empty, with the same {placeholders}. */
+export function validateHindiStrings(english: Record<string, string>, hindi: Record<string, string>): string[] {
+  const holes = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(', ')
+  const errors: string[] = []
+  for (const [key, words] of Object.entries(hindi)) {
+    if (!(key in english)) errors.push(`"${key}" is not an English string`)
+    else if (!words.trim()) errors.push(`"${key}" is empty`)
+    else if (holes(english[key] ?? '') !== holes(words)) errors.push(`"${key}" must keep the placeholders ${holes(english[key] ?? '') || '(none)'}`)
+  }
+  return errors
+}
+
 function listFiles(dir: string, test: (name: string) => boolean): string[] {
   let names: string[]
   try {
@@ -500,11 +514,27 @@ function main(): void {
     problems.push(`content/help.json: ${p}`)
   }
 
+  // Hindi (D-054): every line translates real English text and keeps its placeholders.
+  let missingHindi = 0
+  for (const { english, hindi, also } of CONTENT_OVERLAYS) {
+    const source = readJson(join(root, english))
+    const overlay = (existsSync(join(root, hindi)) ? readJson(join(root, hindi)) : {}) as Overlay
+    for (const p of overlayProblems(source, overlay, also)) problems.push(`${hindi}: ${p}`)
+    missingHindi += [...textPaths(source, also).keys()].filter((path) => !overlay[path]).length
+  }
+  const enStrings = readJson(join(root, 'content', 'strings.en.json')) as Record<string, string>
+  const hiStrings = readJson(join(root, 'content', 'strings.hi.json')) as Record<string, string>
+  for (const p of validateHindiStrings(enStrings, hiStrings)) problems.push(`content/strings.hi.json: ${p}`)
+  missingHindi += Object.keys(enStrings).filter((key) => !hiStrings[key]).length
+
   if (problems.length > 0) {
     console.error(`Content problems (${problems.length}):\n- ${problems.join('\n- ')}`)
     process.exit(1)
   }
   console.log(`Content OK: ${sceneFiles.length} scene(s), ${new Set(usedKeys).size} UI string key(s) checked.`)
+  // Missing Hindi shows the English instead, so it is a warning, not an error. List it: node scripts/hindi-todo.ts
+  if (missingHindi > 0) console.warn(`Hindi: ${missingHindi} English text(s) have no Hindi yet (they show in English).`)
+  else console.log('Hindi: every text has a translation.')
 }
 
 // Run only when called as a script, not when imported by tests.

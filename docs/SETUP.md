@@ -126,3 +126,14 @@ Claude compared both quotes word for word with two copies of the Act, and both m
 3. In the same Act, confirm: anyone with personal knowledge or reason to believe can complain (section 13(2)); the State appoints Child Marriage Prohibition Officers whose duty includes preventing child marriages (section 16(1), 16(3)(a)); and the State may ask an officer of the Gram Panchayat to assist them (section 16(2)), which is why the Sarpanch goes with the officer in the story.
 4. Read the card text (`kid`, `teen`, `ifItHappens`), Sarpanch Kavita ji's lines (`sarpanch-good` to `sarpanch-good-3`), the six quiz questions and the five sort cards (`panchayat-sort`). Each must agree with points 1 to 3. Penalties are deliberately not mentioned anywhere. Also read the whole story once for tone, with an 8-year-old in mind: no wedding is shown, Pooja only tells the player.
 5. When done, set `card.review.status` to `"verified"` and fill in `checkedBy` and `checkedOn`.
+
+## 7. Have the Hindi checked by a fluent speaker ⬜ (owner, before Hindi is used with children)
+
+The Hindi (D-054) was written by Claude and has not been checked by anyone who speaks Hindi fluently. The app says so on the Credits page.
+
+1. Find a fluent Hindi reader, ideally a teacher who knows how children of 8 to 16 talk.
+2. They read, in the app with Hindi chosen in Settings: the title menu, new game, the town, all four stories (talk to everyone, pick every choice, read every card, play every quiz and sort game), the Book, Me, Community and the Help Centre. They can also read the files directly: `content/strings.hi.json` and `content/hi/`.
+3. Fix any wording in those files (only the words: the keys must stay the same). `npm run validate` checks that every key still matches the English and keeps its `{placeholders}`.
+4. The cards' legal text (`law`) and sources stay in English on purpose: they quote the law exactly as written. The Hindi `teen` text explains each law in Hindi; check it says the same as the English `teen` text, especially the ages and section numbers.
+5. Once checked, a reviewer publishes the Hindi items from `/reviewer` (choose "Hindi" in the language filter), and the Hindi cards get their own "Reviewed" tick. Then remove the "not yet checked" note from Credits (`credits.hindi` in both string files) and record it in DECISIONS.md.
+

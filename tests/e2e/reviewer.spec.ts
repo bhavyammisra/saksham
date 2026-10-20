@@ -59,7 +59,7 @@ test('FR-15 a reviewer sends the content, reads it next to its hash, and publish
   const rows = await fakeReviewServer(page, ['teacher', 'reviewer'])
   await signIn(page)
   await page.getByRole('button', { name: strings['reviewer.send'] }).click()
-  await expect(page.getByText(strings['reviewer.sent'].replace('{n}', '9'))).toBeVisible()
+  await expect(page.getByText(strings['reviewer.sent'].replace('{n}', '18'))).toBeVisible()
 
   // The hash the app shows is the one Node works out from the same card.
   const expected = await sha256(cardText(school.card as Card))

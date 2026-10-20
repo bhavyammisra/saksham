@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AMBIENCES, blipPitch, blipsOn, EFFECTS, MUSIC, musicGain, soundGain, STEPS, type SoundState } from './synth'
-import { buildings, getScene, townScene } from './scenes'
+import { getBuildings, getScene, getTownScene } from './scenes'
 
 const base: SoundState = { enabled: true, music: true, silent: false, tone: 'normal' }
 
@@ -32,7 +32,7 @@ describe('NFR-06 sound rules', () => {
 
 describe('P6 Sound v2 recipes', () => {
   it('every scene has an ambience that exists, and a known surface for footsteps', () => {
-    const scenes = [townScene, ...buildings.map((b) => getScene(b.id)).filter((s) => s !== null)]
+    const scenes = [getTownScene(), ...getBuildings().map((b) => getScene(b.id)).filter((s) => s !== null)]
     expect(scenes.length).toBeGreaterThanOrEqual(5)
     for (const scene of scenes) {
       expect(scene.ambience, scene.id).toBeDefined()

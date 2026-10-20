@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validateHubLinks, validatePeople, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validateHindiStrings, validateHubLinks, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -389,5 +389,21 @@ describe('hub doors', () => {
 
   it('ignore scenes that are not hubs', () => {
     expect(validateHubLinks({ ...hub, hub: false }, new Set())).toEqual([])
+  })
+})
+
+describe('P6 Hindi strings (D-054)', () => {
+  const en = { 'results.title': 'Well done, {name}!', 'quiz.next': 'Next question' }
+
+  it('accepts Hindi for English keys, with the same placeholders', () => {
+    expect(validateHindiStrings(en, { 'results.title': 'शाबाश, {name}!' })).toEqual([])
+  })
+
+  it('rejects unknown keys, empty words and changed placeholders', () => {
+    expect(validateHindiStrings(en, { 'quiz.typo': 'अगला', 'quiz.next': ' ', 'results.title': 'शाबाश!' })).toEqual([
+      '"quiz.typo" is not an English string',
+      '"quiz.next" is empty',
+      '"results.title" must keep the placeholders name',
+    ])
   })
 })
