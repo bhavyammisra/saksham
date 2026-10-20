@@ -17,6 +17,10 @@ const MOODS = ['neutral', 'happy', 'worried', 'surprised', 'sad']
 const HOTSPOT_KINDS = ['npc', 'object', 'exit']
 const CHOICE_KINDS = ['good', 'weak']
 const ENDS = ['good', 'retry']
+const SURFACES = ['paving', 'earth', 'floor']
+const TIMES = ['morning', 'day', 'evening', 'clock']
+const AMBIENT_KINDS = ['dog', 'cat', 'pigeons', 'cow', 'passerby', 'cloth', 'plant', 'diya']
+const MAX_AMBIENT = 6 // performance (D-030, D-053)
 const CARD_FIELDS = ['id', 'title', 'kid', 'teen', 'ifItHappens', 'law', 'source'] as const
 
 // ---------------------------------------------------------------- helpers
@@ -67,6 +71,30 @@ export function validateScene(raw: unknown): string[] {
       if (!isText(layer?.id) || !isText(layer?.art)) fail(`layers[${i}] needs "id" and "art"`)
       if (!isNumber(layer?.speed) || layer.speed < 0) fail(`layers[${i}].speed must be 0 or more`)
     })
+  }
+
+  // Sound and light (D-051, D-053)
+  if (scene.surface !== undefined && !SURFACES.includes(scene.surface)) fail(`"surface" must be one of ${SURFACES.join(', ')}`)
+  if (scene.time !== undefined && !TIMES.includes(scene.time)) fail(`"time" must be one of ${TIMES.join(', ')}`)
+
+  // Ambient life (D-053): a few small things, each inside the scene
+  if (scene.ambient !== undefined) {
+    if (!Array.isArray(scene.ambient)) fail('"ambient" must be a list')
+    else {
+      if (scene.ambient.length > MAX_AMBIENT) fail(`"ambient" has ${scene.ambient.length} pieces (at most ${MAX_AMBIENT})`)
+      const seen = new Set<string>()
+      scene.ambient.forEach((a, i) => {
+        const where = `ambient[${i}]`
+        if (!isObject(a) || !isText(a.id)) return fail(`${where} needs an "id"`)
+        if (seen.has(a.id)) fail(`ambient "${a.id}" is duplicated`)
+        seen.add(a.id)
+        if (!AMBIENT_KINDS.includes(a.kind)) fail(`ambient "${a.id}" has unknown kind "${String(a.kind)}"`)
+        const end = (a.x ?? 0) + (a.roam ?? 0)
+        if (!isNumber(a.x) || !isNumber(scene.width) || a.x < 0 || end > scene.width) fail(`ambient "${a.id}" must stay inside the scene`)
+        if (a.depth !== undefined && (!isNumber(a.depth) || a.depth < 0 || a.depth > 1)) fail(`ambient "${a.id}".depth must be from 0 to 1`)
+        if (a.roam !== undefined && (!isNumber(a.roam) || a.roam < 0)) fail(`ambient "${a.id}".roam must be 0 or more`)
+      })
+    }
   }
 
   // Walking area

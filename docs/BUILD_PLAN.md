@@ -26,7 +26,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2, Sound v2 and the voice pass done; next: Living world | | D-050 to D-052 |
+| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2, Sound v2, the voice pass and Living world done; next: Hindi | | D-050 to D-053 |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -341,7 +341,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 - [x] **Splash v2** (D-050): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
 - [x] **Sound v2** (D-051, all synthesised; see the session note): layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
 - [x] **Dialogue voice pass** (D-052): a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
-- [ ] **Living world**: ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
+- [x] **Living world** (D-053): ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
 - [ ] Re-check calm mode, gentle tone and Help Centre silence after each item.
 
 #### Hindi
@@ -665,4 +665,11 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: a validator test for the length rule. 247 unit and 84 e2e tests (83 pass, 1 skips).
 - Owner: read the four stories once more for tone. The Home and Panchayat lines about the law are the ones to fact-check alongside their cards (SETUP.md §6).
 - Next task: P6 › Living world.
+
+**P6: Living world (2026-10-20)**
+- Done: `ambient` and `time` in scene JSON; `src/art/ambient.tsx` and `ambient.css` (dog, cat, pigeons, cow, passers-by, washing, tulsi, diyas), each a small picture of its own; the light of the time of day; the town follows the clock (evening from 5 pm: dusk sky, lamps lit, windows glowing, diyas); dust on earth; everything pauses when the tab is hidden and stands still in calm mode. Rules in `src/engine/ambient.ts`; the validator caps ambient at 6 and checks kinds, places and times. D-053.
+- Fixed on the way: the music loop kept scheduling notes (at zero volume) on the Help Centre; it now stops there and starts again on the way out (the safety test that counts sounds caught it; it had passed by luck in the Sound v2 run).
+- Tests: `src/engine/ambient.test.ts` (4), a validator test, and `tests/e2e/living.spec.ts` (4: the town at noon and at 7 pm, Home always evening, moving and paused when hidden, calm mode). 252 unit tests; e2e below. Checked by screenshot in all five places at 1366 wide (the town at noon and 7 pm) and the town at 390; 62 fps in the town and the Dhaba in headless Chromium.
+- Re-checked after each P6 item: calm mode (splash still, no ambient motion, no dust, no blips), gentle tone (half volume for every sound) and the Help Centre (no splash, no sound at all, nothing moving).
+- Next task: P6 › Hindi.
 

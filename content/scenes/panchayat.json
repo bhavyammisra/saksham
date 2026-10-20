@@ -16,6 +16,13 @@
   "spawn": { "x": 420 },
   "ambience": "panchayat",
   "surface": "paving",
+  "time": "day",
+  "ambient": [
+    {"id":  "walker", "kind":  "passerby", "x":  460, "roam":  300, "depth":  0.02, "look":  2},
+    {"id":  "cow", "kind":  "cow", "x":  1350, "depth":  0},
+    {"id":  "dog", "kind":  "dog", "x":  1720, "roam":  280, "depth":  0.12},
+    {"id":  "pigeons", "kind":  "pigeons", "x":  2560, "depth":  0.06}
+  ],
   "hotspots": [
     { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
     { "id": "sonu", "x": 950, "label": "Talk to Sonu", "kind": "npc", "npc": "sonu", "node": "sonu-hello", "depth": 0.5 },

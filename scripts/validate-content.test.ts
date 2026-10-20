@@ -133,6 +133,23 @@ describe('NFR-07 content validation: scenes', () => {
     expect(errors).toContain('node "hello".choices[0] has 23 words (at most 22)')
   })
 
+  it('accepts a little ambient life, and rejects too much, unknown kinds, strays and bad times (D-053)', () => {
+    const dog = { id: 'dog', kind: 'dog' as const, x: 300, roam: 200 }
+    expect(validateScene(broken((s) => ((s.ambient = [dog]), (s.time = 'clock'))))).toEqual([])
+    const many = Array.from({ length: 7 }, (_, i) => ({ ...dog, id: `dog-${i}` }))
+    expect(validateScene(broken((s) => (s.ambient = many)))).toContain('"ambient" has 7 pieces (at most 6)')
+    const errors = validateScene(
+      broken((s) => {
+        s.ambient = [{ ...dog, kind: 'dragon' as never }, { ...dog, x: s.width - 50 }]
+        s.time = 'midnight' as never
+      }),
+    )
+    expect(errors).toContain('ambient "dog" has unknown kind "dragon"')
+    expect(errors).toContain('ambient "dog" is duplicated')
+    expect(errors).toContain('ambient "dog" must stay inside the scene')
+    expect(errors).toContain('"time" must be one of morning, day, evening, clock')
+  })
+
   it('rejects a node whose id does not match its key', () => {
     expect(validateScene(broken((s) => (s.nodes.note.id = 'other')))).toContain(
       'node "note" has id "other" (must match its key)',

@@ -154,6 +154,15 @@ function startMusic(ctx: AudioContext, bus: GainNode) {
   }
 }
 
+/** The music loop runs only while it can be heard: Music on, and not on the Help Centre. */
+function syncMusic() {
+  const wanted = musicGain(state) > 0
+  if (!wanted && stopMusic) {
+    stopMusic()
+    stopMusic = null
+  } else if (wanted && !stopMusic && context && musicBus) stopMusic = startMusic(context, musicBus)
+}
+
 /** Creates the audio graph on the first gesture, then starts whatever is waiting. */
 function unlock() {
   if (context || typeof AudioContext === 'undefined') return
@@ -165,7 +174,7 @@ function unlock() {
   effectsBus.connect(context.destination)
   musicBus.connect(context.destination)
   applyGains()
-  if (state.music) stopMusic = startMusic(context, musicBus)
+  syncMusic()
   if (ambienceKey) stopAmbience = startAmbience(context, ambienceKey)
   document.addEventListener('visibilitychange', () => {
     if (!context) return
@@ -194,17 +203,14 @@ export const sound = {
   setMusic(on: boolean): void {
     state.music = on
     applyGains()
-    // Turned off, the loop stops for real (no work for a tune nobody hears); turned on, it starts.
-    if (!on) {
-      stopMusic?.()
-      stopMusic = null
-    } else if (context && musicBus && !stopMusic) stopMusic = startMusic(context, musicBus)
+    syncMusic() // turned off, the loop stops for real; turned on, it starts again
   },
 
   /** Silence everything (used while the Help Centre is open). */
   setSilent(on: boolean): void {
     state.silent = on
     applyGains()
+    syncMusic() // not a single note on the Help Centre, not even a silent one
   },
 
   setTone(tone: SoundState['tone']): void {

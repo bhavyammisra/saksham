@@ -16,6 +16,13 @@
   "spawn": { "x": 420 },
   "ambience": "dhaba",
   "surface": "earth",
+  "time": "morning",
+  "ambient": [
+    {"id":  "dog", "kind":  "dog", "x":  1260, "depth":  0.1, "facing":  "left"},
+    {"id":  "cat", "kind":  "cat", "x":  2060, "depth":  0},
+    {"id":  "pigeons", "kind":  "pigeons", "x":  2480, "depth":  0.06},
+    {"id":  "cow", "kind":  "cow", "x":  3120, "depth":  0, "facing":  "left"}
+  ],
   "hotspots": [
     { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
     { "id": "mohan", "x": 1000, "label": "Talk to Mohan Bhaiya", "kind": "npc", "npc": "mohan-bhaiya", "node": "mohan-hello" },

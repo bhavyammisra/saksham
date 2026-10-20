@@ -16,6 +16,14 @@
   "spawn": { "x": 420 },
   "ambience": "home",
   "surface": "floor",
+  "time": "evening",
+  "ambient": [
+    {"id":  "cat", "kind":  "cat", "x":  620, "depth":  0},
+    {"id":  "washing", "kind":  "cloth", "x":  1180, "depth":  0},
+    {"id":  "tulsi", "kind":  "plant", "x":  2060, "depth":  0},
+    {"id":  "diya-1", "kind":  "diya", "x":  2620, "depth":  0, "evening":  true},
+    {"id":  "diya-2", "kind":  "diya", "x":  3000, "depth":  0, "evening":  true}
+  ],
   "hotspots": [
     { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
     { "id": "kabir", "x": 900, "label": "Talk to Kabir", "kind": "npc", "npc": "kabir", "node": "kabir-hello", "depth": 0.5 },

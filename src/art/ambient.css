@@ -1,0 +1,121 @@
+/* Living world (D-053). Only small pictures move: transform and opacity, nothing else.
+   Calm mode cuts every animation here to its end (index.css), so everything stands still.
+   While the tab is hidden, Scene sets data-hidden and nothing moves at all. */
+
+.scene[data-hidden] .amb,
+.scene[data-hidden] .amb *,
+.scene[data-hidden] .game-dust * {
+  animation-play-state: paused !important;
+}
+
+/* A stroll to the right and back, turning round at the far end. */
+.amb-roam {
+  animation: amb-roam var(--dur) ease-in-out infinite;
+}
+.amb-turn {
+  animation: amb-turn var(--dur) linear infinite;
+}
+@keyframes amb-roam {
+  0%, 4% { transform: translateX(0); }
+  46%, 54% { transform: translateX(var(--roam)); }
+  96%, 100% { transform: translateX(0); }
+}
+@keyframes amb-turn {
+  0%, 49.9% { transform: scaleX(1); }
+  50%, 99.9% { transform: scaleX(-1); }
+}
+
+/* The dog: legs trot while it strolls, the tail always wags. */
+.amb-moving .amb-leg-a { animation: amb-trot 0.36s ease-in-out infinite alternate; }
+.amb-moving .amb-leg-b { animation: amb-trot 0.36s ease-in-out infinite alternate-reverse; }
+@keyframes amb-trot {
+  from { transform: rotate(18deg); }
+  to { transform: rotate(-18deg); }
+}
+.amb-tail { animation: amb-wag 0.5s ease-in-out infinite alternate; }
+@keyframes amb-wag {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(16deg); }
+}
+
+/* The cat's tail: still for a while, then a flick. */
+.amb-flick { animation: amb-flick 4.5s ease-in-out infinite; }
+@keyframes amb-flick {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  78% { transform: rotate(18deg); }
+  86% { transform: rotate(-8deg); }
+}
+
+/* Pigeons peck. */
+.amb-peck { animation: amb-peck 1.6s ease-in-out infinite; }
+@keyframes amb-peck {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  65% { transform: rotate(38deg); }
+  75% { transform: rotate(0deg); }
+  85% { transform: rotate(38deg); }
+}
+
+/* The cow swishes her tail and twitches an ear. */
+.amb-swish { animation: amb-swish 3.2s ease-in-out infinite; }
+@keyframes amb-swish {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(14deg); }
+  60% { transform: rotate(-6deg); }
+}
+.amb-ear { animation: amb-ear 5s ease-in-out infinite; }
+@keyframes amb-ear {
+  0%, 88%, 100% { transform: rotate(0deg); }
+  92% { transform: rotate(-16deg); }
+  96% { transform: rotate(4deg); }
+}
+
+/* Wind in cloth and leaves. */
+.amb-sway { animation: amb-sway 3.4s ease-in-out infinite; }
+@keyframes amb-sway {
+  0%, 100% { transform: rotate(-3deg) skewX(-2deg); }
+  50% { transform: rotate(4deg) skewX(3deg); }
+}
+.amb-leaves { animation: amb-leaves 4s ease-in-out infinite; }
+@keyframes amb-leaves {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* A diya's flame flickers and its glow breathes. */
+.amb-flame { animation: amb-flame 0.9s ease-in-out infinite alternate; }
+@keyframes amb-flame {
+  0% { transform: scale(1, 1); }
+  40% { transform: scale(0.92, 1.1); }
+  100% { transform: scale(1.05, 0.94); }
+}
+.amb-glow { animation: amb-glow 2.4s ease-in-out infinite alternate; }
+@keyframes amb-glow {
+  from { opacity: 0.75; }
+  to { opacity: 1; }
+}
+
+/* Dust where the player walks on earth: three little puffs behind the feet. */
+.game-dust span {
+  position: absolute;
+  bottom: 0;
+  width: 40%;
+  aspect-ratio: 2 / 1;
+  border-radius: 50%;
+  background: rgb(232 214 182 / 0.8);
+  opacity: 0;
+  animation: amb-dust 0.84s ease-out infinite;
+}
+.game-dust span:nth-child(2) { left: 30%; animation-delay: 0.28s; }
+.game-dust span:nth-child(3) { left: 60%; animation-delay: 0.56s; }
+@keyframes amb-dust {
+  0% { transform: translateY(0) scale(0.4); opacity: 0.7; }
+  100% { transform: translateY(-40%) scale(1.3); opacity: 0; }
+}
+
+/* The light of the time of day, laid over the whole picture (plain transparency, no blend mode). */
+.game-light[data-light='morning'] {
+  background: radial-gradient(ellipse 70% 60% at 12% 18%, rgb(255 222 160 / 0.2) 0%, transparent 70%);
+}
+.game-light[data-light='evening'] {
+  background: linear-gradient(180deg, rgb(28 38 62 / 0.3) 0%, rgb(255 150 80 / 0.1) 62%, rgb(18 20 30 / 0.28) 100%);
+}

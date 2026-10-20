@@ -458,3 +458,16 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Why:** Children of 8 read short lines more easily, especially on a phone, and a written voice for each person keeps the stories consistent as more are added.
 - **Alternatives:** A soft warning instead of an error (lines would creep back up); longer dialogue boxes (harder to read, and they cover the scene); rewriting the stories (they were already approved for tone).
 
+## D-053 Living world: ambient life, the time of day and dust
+
+- **Context:** BUILD_PLAN P6 asks for ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, and glowing windows and diyas in the evening, with ambient elements capped, paused when the tab is hidden, and 60 fps on a mid-range phone. D-030 forbids animating anything inside the very wide scene layers.
+- **Choice:**
+  - Scenes gain `ambient` (at most 6 pieces, checked by the validator) and `time` (`morning`, `day`, `evening`, or `clock` to follow the device). Each piece has a `kind` (dog, cat, pigeons, cow, passer-by, washing on a line, a tulsi plant, a diya), a place and depth, and may `roam` (stroll right and back), face left, or come out only in the `evening`.
+  - Every piece is its own small picture (`src/art/ambient.tsx`, motion in `ambient.css`) placed on the stage like a person, so only small things move: the dog trots and wags, the cat flicks its tail, pigeons peck, the cow swishes her tail, cloth and leaves sway in the wind, a diya's flame flickers, and passers-by (three preset adults, drawn with the character rig) stroll and turn round. They never talk and can't be used.
+  - Time of day: the School and the Dhaba are mornings, the Panchayat is day, Home is evening, and the town follows the clock (evening from 5 pm to 5 am). The light is a still, see-through gradient over the picture (no blend mode). In the evening the art receives an `evening` flag: the day sky becomes the evening one, and in the town the lamps light and windows glow; diyas come out.
+  - Dust: little puffs behind the player's feet while walking on `earth` (the Dhaba).
+  - While the tab is hidden the scene sets `data-hidden` and every ambient animation pauses. In calm mode nothing ambient moves (passers-by stand still rather than walking on the spot, past the walk exception) and there is no dust.
+  - Pure rules in `src/engine/ambient.ts` (which light, which pieces are out, sizes, stroll speed), unit-tested.
+- **Why:** The places feel lived in, and evening visits feel different, without breaking the frame-rate rules: 62 fps measured in headless Chromium in the town and the Dhaba with everything moving.
+- **Alternatives:** Animating parts of the wide scene art (against D-030); real-time light that changes by the minute (more work every frame, and the stories say when they happen); a random number of animals (harder to test and to keep within the cap).
+

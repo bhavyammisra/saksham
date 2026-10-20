@@ -28,6 +28,15 @@
   },
   "ambience": "town",
   "surface": "paving",
+  "time": "clock",
+  "ambient": [
+    {"id":  "dog", "kind":  "dog", "x":  1150, "roam":  320, "depth":  0.1},
+    {"id":  "pigeons", "kind":  "pigeons", "x":  1950, "depth":  0.05},
+    {"id":  "walker", "kind":  "passerby", "x":  2560, "roam":  520, "depth":  0.02, "look":  1},
+    {"id":  "cow", "kind":  "cow", "x":  3720, "depth":  0, "facing":  "left"},
+    {"id":  "diya-flats", "kind":  "diya", "x":  2480, "depth":  0, "evening":  true},
+    {"id":  "diya-panchayat", "kind":  "diya", "x":  3110, "depth":  0, "evening":  true}
+  ],
   "hotspots": [
     {
       "id": "school",

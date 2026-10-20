@@ -16,6 +16,13 @@
   "spawn": { "x": 420 },
   "ambience": "school",
   "surface": "paving",
+  "time": "morning",
+  "ambient": [
+    {"id":  "pigeons", "kind":  "pigeons", "x":  1120, "depth":  0.05},
+    {"id":  "plant-1", "kind":  "plant", "x":  2150, "depth":  0},
+    {"id":  "plant-2", "kind":  "plant", "x":  2700, "depth":  0},
+    {"id":  "dog", "kind":  "dog", "x":  2850, "roam":  260, "depth":  0.12}
+  ],
   "hotspots": [
     { "id": "lata", "x": 790, "label": "Talk to the girl at the gate", "kind": "npc", "npc": "lata", "node": "lata-hello", "hideIf": ["met-lata"] },
     { "id": "lata-again", "x": 790, "label": "Talk to Lata", "kind": "npc", "npc": "lata", "node": "lata-again", "showIf": ["met-lata"] },
