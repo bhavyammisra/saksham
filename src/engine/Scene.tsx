@@ -21,6 +21,7 @@ import { HelpButton } from '@/components/HelpButton'
 import { SettingsDialog } from '@/components/SettingsDialog'
 import { t } from '@/lib/i18n'
 import { sound } from '@/lib/sound'
+import { STEP_SECONDS } from '@/lib/synth'
 import { selectActiveProfile, useStore } from '@/lib/store'
 import { Dialogue, speakerColour } from './Dialogue'
 import { useCalm, useCoarsePointer, useElementSize } from './hooks'
@@ -142,6 +143,23 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
     sound.setTone(scene.tone) // gentle scenes play at half volume
     return () => sound.setTone('normal')
   }, [scene.tone])
+
+  // The place's bed of sound, and footsteps while the player walks (Sound v2, D-051).
+  useEffect(() => {
+    sound.setAmbience(scene.ambience ?? null)
+    return () => sound.setAmbience(null)
+  }, [scene.ambience])
+  useEffect(() => {
+    if (!state.walking) return
+    const surface = scene.surface ?? 'paving'
+    sound.step(surface)
+    const timer = window.setInterval(() => sound.step(surface), STEP_SECONDS * 1000)
+    return () => window.clearInterval(timer)
+  }, [state.walking, scene.surface])
+
+  useEffect(() => {
+    if (panel !== 'none') sound.play('open')
+  }, [panel])
 
   const fxPose = state.fx?.pose ?? null
   useEffect(() => {

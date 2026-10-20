@@ -6,6 +6,7 @@
 export type Tone = 'normal' | 'gentle'
 export type Mood = 'neutral' | 'happy' | 'worried' | 'surprised' | 'sad'
 export type Band = 'young' | 'teen'
+export type Surface = 'paving' | 'earth' | 'floor'
 
 export interface SceneDef {
   id: string // "school"
@@ -18,7 +19,8 @@ export interface SceneDef {
   walkable: { minX: number; maxX: number }
   blockers?: { x1: number; x2: number }[]
   spawn: { x: number }
-  ambience?: string // sound bed key
+  ambience?: string // sound bed key (src/lib/synth.ts)
+  surface?: Surface // what footsteps sound like (default paving)
   hotspots: Hotspot[]
   objectives: Objective[]
   startNode: string

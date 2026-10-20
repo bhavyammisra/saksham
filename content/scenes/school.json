@@ -15,6 +15,7 @@
   "walkable": { "minX": 150, "maxX": 3450 },
   "spawn": { "x": 420 },
   "ambience": "school",
+  "surface": "paving",
   "hotspots": [
     { "id": "lata", "x": 790, "label": "Talk to the girl at the gate", "kind": "npc", "npc": "lata", "node": "lata-hello", "hideIf": ["met-lata"] },
     { "id": "lata-again", "x": 790, "label": "Talk to Lata", "kind": "npc", "npc": "lata", "node": "lata-again", "showIf": ["met-lata"] },

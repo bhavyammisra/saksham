@@ -26,7 +26,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2 done; next: Sound v2 | | D-050 |
+| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2 and Sound v2 done; next: Dialogue voice pass | | D-050, D-051 |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -339,7 +339,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 #### Experience upgrade
 
 - [x] **Splash v2** (D-050): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
-- [ ] **Sound v2**: layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
+- [x] **Sound v2** (D-051, all synthesised; see the session note): layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
 - [ ] **Dialogue voice pass**: a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
 - [ ] **Living world**: ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
 - [ ] Re-check calm mode, gentle tone and Help Centre silence after each item.
@@ -653,3 +653,10 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Done: `src/components/Splash.tsx` and `splash.css`: a storybook opens on a dusk sky, the town pops up out of its pages (hills, the four buildings, trees), seven lanterns light one by one, and Mitthu flies in with the SAKSHAM banner. About 4 s on the first load, 1 s after (`saksham-splash` in localStorage), only when the game opens on `/`; tap, click or Escape skips it; its own Need help?; the page behind is `inert`. Calm mode: a still, finished picture for 1.2 s, then a fade. No sound (browsers block it before the first tap). D-050. `HelpButton` takes an optional `testId`.
 - Tests: `tests/e2e/splash.spec.ts` (4: first load ends by itself, skipping and the short version, Need help? and never on `/help` or deep links, calm mode has no CSS animation). Every other test starts as a returning player (`storageState` in `playwright.config.ts`). 241 unit and 84 e2e tests (83 pass, 1 skips). Checked by frame-by-frame screenshots at 1366 and 390 wide, and in calm mode.
 - Next task: P6 › Sound v2.
+
+**P6: Sound v2 (2026-10-20)**
+- Done: every sound is synthesised in the browser (`src/lib/synth.ts` recipes, `src/lib/sound.ts` player): an ambience per place (birds, a far-off school bell, a sizzling tawa and clinking glasses at the Dhaba, a slow fan at Home, crows), a soft Bhupali music loop over a drone (the Music setting now works), footsteps on paving, earth or floor (`surface` in scene JSON), a typing blip per speaker, and new `open`, `flip` and `unlock` sounds. Silent on the Help Centre, half in gentle scenes, paused when the tab is hidden. D-051; `ASSET_LICENSES.md` lists the synthesised sound.
+- Owner: no recorded sound was used, because a licence couldn't be confirmed from here and each download needs your OK. If you want recorded ambience or music, pick CC0 files you have checked, and they can replace a recipe by key.
+- Tests: `src/lib/sound.test.ts` (9: the volume rules for effects and music, every scene has a real ambience and surface, nothing loud or nagging, the tune stays in Bhupali, blip pitches and where blips fall). 246 unit tests. Checked in a real browser that the audio graph starts on the first tap, footsteps fire every 0.42 s while walking, and there are no errors. Not checked: how it sounds (Claude can't listen). Owner: play with sound on once and say if anything is too loud or annoying.
+- Next task: P6 › Dialogue voice pass.
+

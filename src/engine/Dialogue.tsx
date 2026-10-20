@@ -3,6 +3,7 @@ import type { SceneDef } from '@content/types'
 import type { CharacterSpec } from '@/character/spec'
 import { t } from '@/lib/i18n'
 import { sound } from '@/lib/sound'
+import { blipsOn } from '@/lib/synth'
 import { getNpc } from './people'
 import type { DialogueState } from './story'
 
@@ -52,13 +53,13 @@ export function Dialogue(props: Props) {
         {name}
       </span>
       {/* key: a new line restarts the typewriter */}
-      <Line key={props.dialogue.nodeId} {...props} text={node.text} choices={node.choices} />
+      <Line key={props.dialogue.nodeId} {...props} text={node.text} choices={node.choices} speaker={node.speaker} />
     </section>
   )
 }
 
-function Line(props: Props & { text: string; choices?: { label: string }[] }) {
-  const { text, calm } = props
+function Line(props: Props & { text: string; choices?: { label: string }[]; speaker: string }) {
+  const { text, calm, speaker } = props
   const parts = splitGraphemes(text)
   const [shown, setShown] = useState(calm ? parts.length : 0)
   const done = shown >= parts.length
@@ -70,6 +71,13 @@ function Line(props: Props & { text: string; choices?: { label: string }[] }) {
     const timer = window.setInterval(() => setShown((n) => Math.min(parts.length, n + 1)), 1000 / CHARS_PER_SECOND)
     return () => window.clearInterval(timer)
   }, [done, parts.length])
+
+  // A typing blip as letters appear, in the speaker's own pitch (Sound v2, D-051).
+  useEffect(() => {
+    const index = shown - 1
+    if (calm || index < 0 || !blipsOn(parts[index] ?? '', index)) return
+    sound.blip(speaker, getNpc(speaker)?.kind === 'parrot' ? 'parrot' : undefined)
+  }, [shown]) // eslint-disable-line react-hooks/exhaustive-deps -- once per new letter
 
   // Keyboard users land on the next thing to press (Enter or Space then goes on).
   useEffect(() => {

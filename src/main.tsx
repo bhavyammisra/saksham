@@ -21,6 +21,7 @@ const applySettings = () => {
   setCalmSetting(settings.calmMotion)
   setLang(settings.lang)
   sound.setEnabled(settings.sound)
+  sound.setMusic(settings.music)
   document.documentElement.lang = settings.lang
 }
 applySettings()

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router'
 import type { Tone } from '@content/types'
 import { Portrait } from '@/character/Portrait'
@@ -5,6 +6,7 @@ import type { Celebration } from '@/components/ReturnCelebration'
 import type { CharacterSpec } from '@/character/spec'
 import { Button } from '@/components/Button'
 import { t, type StringKey } from '@/lib/i18n'
+import { sound } from '@/lib/sound'
 import type { BadgeId, Score } from '@/lib/rules'
 import { BADGE_TEXT } from './badgeText'
 import './play.css'
@@ -44,6 +46,9 @@ export function Results({
   onAgain: () => void
 }) {
   const { stars, score, newBadges, unlocked } = summary
+  useEffect(() => {
+    if (unlocked) sound.play('unlock')
+  }, [unlocked])
   return (
     <section className="mx-auto max-w-2xl rounded-card bg-plaster p-5 text-center shadow-soft md:p-8">
       <div className="mx-auto size-28">

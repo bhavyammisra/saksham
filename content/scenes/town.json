@@ -27,6 +27,7 @@
     "x": 380
   },
   "ambience": "town",
+  "surface": "paving",
   "hotspots": [
     {
       "id": "school",
