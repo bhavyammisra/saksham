@@ -26,7 +26,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | 🔄 branch `p6-experience`; next: Splash v2 | | |
+| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2 done; next: Sound v2 | | D-050 |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -338,7 +338,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Experience upgrade
 
-- [ ] **Splash v2**: a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
+- [x] **Splash v2** (D-050): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
 - [ ] **Sound v2**: layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
 - [ ] **Dialogue voice pass**: a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
 - [ ] **Living world**: ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
@@ -648,3 +648,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P5 merged (2026-10-19)**
 - PR #6 (`p5-backend` into `main`) merged with a merge commit (`f4eebac`) after every check passed on its latest commit, with the owner's approval in chat. Phase 5 is complete; `p6-experience` cut from `main`.
 - Next task: P6 › Splash v2.
+
+**P6: Splash v2 (2026-10-20)**
+- Done: `src/components/Splash.tsx` and `splash.css`: a storybook opens on a dusk sky, the town pops up out of its pages (hills, the four buildings, trees), seven lanterns light one by one, and Mitthu flies in with the SAKSHAM banner. About 4 s on the first load, 1 s after (`saksham-splash` in localStorage), only when the game opens on `/`; tap, click or Escape skips it; its own Need help?; the page behind is `inert`. Calm mode: a still, finished picture for 1.2 s, then a fade. No sound (browsers block it before the first tap). D-050. `HelpButton` takes an optional `testId`.
+- Tests: `tests/e2e/splash.spec.ts` (4: first load ends by itself, skipping and the short version, Need help? and never on `/help` or deep links, calm mode has no CSS animation). Every other test starts as a returning player (`storageState` in `playwright.config.ts`). 241 unit and 84 e2e tests (83 pass, 1 skips). Checked by frame-by-frame screenshots at 1366 and 390 wide, and in calm mode.
+- Next task: P6 › Sound v2.

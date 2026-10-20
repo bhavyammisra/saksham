@@ -423,3 +423,16 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
   - The unused `Placeholder` screen is deleted (`/reviewer` was its last use).
 - **Why:** The reviewer approves exactly what children read, and a later change to a card removes its tick until it is reviewed again, with no text stored on the server.
 - **Alternatives:** Storing the text on the server (two copies that can drift apart); a seeding script run with the service-role key (forbidden); the tick from the cards' own `review` block (that records the owner's fact check in the repo, not a published review).
+
+## D-050 Splash v2: the pop-up storybook opening
+
+- **Context:** BUILD_PLAN P6 asks for a splash: a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across with the Saksham banner, tap to continue; about 4 s on the first load and 1 s after, a still picture in calm mode, always skippable, never over `/help`. It must keep the performance rule (D-030) and the safety rule that Need help? is on every screen.
+- **Choice:**
+  - `src/components/Splash.tsx` and `splash.css`, mounted once in `App`. It shows only when the game is opened on the title menu (`/`), so never over the Help Centre, a teacher's email link or any other deep link, and it closes for good if the player leaves `/`.
+  - One timeline in CSS, written in a unit `--u`: 1 s on the first load (about 4 s in all), 0.25 s after (about 1 s). "Seen" is a separate localStorage key, `saksham-splash`, so it never touches the saved game.
+  - The book is HTML (a cover that turns with `rotateY`, pages revealed with `clip-path`); the town inside is one small SVG whose layers pop up with `scaleY`. Only transform, opacity and clip-path move: no blur, no blend modes, nothing wide.
+  - The whole screen is one "Tap to continue" button; Escape also skips; it ends by itself. It has its own Need help? (test id `splash-help-button`), and the page behind it is `inert` while it shows.
+  - Calm mode turns its animations off and shows the finished picture (cover open, lanterns lit) for 1.2 s. The fade out uses the Web Animations API, which calm mode's CSS doesn't cut, because a fade is not movement.
+  - e2e: every test starts as a returning player (`storageState` in `playwright.config.ts`), so it meets the 1 s version; `splash.spec.ts` starts fresh.
+- **Why:** A short, skippable welcome that sets the tone (a storybook, the town, Mitthu) without slowing down returning players or ever standing between a child and help.
+- **Alternatives:** A video or GIF (heavy, not themeable, can't be calm); drawing the real town art (very wide SVG layers, against D-030); waiting for a tap with no time limit (one more step before the menu every time); keeping "seen" in the store (seeded test saves would reset it).

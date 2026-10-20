@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { Shell } from '@/components/Shell'
 import { SoundRouteSync } from '@/components/SoundRouteSync'
+import { Splash } from '@/components/Splash'
 import { Book } from '@/screens/Book'
 import { Credits } from '@/screens/Credits'
 import { DevCharacters } from '@/screens/DevCharacters'
@@ -22,6 +23,7 @@ export default function App() {
   return (
     <>
       <SoundRouteSync />
+      <Splash />
       <Routes>
         {/* The Help Centre has no shell: no Help button, nothing that moves or makes sound. */}
         <Route path="/help" element={<HelpCentre />} />

@@ -365,6 +365,8 @@
   "color.olive": "Olive",
   "color.stone": "Stone",
   "title.tagline": "Know your rights. Play your part.",
+  "splash.label": "Saksham is opening. Tap to continue.",
+  "splash.tap": "Tap to continue",
   "title.menu": "Main menu",
   "title.continue": "Continue",
   "title.continueAs": "as {name}",

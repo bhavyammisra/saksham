@@ -15,6 +15,9 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
+    // Every test starts as a returning player, who sees the short (1 s) splash, not the 4 s one.
+    // splash.spec.ts clears this to test the first load (D-050).
+    storageState: { cookies: [], origins: [{ origin: `http://localhost:${PORT}`, localStorage: [{ name: 'saksham-splash', value: 'seen' }] }] },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

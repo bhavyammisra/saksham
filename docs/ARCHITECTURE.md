@@ -21,7 +21,7 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 | `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Sort` (the sort game, D-041), `Results`; `RightsCard` (card front, back and details, shared with the Book) and `badgeText` | P3, P4 |
 | `src/art/` | Scene art registry by key (`index.ts`), `style.tsx` (shared drawing rules), `sandbox.tsx`, `modern.tsx` (the shared modern kit, D-036), `school.tsx`, `town.tsx` (the walkable town), `dhaba.tsx`, `home.tsx`, `panchayat.tsx` (the cover screens use plain CSS, `src/components/cover.css`, D-034) | P2 to P4 |
 | `src/screens/` | One component per route: Onboarding, Profiles, Title (the main menu at `/`), Town (the walkable town, full screen), Play (a building, full screen), Book, Me (+ character), Community (D-042), Teacher (`/teacher`, D-044) with TeacherDashboard (each class's live progress, D-047), Reviewer (`/reviewer`, D-049), Credits, HelpCentre, guards; dev pages DevCharacters, DevScene | P1 to P5 |
-| `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
+| `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync, Splash (the storybook opening, D-050) | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
 | `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |
 | `scripts/` | `validate-content.ts` (content and strings checks, run in CI) | P1 |

@@ -1,0 +1,195 @@
+/* Splash v2 (D-050). Every time is a multiple of --u: 1s on the first load (about 4 s in all),
+   0.25s after that (about 1 s). Only transform, opacity and clip-path move (D-030: no blur, no
+   blend modes). Calm mode cuts every animation to its end (index.css), which leaves the finished
+   picture standing still; Splash.tsx then fades it out. */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1c3438 0%, #2a4a4c 55%, #8a5a3c 100%);
+  font-family: var(--font-serif);
+}
+
+/* The whole screen is the "continue" button; the pictures let taps through to it. */
+.splash-skip {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: transparent;
+}
+.splash-skip:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 4px var(--color-focus);
+}
+.splash-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(760px, 92vw);
+  pointer-events: none;
+}
+.splash-help {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+/* ---- The book ---- */
+.splash-book {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  perspective: 1800px;
+  animation: splash-book-centre calc(var(--u) * 0.9) cubic-bezier(0.3, 0.7, 0.2, 1) calc(var(--u) * 0.1) both;
+}
+.splash-spread {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 0 0 6px #6e3420, 0 24px 50px rgb(0 0 0 / 0.35);
+  animation: splash-spread-open calc(var(--u) * 0.9) cubic-bezier(0.3, 0.7, 0.2, 1) calc(var(--u) * 0.1) both;
+}
+.splash-cover {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  left: 50%;
+  right: -6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 2px 8px 8px 2px;
+  background: #8a3b20;
+  box-shadow: inset 0 0 0 10px #8a3b20, inset 0 0 0 12px #e8a33d;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  animation: splash-cover-open calc(var(--u) * 0.9) cubic-bezier(0.5, 0, 0.3, 1) calc(var(--u) * 0.1) both;
+}
+.splash-cover-title {
+  color: #f6d79a;
+  font-size: clamp(1rem, 3.4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+.splash-cover-rule {
+  width: 30%;
+  height: 2px;
+  background: #e8a33d;
+}
+
+@keyframes splash-book-centre {
+  from { transform: translateX(-25%); }
+  to { transform: none; }
+}
+@keyframes splash-spread-open {
+  from { clip-path: inset(-80px -80px -80px 50%); }
+  to { clip-path: inset(-80px); }
+}
+@keyframes splash-cover-open {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(-178deg); }
+}
+
+/* ---- The town pops up out of the pages, one layer after another ---- */
+.splash-pop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: splash-pop calc(var(--u) * 0.45) cubic-bezier(0.3, 1.5, 0.5, 1) calc(var(--u) * (0.85 + var(--i) * 0.28)) both;
+}
+@keyframes splash-pop {
+  from { transform: scaleY(0); opacity: 0; }
+  40% { opacity: 1; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+/* ---- Lanterns light one by one ---- */
+.splash-string {
+  animation: splash-appear calc(var(--u) * 0.3) ease-out calc(var(--u) * 1.9) both;
+}
+.splash-lantern {
+  animation: splash-appear calc(var(--u) * 0.2) ease-out calc(var(--u) * 1.9) both;
+}
+.splash-lantern-body {
+  fill: #7a5a3e;
+  animation: splash-light calc(var(--u) * 0.25) ease-out calc(var(--u) * (2.1 + var(--i) * 0.12)) both;
+}
+.splash-lantern-glow {
+  animation: splash-appear calc(var(--u) * 0.35) ease-out calc(var(--u) * (2.1 + var(--i) * 0.12)) both;
+}
+@keyframes splash-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes splash-light {
+  from { fill: #7a5a3e; }
+  to { fill: #e8a33d; }
+}
+
+/* ---- Mitthu flies in with the banner and stops above the book ---- */
+.splash-flight {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(300px, 70vw);
+  margin-bottom: -0.5rem;
+  z-index: 1;
+  animation: splash-fly calc(var(--u) * 1.2) cubic-bezier(0.25, 0.6, 0.3, 1) calc(var(--u) * 2.2) both;
+}
+.splash-mitthu {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: -1.6rem;
+}
+.splash-banner {
+  width: 100%;
+}
+.splash-banner-text {
+  fill: #f6d79a;
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+@keyframes splash-fly {
+  from { transform: translate(-80vw, 3rem); opacity: 1; }
+  55% { transform: translate(-6vw, -1.2rem); }
+  to { transform: none; opacity: 1; }
+}
+
+/* ---- Words under the book ---- */
+.splash-tagline {
+  margin-top: 1.75rem;
+  color: #f6efe2;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  text-align: center;
+  animation: splash-appear calc(var(--u) * 0.4) ease-out calc(var(--u) * 2.8) both;
+}
+.splash-hint {
+  margin-top: 0.5rem;
+  color: #d6c7ae;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  animation: splash-appear calc(var(--u) * 0.4) ease-out calc(var(--u) * 0.3) both;
+}
+
+/* Calm mode: no movement at all, just the finished picture (the cover already open, every
+   lantern lit). Splash.tsx holds it for a moment, then fades it out. */
+html[data-calm] .splash * {
+  animation: none !important;
+}
+html[data-calm] .splash-cover {
+  display: none;
+}
+html[data-calm] .splash-lantern-body {
+  fill: #e8a33d;
+}
