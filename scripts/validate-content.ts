@@ -21,6 +21,11 @@ const CARD_FIELDS = ['id', 'title', 'kid', 'teen', 'ifItHappens', 'law', 'source
 
 // ---------------------------------------------------------------- helpers
 
+// Dialogue stays short and spoken (BUILD_PLAN P6 voice pass, docs/VOICES.md, D-052).
+const MAX_LINE_WORDS = 18
+const MAX_CHOICE_WORDS = 22
+const wordCount = (text: string) => text.trim().split(/\s+/).length
+
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -104,6 +109,7 @@ export function validateScene(raw: unknown): string[] {
     if (node.id !== key) fail(`${where} has id "${String(node.id)}" (must match its key)`)
     if (!isText(node.speaker)) fail(`${where} needs a "speaker"`)
     if (!isText(node.text)) fail(`${where} needs "text"`)
+    else if (wordCount(node.text) > MAX_LINE_WORDS) fail(`${where} has ${wordCount(node.text)} words (at most ${MAX_LINE_WORDS}; split it, docs/VOICES.md)`)
     if (node.mood !== undefined && !MOODS.includes(node.mood)) fail(`${where} has unknown mood "${node.mood}"`)
     if (node.end !== undefined && !ENDS.includes(node.end)) fail(`${where} has unknown end "${node.end}"`)
     if (node.set !== undefined) {
@@ -119,6 +125,7 @@ export function validateScene(raw: unknown): string[] {
       } else {
         node.choices.forEach((choice, i) => {
           if (!isText(choice?.label)) fail(`${where}.choices[${i}] needs a "label"`)
+          else if (wordCount(choice.label) > MAX_CHOICE_WORDS) fail(`${where}.choices[${i}] has ${wordCount(choice.label)} words (at most ${MAX_CHOICE_WORDS})`)
           if (!nodeExists(choice?.to)) fail(`${where}.choices[${i}] points to missing node "${String(choice?.to)}"`)
           if (choice?.kind !== undefined && !CHOICE_KINDS.includes(choice.kind)) {
             fail(`${where}.choices[${i}] has unknown kind "${choice.kind}"`)

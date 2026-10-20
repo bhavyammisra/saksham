@@ -37,7 +37,14 @@
       "id": "intro",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "The Panchayat! This is where the village meets to sort out problems. Today the square is busy. Hmm, why is that girl under the tree reading the same page again and again?",
+      "text": "The Panchayat! This is where the village meets to sort out problems.",
+      "next": "intro-more"
+    },
+    "intro-more": {
+      "id": "intro-more",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Hmm, why is that girl under the tree reading the same page again and again?",
       "end": "good"
     },
 
@@ -45,7 +52,14 @@
       "id": "sonu-hello",
       "speaker": "sonu",
       "mood": "neutral",
-      "text": "That's my sister Pooja under the tree. She always helps me with homework. But this week she keeps crying when she thinks nobody is looking.",
+      "text": "That's my didi, Pooja, under the tree. She always helps me with homework.",
+      "next": "sonu-hello-more"
+    },
+    "sonu-hello-more": {
+      "id": "sonu-hello-more",
+      "speaker": "sonu",
+      "mood": "neutral",
+      "text": "But this week she keeps crying when she thinks nobody's looking.",
       "end": "good"
     },
 
@@ -53,8 +67,15 @@
       "id": "admit-card",
       "speaker": "mitthu",
       "mood": "surprised",
-      "text": "Someone left their exam admit card on the bench. Class 10, Pooja Kumari. Look at her date of birth: Pooja is only fifteen.",
+      "text": "Someone's exam admit card: Class 10, Pooja Kumari.",
       "set": ["saw-card"],
+      "next": "admit-card-more"
+    },
+    "admit-card-more": {
+      "id": "admit-card-more",
+      "speaker": "mitthu",
+      "mood": "surprised",
+      "text": "Look at her date of birth. Pooja is only fifteen.",
       "end": "good"
     },
 
@@ -96,7 +117,14 @@
       "id": "mitthu-pooja",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Pooja is still a child. She should be studying, not getting married. The Sarpanch runs the Panchayat. Let's ask her.",
+      "text": "Pooja is still a child. She should be studying, not getting married.",
+      "next": "mitthu-pooja-more"
+    },
+    "mitthu-pooja-more": {
+      "id": "mitthu-pooja-more",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Kavita ji, the Sarpanch, runs the Panchayat. Let's ask her.",
       "end": "good"
     },
     "pooja-again": {
@@ -124,7 +152,7 @@
         { "label": "It's nothing. Weddings are a family matter, so it's not our business.", "to": "sarpanch-weak-1", "kind": "weak" },
         { "label": "Pooja's wedding is after her exams, so she can still study until then.", "to": "sarpanch-weak-2", "kind": "weak" },
         {
-          "label": "Pooja is only fifteen, and her family has fixed her wedding for after her exams. She wants to finish school. Can you help?",
+          "label": "Pooja is only fifteen, and her wedding is fixed for after her exams. She wants to finish school. Can you help?",
           "to": "sarpanch-good",
           "kind": "good"
         }
@@ -141,7 +169,7 @@
       "id": "mitthu-retry-1",
       "speaker": "mitthu",
       "mood": "worried",
-      "text": "When a child is going to be married, it is not just a family matter. Helping is everyone's business. Let's try that again.",
+      "text": "A child's wedding isn't just a family matter. Helping is everyone's business. Let's try that again.",
       "end": "retry"
     },
     "sarpanch-weak-2": {
@@ -155,7 +183,7 @@
       "id": "mitthu-retry-2",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Studying until the wedding isn't enough. Pooja is fifteen, too young to marry at all. Let's tell the Sarpanch everything.",
+      "text": "Studying till the wedding isn't enough. Pooja is too young to marry at all. Let's try that again.",
       "end": "retry"
     },
     "sarpanch-good": {
@@ -170,14 +198,28 @@
       "id": "sarpanch-good-2",
       "speaker": "sarpanch-kavita",
       "mood": "neutral",
-      "text": "In India, a girl must be at least eighteen to marry, and a boy at least twenty-one. Before that, they are children, and a wedding is not allowed.",
+      "text": "In India, a girl must be at least eighteen to marry, and a boy at least twenty-one.",
+      "next": "sarpanch-good-2-more"
+    },
+    "sarpanch-good-2-more": {
+      "id": "sarpanch-good-2-more",
+      "speaker": "sarpanch-kavita",
+      "mood": "neutral",
+      "text": "Before that, they are children, and a wedding is not allowed.",
       "next": "sarpanch-good-3"
     },
     "sarpanch-good-3": {
       "id": "sarpanch-good-3",
       "speaker": "sarpanch-kavita",
       "mood": "happy",
-      "text": "I'll visit Pooja's parents this evening with the Child Marriage Prohibition Officer. Their job is to stop child marriages, and to help families understand. Anyone can call 1098 too.",
+      "text": "I'll visit Pooja's parents this evening, with the Child Marriage Prohibition Officer.",
+      "next": "sarpanch-good-3-more"
+    },
+    "sarpanch-good-3-more": {
+      "id": "sarpanch-good-3-more",
+      "speaker": "sarpanch-kavita",
+      "mood": "happy",
+      "text": "Their job is to stop child marriages and help families understand. Anyone can call 1098 too.",
       "next": "player-good"
     },
     "player-good": {
@@ -197,7 +239,14 @@
       "id": "mitthu-good",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "Pooja's family has called off the wedding. She passed her exams, and now she's in Class 11, studying science to become a nurse.",
+      "text": "Pooja's family called off the wedding. She passed her exams!",
+      "next": "mitthu-good-more"
+    },
+    "mitthu-good-more": {
+      "id": "mitthu-good-more",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Now she's in Class 11, studying science to become a nurse.",
       "end": "good"
     }
   },

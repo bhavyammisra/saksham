@@ -26,7 +26,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2 and Sound v2 done; next: Dialogue voice pass | | D-050, D-051 |
+| P6 Experience and Hindi | 🔄 branch `p6-experience`; Splash v2, Sound v2 and the voice pass done; next: Living world | | D-050 to D-052 |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -340,7 +340,7 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 - [x] **Splash v2** (D-050): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
 - [x] **Sound v2** (D-051, all synthesised; see the session note): layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
-- [ ] **Dialogue voice pass**: a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
+- [x] **Dialogue voice pass** (D-052): a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
 - [ ] **Living world**: ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
 - [ ] Re-check calm mode, gentle tone and Help Centre silence after each item.
 
@@ -659,4 +659,10 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Owner: no recorded sound was used, because a licence couldn't be confirmed from here and each download needs your OK. If you want recorded ambience or music, pick CC0 files you have checked, and they can replace a recipe by key.
 - Tests: `src/lib/sound.test.ts` (9: the volume rules for effects and music, every scene has a real ambience and surface, nothing loud or nagging, the tune stays in Bhupali, blip pitches and where blips fall). 246 unit tests. Checked in a real browser that the audio graph starts on the first tap, footsteps fire every 0.42 s while walking, and there are no errors. Not checked: how it sounds (Claude can't listen). Owner: play with sound on once and say if anything is too loud or annoying.
 - Next task: P6 › Dialogue voice pass.
+
+**P6: Dialogue voice pass (2026-10-20)**
+- Done: `docs/VOICES.md` (rules, and 14 voices with a paragraph and three sample lines each). All 35 lines over 18 words rewritten: most split into two lines (`<id>-more` nodes, so links and tests stay the same), the rest tightened; the four good choices shortened but complete. What people say about the law is unchanged in meaning; the cards are untouched. The validator now rejects a spoken line over 18 words or a choice over 22. D-052.
+- Tests: a validator test for the length rule. 247 unit and 84 e2e tests (83 pass, 1 skips).
+- Owner: read the four stories once more for tone. The Home and Panchayat lines about the law are the ones to fact-check alongside their cards (SETUP.md §6).
+- Next task: P6 › Living world.
 

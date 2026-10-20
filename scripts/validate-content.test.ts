@@ -123,6 +123,16 @@ describe('NFR-07 content validation: scenes', () => {
     expect(errors).toContain('node "good" must have only one of "next", "choices" or "end"')
   })
 
+  it('rejects a spoken line over 18 words and a choice over 22 (docs/VOICES.md)', () => {
+    const long = (n: number) => Array.from({ length: n }, () => 'word').join(' ')
+    expect(validateScene(broken((s) => (s.nodes.note.text = long(18))))).toEqual([])
+    expect(validateScene(broken((s) => (s.nodes.note.text = long(19))))).toContain(
+      'node "note" has 19 words (at most 18; split it, docs/VOICES.md)',
+    )
+    const errors = validateScene(broken((s) => s.nodes.hello.choices?.forEach((c: { label: string }) => (c.label = long(23)))))
+    expect(errors).toContain('node "hello".choices[0] has 23 words (at most 22)')
+  })
+
   it('rejects a node whose id does not match its key', () => {
     expect(validateScene(broken((s) => (s.nodes.note.id = 'other')))).toContain(
       'node "note" has id "other" (must match its key)',

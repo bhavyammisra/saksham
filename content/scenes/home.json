@@ -37,7 +37,14 @@
       "id": "intro",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "Home! This is your building. Everyone is back from school and the courtyard is busy. Hmm, why is Anu standing all alone by the stairs?",
+      "text": "Home! Everyone is back from school and the courtyard is busy.",
+      "next": "intro-more"
+    },
+    "intro-more": {
+      "id": "intro-more",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "But why is Anu standing all alone by the stairs?",
       "end": "good"
     },
 
@@ -45,7 +52,14 @@
       "id": "kabir-hello",
       "speaker": "kabir",
       "mood": "neutral",
-      "text": "Want to play cricket? Anu used to play with us every evening. Now she just stands by the stairs. I think something is wrong.",
+      "text": "Want to play cricket? Anu used to bowl for us every evening.",
+      "next": "kabir-hello-more"
+    },
+    "kabir-hello-more": {
+      "id": "kabir-hello-more",
+      "speaker": "kabir",
+      "mood": "neutral",
+      "text": "Now she just stands by the stairs. I think something's wrong.",
       "end": "good"
     },
 
@@ -74,7 +88,14 @@
       "id": "anu-2",
       "speaker": "anu",
       "mood": "sad",
-      "text": "When I make a mistake, my uncle gets really angry. He hits me. Yesterday it was because I spilled the milk.",
+      "text": "When I make a mistake, my uncle gets really angry. He hits me.",
+      "next": "anu-2-more"
+    },
+    "anu-2-more": {
+      "id": "anu-2-more",
+      "speaker": "anu",
+      "mood": "sad",
+      "text": "Yesterday it was because I spilled the milk.",
       "next": "anu-3"
     },
     "anu-3": {
@@ -95,7 +116,14 @@
       "id": "mitthu-anu",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Nobody is allowed to hurt Anu. And this is a secret she should not have to keep. Let's find a grown-up we can trust.",
+      "text": "Nobody is allowed to hurt Anu. And she shouldn't have to keep this secret.",
+      "next": "mitthu-anu-more"
+    },
+    "mitthu-anu-more": {
+      "id": "mitthu-anu-more",
+      "speaker": "mitthu",
+      "mood": "neutral",
+      "text": "Let's find a grown-up we trust.",
       "end": "good"
     },
     "anu-again": {
@@ -110,8 +138,15 @@
       "id": "drawing",
       "speaker": "mitthu",
       "mood": "worried",
-      "text": "A drawing by Anu, pinned up by the letterboxes. Her family is big and colourful. Anu drew herself very small in the corner, under a grey cloud.",
+      "text": "Anu's drawing, pinned up by the letterboxes. Her whole family, big and colourful.",
       "set": ["saw-drawing"],
+      "next": "drawing-more"
+    },
+    "drawing-more": {
+      "id": "drawing-more",
+      "speaker": "mitthu",
+      "mood": "worried",
+      "text": "And Anu, very small in the corner, under a grey cloud.",
       "end": "good"
     },
 
@@ -124,7 +159,7 @@
         { "label": "Nothing. It's a family thing, so it's not our business.", "to": "farida-weak-1", "kind": "weak" },
         { "label": "Anu should be more careful, so she doesn't make mistakes.", "to": "farida-weak-2", "kind": "weak" },
         {
-          "label": "Anu is scared to go home. Her uncle hits her when she makes a mistake, and he told her to keep it a secret. Can you help her?",
+          "label": "Anu is scared to go home. Her uncle hits her for mistakes and says it's a secret. Can you help?",
           "to": "farida-good",
           "kind": "good"
         }
@@ -155,7 +190,7 @@
       "id": "mitthu-retry-2",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "It is never Anu's fault when someone hurts her. Farida Aunty needs to know what is really happening. Let's try that again.",
+      "text": "It's never Anu's fault. Farida Aunty needs to know what's really happening. Let's try that again.",
       "end": "retry"
     },
     "farida-good": {
@@ -170,14 +205,28 @@
       "id": "farida-good-2",
       "speaker": "farida-aunty",
       "mood": "neutral",
-      "text": "Nobody is allowed to hurt a child. Not a stranger, not a teacher, not even family. And it is never the child's fault.",
+      "text": "Nobody is allowed to hurt a child. Not a stranger, not a teacher, not even family.",
+      "next": "farida-good-2-more"
+    },
+    "farida-good-2-more": {
+      "id": "farida-good-2-more",
+      "speaker": "farida-aunty",
+      "mood": "neutral",
+      "text": "And it is never the child's fault.",
       "next": "farida-good-3"
     },
     "farida-good-3": {
       "id": "farida-good-3",
       "speaker": "farida-aunty",
       "mood": "happy",
-      "text": "I'll sit with Anu now, and talk to her mother this evening. If Anu isn't safe at home, we will call 1098 together. People there are trained to help keep children safe.",
+      "text": "I'll sit with Anu now, and talk to her mother this evening.",
+      "next": "farida-good-3-more"
+    },
+    "farida-good-3-more": {
+      "id": "farida-good-3-more",
+      "speaker": "farida-aunty",
+      "mood": "happy",
+      "text": "If Anu isn't safe at home, we'll call 1098 together. They're trained to keep children safe.",
       "next": "player-good"
     },
     "player-good": {
@@ -197,7 +246,14 @@
       "id": "mitthu-good",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "A few weeks later, Anu is back to playing cricket in the courtyard. Home feels calmer now, and she knows who she can talk to.",
+      "text": "A few weeks later, Anu is bowling in the courtyard again.",
+      "next": "mitthu-good-more"
+    },
+    "mitthu-good-more": {
+      "id": "mitthu-good-more",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Home feels calmer, and she knows who she can talk to.",
       "end": "good"
     }
   },

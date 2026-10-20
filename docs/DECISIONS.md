@@ -447,3 +447,14 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Why:** Sound brings the places to life without a licence question, a download or extra weight, and the safety rules (silent Help Centre, quieter gentle scenes) apply to every sound in one place.
 - **Alternatives:** Recorded CC0 loops (richer, but each needs a confirmed licence and the owner's approval to download, and adds megabytes); one shared bus (music couldn't have its own setting); footsteps from the animation's events (tied to CSS that calm mode changes).
 
+## D-052 Dialogue voice pass: a voice bible and short lines
+
+- **Context:** BUILD_PLAN P6 asks for `docs/VOICES.md` (one paragraph and three sample lines per character; Mitthu warm, curious, a little funny, never preachy) and for every line to be short (aim for 18 words or fewer), natural spoken Indian English with specific details, consequences real but never graphic, and no change to the legal text. Before the pass, 35 of the 97 lines ran over 18 words.
+- **Choice:**
+  - `docs/VOICES.md`: the rules, then each of the 14 voices (Mitthu, the player and the twelve people in the four buildings).
+  - Every line now has 18 words or fewer. A long thought became two lines: the node keeps its id and the first half, and a new node `<id>-more` (same speaker and mood) says the rest and carries on as the original did, so no link, flag or test had to change. Lines got more specific ("from six in the morning", "a parrot-sized swing") and a little funnier where Mitthu speaks, never during a sad moment. The good choice in each building is shorter but keeps every fact it needs.
+  - What people say about the law means the same as before (6 to 14, under fourteen, eighteen and twenty-one, 1098). The cards are unchanged.
+  - The validator now rejects a spoken line over 18 words or a choice over 22, so later writing stays short.
+- **Why:** Children of 8 read short lines more easily, especially on a phone, and a written voice for each person keeps the stories consistent as more are added.
+- **Alternatives:** A soft warning instead of an error (lines would creep back up); longer dialogue boxes (harder to read, and they cover the scene); rewriting the stories (they were already approved for tone).
+
