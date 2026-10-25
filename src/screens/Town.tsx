@@ -5,7 +5,7 @@ import { ReturnCelebration, type Celebration } from '@/components/ReturnCelebrat
 import { Scene } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
 import { isUnlocked, recommendedBuilding } from '@/lib/rules'
-import { buildings, getScene, townScene } from '@/lib/scenes'
+import { getBuildings, getScene, getTownScene } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { HELP, TOWN, useMap } from '@/play/useMap'
 
@@ -28,8 +28,8 @@ export function Town() {
   const locked = useMemo(
     () =>
       new Set(
-        townScene.hotspots
-          .filter((h) => h.kind === 'exit' && h.to !== HELP && !(h.to && isUnlocked(h.to, buildings, progress, demo) && getScene(h.to)))
+        getTownScene().hotspots
+          .filter((h) => h.kind === 'exit' && h.to !== HELP && !(h.to && isUnlocked(h.to, getBuildings(), progress, demo) && getScene(h.to)))
           .map((h) => h.id),
       ),
     [progress, demo],
@@ -38,7 +38,7 @@ export function Town() {
   // Coming back from a building: start outside its door, and celebrate if it was just finished.
   const routeState = location.state as { from?: string; celebration?: Celebration | null } | null
   const from = routeState?.from
-  const startX = townScene.hotspots.find((h) => h.to !== undefined && h.to === from)?.x
+  const startX = getTownScene().hotspots.find((h) => h.to !== undefined && h.to === from)?.x
   const [celebration, setCelebration] = useState<Celebration | null>(routeState?.celebration ?? null)
   // Show it once: clear it from the history entry, so a reload or Back doesn't celebrate again.
   useEffect(() => {
@@ -47,7 +47,7 @@ export function Town() {
 
   // Saved progress, as flags the town's content and art can use ("done:school").
   const startFlags = useMemo(
-    () => (townScene.hostFlags ?? []).filter((f) => progress[f.replace('done:', '')]?.completed),
+    () => (getTownScene().hostFlags ?? []).filter((f) => progress[f.replace('done:', '')]?.completed),
     [progress],
   )
 
@@ -61,9 +61,9 @@ export function Town() {
   const onComplete = useCallback(() => {}, []) // the town never "completes"
 
   // Mitthu only suggests a place that can actually be played right now, and points at its door.
-  const suggested = recommendedBuilding(buildings, progress, demo)
-  const suggestion = suggested && getScene(suggested) ? buildings.find((b) => b.id === suggested) : undefined
-  const guideDoor = townScene.hotspots.find((h) => h.kind === 'exit' && h.to === suggestion?.id)
+  const suggested = recommendedBuilding(getBuildings(), progress, demo)
+  const suggestion = suggested && getScene(suggested) ? getBuildings().find((b) => b.id === suggested) : undefined
+  const guideDoor = getTownScene().hotspots.find((h) => h.kind === 'exit' && h.to === suggestion?.id)
   const guide = useMemo(
     () => (guideDoor && suggestion ? { hotspotId: guideDoor.id, text: t('town.guideHint', { name: suggestion.name }) } : undefined),
     [guideDoor, suggestion],
@@ -71,7 +71,7 @@ export function Town() {
 
   return (
     <>
-      <Scene scene={townScene} locked={locked} startX={startX} startFlags={startFlags} skipIntro={from !== undefined} guide={guide} onExit={onExit} onComplete={onComplete} map={map} />
+      <Scene scene={getTownScene()} locked={locked} startX={startX} startFlags={startFlags} skipIntro={from !== undefined} guide={guide} onExit={onExit} onComplete={onComplete} map={map} />
       {celebration && profile && <ReturnCelebration name={profile.firstName} celebration={celebration} onClose={() => setCelebration(null)} />}
     </>
   )

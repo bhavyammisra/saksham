@@ -27,6 +27,16 @@
     "x": 380
   },
   "ambience": "town",
+  "surface": "paving",
+  "time": "clock",
+  "ambient": [
+    {"id":  "dog", "kind":  "dog", "x":  1150, "roam":  320, "depth":  0.1},
+    {"id":  "pigeons", "kind":  "pigeons", "x":  1950, "depth":  0.05},
+    {"id":  "walker", "kind":  "passerby", "x":  2560, "roam":  520, "depth":  0.02, "look":  1},
+    {"id":  "cow", "kind":  "cow", "x":  3720, "depth":  0, "facing":  "left"},
+    {"id":  "diya-flats", "kind":  "diya", "x":  2480, "depth":  0, "evening":  true},
+    {"id":  "diya-panchayat", "kind":  "diya", "x":  3110, "depth":  0, "evening":  true}
+  ],
   "hotspots": [
     {
       "id": "school",
@@ -103,21 +113,28 @@
       "id": "intro",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "Welcome to the town! Walk down the street and go into any place that's open. The teal door at the end is the Help Centre, whenever you need it.",
+      "text": "Welcome to the town! Walk down the street and peek into any open door.",
+      "next": "intro-more"
+    },
+    "intro-more": {
+      "id": "intro-more",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "See the teal door at the end? That's the Help Centre. It's always open.",
       "end": "good"
     },
     "school-closed": {
       "id": "school-closed",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "The school gate is shut right now. Let's try again in a little while.",
+      "text": "The school gate is shut. Even I can't fly over it! Let's come back later.",
       "end": "good"
     },
     "dhaba-closed": {
       "id": "dhaba-closed",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "The Dhaba isn't open to us yet. Let's help at the places with open doors first, then come back.",
+      "text": "The Dhaba isn't ready for us yet. Let's help where the doors are open first.",
       "end": "good"
     },
     "home-closed": {
@@ -138,7 +155,7 @@
       "id": "playground-soon",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "The playground is being fixed up. Coming soon!",
+      "text": "The playground swings are being fixed. I've asked for a parrot-sized one. Coming soon!",
       "end": "good"
     },
     "cyber-adda-soon": {
@@ -152,7 +169,7 @@
       "id": "lata-town",
       "speaker": "lata",
       "mood": "happy",
-      "text": "I go to school every day now! Meena Didi gave me a new notebook, and I'm the fastest at sums in my class.",
+      "text": "Meena Didi gave me a new notebook. And guess what? I'm the fastest at sums in class!",
       "next": "lata-town-2"
     },
     "lata-town-2": {

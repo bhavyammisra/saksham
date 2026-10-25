@@ -423,3 +423,64 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
   - The unused `Placeholder` screen is deleted (`/reviewer` was its last use).
 - **Why:** The reviewer approves exactly what children read, and a later change to a card removes its tick until it is reviewed again, with no text stored on the server.
 - **Alternatives:** Storing the text on the server (two copies that can drift apart); a seeding script run with the service-role key (forbidden); the tick from the cards' own `review` block (that records the owner's fact check in the repo, not a published review).
+
+## D-050 Splash v2: the pop-up storybook opening
+
+- **Context:** BUILD_PLAN P6 asks for a splash: a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across with the Saksham banner, tap to continue; about 4 s on the first load and 1 s after, a still picture in calm mode, always skippable, never over `/help`. It must keep the performance rule (D-030) and the safety rule that Need help? is on every screen.
+- **Choice:**
+  - `src/components/Splash.tsx` and `splash.css`, mounted once in `App`. It shows only when the game is opened on the title menu (`/`), so never over the Help Centre, a teacher's email link or any other deep link, and it closes for good if the player leaves `/`.
+  - One timeline in CSS, written in a unit `--u`: 1 s on the first load (about 4 s in all), 0.25 s after (about 1 s). "Seen" is a separate localStorage key, `saksham-splash`, so it never touches the saved game.
+  - The book is HTML (a cover that turns with `rotateY`, pages revealed with `clip-path`); the town inside is one small SVG whose layers pop up with `scaleY`. Only transform, opacity and clip-path move: no blur, no blend modes, nothing wide.
+  - The whole screen is one "Tap to continue" button; Escape also skips; it ends by itself. It has its own Need help? (test id `splash-help-button`), and the page behind it is `inert` while it shows.
+  - Calm mode turns its animations off and shows the finished picture (cover open, lanterns lit) for 1.2 s. The fade out uses the Web Animations API, which calm mode's CSS doesn't cut, because a fade is not movement.
+  - e2e: every test starts as a returning player (`storageState` in `playwright.config.ts`), so it meets the 1 s version; `splash.spec.ts` starts fresh.
+- **Why:** A short, skippable welcome that sets the tone (a storybook, the town, Mitthu) without slowing down returning players or ever standing between a child and help.
+- **Alternatives:** A video or GIF (heavy, not themeable, can't be calm); drawing the real town art (very wide SVG layers, against D-030); waiting for a tap with no time limit (one more step before the menu every time); keeping "seen" in the store (seeded test saves would reset it).
+
+## D-051 Sound v2: synthesised ambience, music, footsteps and typing blips
+
+- **Context:** BUILD_PLAN P6 asks for layered ambience per scene from short CC0 or permissive loops, a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips and richer UI sounds; "if a licence cannot be confirmed, use synthesised sound only and tell the owner." Downloading audio needs the owner's approval for each file, and Claude can't reliably confirm a recording's licence.
+- **Choice:** everything is synthesised with the Web Audio API, so there are no audio files and nothing to licence.
+  - `src/lib/synth.ts` holds the sounds as plain data and pure functions (unit-tested): six effects (`tap`, `soft`, `success`, and new `open` for a panel or the map, `flip` for a card, `unlock` for a new place), footsteps for three surfaces, an ambience per `ambience` key (a bed of filtered noise, sometimes swaying like wind or a fan, plus birds, a far-off bell, glasses clinking or a crow now and then), a music loop in the Bhupali scale (C D E G A) over a quiet drone, and the volume rules.
+  - `src/lib/sound.ts` turns them into sound: two buses (effects, which also carry ambience, footsteps and blips; and music), each set by the rules: effects follow "Sound effects", music follows "Music" (the setting existed but did nothing until now); both are silent on the Help Centre and half as loud in gentle scenes; everything pauses while the tab is hidden; music stops for real when turned off.
+  - Content: scenes gain an optional `surface` (`paving`, `earth`, `floor`). The Dhaba is earth, Home is a floor, the rest are paving. The engine plays the scene's `ambience` and a step every 0.42 s while walking (two steps per walk cycle in `character.css`), and the dialogue blips on every second letter in the speaker's own pitch (none in calm mode, where nothing is typed out).
+- **Why:** Sound brings the places to life without a licence question, a download or extra weight, and the safety rules (silent Help Centre, quieter gentle scenes) apply to every sound in one place.
+- **Alternatives:** Recorded CC0 loops (richer, but each needs a confirmed licence and the owner's approval to download, and adds megabytes); one shared bus (music couldn't have its own setting); footsteps from the animation's events (tied to CSS that calm mode changes).
+
+## D-052 Dialogue voice pass: a voice bible and short lines
+
+- **Context:** BUILD_PLAN P6 asks for `docs/VOICES.md` (one paragraph and three sample lines per character; Mitthu warm, curious, a little funny, never preachy) and for every line to be short (aim for 18 words or fewer), natural spoken Indian English with specific details, consequences real but never graphic, and no change to the legal text. Before the pass, 35 of the 97 lines ran over 18 words.
+- **Choice:**
+  - `docs/VOICES.md`: the rules, then each of the 14 voices (Mitthu, the player and the twelve people in the four buildings).
+  - Every line now has 18 words or fewer. A long thought became two lines: the node keeps its id and the first half, and a new node `<id>-more` (same speaker and mood) says the rest and carries on as the original did, so no link, flag or test had to change. Lines got more specific ("from six in the morning", "a parrot-sized swing") and a little funnier where Mitthu speaks, never during a sad moment. The good choice in each building is shorter but keeps every fact it needs.
+  - What people say about the law means the same as before (6 to 14, under fourteen, eighteen and twenty-one, 1098). The cards are unchanged.
+  - The validator now rejects a spoken line over 18 words or a choice over 22, so later writing stays short.
+- **Why:** Children of 8 read short lines more easily, especially on a phone, and a written voice for each person keeps the stories consistent as more are added.
+- **Alternatives:** A soft warning instead of an error (lines would creep back up); longer dialogue boxes (harder to read, and they cover the scene); rewriting the stories (they were already approved for tone).
+
+## D-053 Living world: ambient life, the time of day and dust
+
+- **Context:** BUILD_PLAN P6 asks for ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, and glowing windows and diyas in the evening, with ambient elements capped, paused when the tab is hidden, and 60 fps on a mid-range phone. D-030 forbids animating anything inside the very wide scene layers.
+- **Choice:**
+  - Scenes gain `ambient` (at most 6 pieces, checked by the validator) and `time` (`morning`, `day`, `evening`, or `clock` to follow the device). Each piece has a `kind` (dog, cat, pigeons, cow, passer-by, washing on a line, a tulsi plant, a diya), a place and depth, and may `roam` (stroll right and back), face left, or come out only in the `evening`.
+  - Every piece is its own small picture (`src/art/ambient.tsx`, motion in `ambient.css`) placed on the stage like a person, so only small things move: the dog trots and wags, the cat flicks its tail, pigeons peck, the cow swishes her tail, cloth and leaves sway in the wind, a diya's flame flickers, and passers-by (three preset adults, drawn with the character rig) stroll and turn round. They never talk and can't be used.
+  - Time of day: the School and the Dhaba are mornings, the Panchayat is day, Home is evening, and the town follows the clock (evening from 5 pm to 5 am). The light is a still, see-through gradient over the picture (no blend mode). In the evening the art receives an `evening` flag: the day sky becomes the evening one, and in the town the lamps light and windows glow; diyas come out.
+  - Dust: little puffs behind the player's feet while walking on `earth` (the Dhaba).
+  - While the tab is hidden the scene sets `data-hidden` and every ambient animation pauses. In calm mode nothing ambient moves (passers-by stand still rather than walking on the spot, past the walk exception) and there is no dust.
+  - Pure rules in `src/engine/ambient.ts` (which light, which pieces are out, sizes, stroll speed), unit-tested.
+- **Why:** The places feel lived in, and evening visits feel different, without breaking the frame-rate rules: 62 fps measured in headless Chromium in the town and the Dhaba with everything moving.
+- **Alternatives:** Animating parts of the wide scene art (against D-030); real-time light that changes by the minute (more work every frame, and the stories say when they happen); a random number of animals (harder to test and to keep within the cap).
+
+## D-054 Hindi: overlays over the English, machine-written and flagged as unreviewed
+
+- **Context:** BUILD_PLAN P6 asks for `strings.hi.json` and Hindi overlays for scenes, cards, quizzes and help, laid over the English by a `localize()` function, where only text changes: ids, wiring, answers, `law`, `source` and helpline numbers always come from English. The typewriter types by grapheme (`Intl.Segmenter`, already in place). Read-aloud was removed at the owner's request (D-038), so the `hi-IN` voice part is skipped. The Hindi is machine-authored and must be flagged as unreviewed.
+- **Choice:**
+  - A translation is a flat map from a path in the English content to its Hindi words (`"nodes.ravi-hello.text": "…"`, `"games.school-quiz.questions.age.options.0": "…"`). Paths use ids where items have them, so they survive reordering. `src/lib/localize.ts` (pure, tested) replaces only fields in an allow-list of text fields (`title`, `text`, `label`, `kid`, `teen`, `options`, `explanation`…) and never anything under `law`, `source`, `sources`, `review`, `layers` or `ambient`, so a wrong path can't change wiring, an answer, the law or a number.
+  - Files: `content/strings.hi.json` (all 398 UI strings) and `content/hi/` (the five scenes, buildings, people's names, the Help Centre and Community): 825 texts, every one translated. `src/lib/overlays.ts` lists which file translates which.
+  - The app: `i18n.ts` has `hi`; `scenes.ts` offers getters (`getScene`, `getTownScene`, `getBuildings`, `getHelp`, `getCommunity`) that return the content in the language on screen, cached per language; `getNpc` gives Hindi names. Choosing Hindi in Settings remounts every screen (`App.tsx` keys them by language), so each reads its words again; the splash stays outside so it doesn't replay. Devanagari uses Noto Serif Devanagari (already bundled), also in the UI font stack, and Hindi headings drop the wide letter-spacing that would break the line joining the letters.
+  - Review: Hindi items are separate (`card:<id>:hi`, `quiz:<building>:hi`, `help:centre:hi`), so they stay unpublished until a fluent reviewer approves them; the "Reviewed" tick looks for the item in the language on screen. `npm run content:hashes` prints both languages; `/reviewer` can filter to Hindi.
+  - Checks: the validator rejects a Hindi line whose path isn't English text, empty words, or changed `{placeholders}`, and warns (not fails) when English text has no Hindi yet, because it then shows in English. `node scripts/hindi-todo.ts` lists anything missing.
+  - The Credits page says plainly that the Hindi was written with a computer's help and not yet checked by a fluent speaker (SETUP.md §7).
+- **Why:** Many children in the target age group read Hindi more easily than English. Keeping the English as the single source of wiring and law means the two languages can never disagree on what matters, and a translator can only change words.
+- **Alternatives:** Full copies of each scene in Hindi (two sets of wiring to keep in step, easy to break); an i18n library such as i18next (a dependency for what one small function does); translating the legal quotes (the law must render exactly as authored, in the language it was enacted and published in).
+

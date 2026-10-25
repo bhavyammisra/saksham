@@ -68,8 +68,8 @@ function DhabaFront({ x }: { x: number }) {
   )
 }
 
-/** Home: a four-storey block of flats with balconies. */
-function Flats({ x }: { x: number }) {
+/** Home: a four-storey block of flats with balconies. In the evening some windows are lit. */
+function Flats({ x, evening }: { x: number; evening: boolean }) {
   return (
     <g>
       <CastShadow x={x} w={560} reach={80} />
@@ -78,7 +78,7 @@ function Flats({ x }: { x: number }) {
       {[0, 1, 2].map((floor) => (
         <g key={floor}>
           {[40, 300].map((wx) => (
-            <WindowBand key={wx} x={x + wx} y={380 + floor * 120} w={220} h={70} panes={3} />
+            <WindowBand key={wx} x={x + wx} y={380 + floor * 120} w={220} h={70} panes={3} warm={evening && (floor + wx) % 3 !== 1} />
           ))}
           <rect x={x + 30} y={460 + floor * 120} width="240" height="10" fill="#7a7068" />
           <rect x={x + 30} y={440 + floor * 120} width="240" height="4" fill="#3a3d40" />
@@ -151,7 +151,7 @@ function CyberAdda({ x }: { x: number }) {
 }
 
 /** The Help Centre: calm teal, a clear door, and a heart on the sign. Never red. */
-function HelpCentre({ x }: { x: number }) {
+function HelpCentre({ x, evening }: { x: number; evening: boolean }) {
   return (
     <g>
       <CastShadow x={x} w={460} reach={60} />
@@ -160,8 +160,8 @@ function HelpCentre({ x }: { x: number }) {
       <rect x={x + 60} y="550" width="340" height="60" rx="6" fill="#2f6f73" />
       <path d={`M${x + 100} 572 c-10 -14 -30 -4 -20 10 l20 18 l20 -18 c10 -14 -10 -24 -20 -10 Z`} fill="#ffffff" />
       <SignLines x={x + 150} y={570} w={200} />
-      <WindowBand x={x + 30} y={650} w={120} h={110} panes={2} />
-      <WindowBand x={x + 310} y={650} w={120} h={110} panes={2} />
+      <WindowBand x={x + 30} y={650} w={120} h={110} panes={2} warm={evening} />
+      <WindowBand x={x + 310} y={650} w={120} h={110} panes={2} warm={evening} />
       <rect x={x + 180} y="640" width="100" height={GROUND - 640} fill="#1e2428" />
       <rect x={x + 190} y="650" width="80" height={GROUND - 650} fill="url(#m-glass)" />
       <FacadeLight x={x - 8} y={512} w={476} h={GROUND - 512} />
@@ -171,6 +171,7 @@ function HelpCentre({ x }: { x: number }) {
 
 const Street: LayerArt = ({ width, flags }) => {
   const done = (id: string) => flags?.has(`done:${id}`) ?? false
+  const evening = flags?.has('evening') ?? false // lamps and windows light up (D-053)
   return (
     <LayerSvg width={width}>
       <Paving width={width} />
@@ -179,16 +180,16 @@ const Street: LayerArt = ({ width, flags }) => {
       {/* The School: the same building as inside, placed so its entrance is the door at 700. */}
       <SchoolBuilding x0={-645} />
       {done('school') && <DoneLights x={620} w={300} y={700} />}
-      <Lamp x={1040} />
+      <Lamp x={1040} lit={evening} />
 
       <DhabaFront x={1320} />
       {done('dhaba') && <DoneLights x={1350} w={400} y={680} />}
       <Tree x={1900} s={1.05} />
       <Bench x={1960} />
 
-      <Flats x={2120} />
+      <Flats x={2120} evening={evening} />
       {done('home') && <DoneLights x={2330} w={140} y={704} />}
-      <Lamp x={2780} />
+      <Lamp x={2780} lit={evening} />
       <Planter x={2840} />
 
       <Panchayat x={2980} />
@@ -197,14 +198,14 @@ const Street: LayerArt = ({ width, flags }) => {
 
       <Playground x={3800} />
       <Boards x={4040} w={120} />
-      <Lamp x={4500} />
+      <Lamp x={4500} lit={evening} />
       <Bench x={4540} />
 
       <CyberAdda x={4700} />
       <Boards x={4840} w={120} />
       <Tree x={5250} s={1.1} />
 
-      <HelpCentre x={5420} />
+      <HelpCentre x={5420} evening={evening} />
       <Planter x={5920} />
       <Tree x={6120} s={1.2} />
     </LayerSvg>

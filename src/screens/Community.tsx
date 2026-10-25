@@ -1,16 +1,14 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router'
-import communityJson from '@content/community.json'
-import type { CommunityContent } from '@content/types'
 import { Button } from '@/components/Button'
 import { Page } from '@/components/Page'
 import { t } from '@/lib/i18n'
 import { classMission } from '@/lib/classroom'
+import { getCommunity } from '@/lib/scenes'
 import { QUESTION_MAX } from '@/lib/rules'
 import { selectActiveData, useStore } from '@/lib/store'
 import { supabase } from '@/lib/supabase'
 
-const community = communityJson as CommunityContent
 // One shared empty list, so the store selectors below return the same value when there is nothing yet.
 const NONE: never[] = []
 
@@ -51,7 +49,7 @@ function Pledges() {
   return (
     <Section id="community-pledges" title={t('community.pledges')} hint={t('community.pledgesHint')}>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-        {community.pledges.map((p) => {
+        {getCommunity().pledges.map((p) => {
           const has = taken.includes(p.id)
           return (
             <li key={p.id} className={`flex flex-col rounded-card p-4 ${has ? 'bg-plaster-deep' : 'border-2 border-dashed border-sand'}`}>
@@ -88,13 +86,13 @@ function Mission() {
   }, [inClass])
 
   const stars = live?.total ?? deviceStars
-  const target = live?.target ?? community.mission.target
+  const target = live?.target ?? getCommunity().mission.target
   const shown = Math.min(stars, target)
   return (
     <Section id="community-mission" title={t('community.mission')}>
       <div className="mt-3 rounded-card bg-plaster-deep p-4">
         {!live && <p className="inline-block rounded-button border-2 border-brass px-2 text-sm font-semibold uppercase tracking-wider">{t('community.sample')}</p>}
-        <p className="mt-2 text-lg font-semibold">{live ? t('community.classGoal', { name: live.className, target }) : community.mission.goal}</p>
+        <p className="mt-2 text-lg font-semibold">{live ? t('community.classGoal', { name: live.className, target }) : getCommunity().mission.goal}</p>
         <div className="mt-3 h-3 rounded-pill bg-sand/50" aria-hidden="true">
           <div className="h-3 rounded-pill bg-marigold" style={{ width: `${(shown / target) * 100}%` }} />
         </div>
@@ -174,7 +172,7 @@ function Places() {
   return (
     <Section id="community-places" title={t('community.places')} hint={t('community.placesHint')}>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-        {community.places.map((p) => (
+        {getCommunity().places.map((p) => (
           <li key={p.id} className="rounded-card bg-plaster-deep p-4">
             <p className="font-semibold">{p.name}</p>
             <p className="mt-1">{p.what}</p>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/Button'
 import { t } from '@/lib/i18n'
-import { buildings, getScene } from '@/lib/scenes'
+import { getBuildings, getScene } from '@/lib/scenes'
 import type { Supabase } from '@/lib/supabase'
 
 const POLL_MS = 30_000
-const places = buildings.filter((b) => !b.teaser)
+const places = () => getBuildings().filter((b) => !b.teaser)
 
 interface ClassData {
   students: { id: string; first_name: string }[]
@@ -104,7 +104,7 @@ export function TeacherDashboard({ db, classId }: { db: Supabase; classId: strin
                   <th scope="col" className="p-2">
                     {t('dashboard.student')}
                   </th>
-                  {places.map((b) => (
+                  {places().map((b) => (
                     <th key={b.id} scope="col" className="p-2 text-center text-sm">
                       {b.name}
                     </th>
@@ -120,7 +120,7 @@ export function TeacherDashboard({ db, classId }: { db: Supabase; classId: strin
                     <th scope="row" className="p-2 font-semibold">
                       {s.first_name}
                     </th>
-                    {places.map((b) => (
+                    {places().map((b) => (
                       <StarCell key={b.id} stars={data.stars.get(`${s.id}:${b.id}`)} />
                     ))}
                     <td className="p-2">
@@ -145,7 +145,7 @@ export function TeacherDashboard({ db, classId }: { db: Supabase; classId: strin
                   <th scope="row" className="p-2">
                     {t('dashboard.average')}
                   </th>
-                  {places.map((b) => {
+                  {places().map((b) => {
                     const a = data.averages.get(b.id)
                     return (
                       <td key={b.id} className="p-2 text-center text-sm">
@@ -166,7 +166,7 @@ export function TeacherDashboard({ db, classId }: { db: Supabase; classId: strin
             <ol className="mt-2 grid list-decimal gap-2 pl-6">
               {data.mistakes.map((m) => (
                 <li key={`${m.buildingId}:${m.questionId}`}>
-                  <span className="font-semibold">{buildings.find((b) => b.id === m.buildingId)?.name}:</span> {questionText(m.buildingId, m.questionId)}{' '}
+                  <span className="font-semibold">{getBuildings().find((b) => b.id === m.buildingId)?.name}:</span> {questionText(m.buildingId, m.questionId)}{' '}
                   <span className="text-ink-soft">{t('dashboard.wrongCount', { wrong: m.wrong, answered: m.answered })}</span>
                 </li>
               ))}

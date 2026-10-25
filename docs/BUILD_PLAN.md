@@ -25,8 +25,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P2 Character and scene engine, plus the owner's redesign | ✅ merged | #3 | D-019 to D-026 |
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
-| P5 Backend | ✅ all tasks done on `p5-backend`; PR open, CI green, **merge next** (by the owner) | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | ⬜ | | |
+| P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
+| P6 Experience and Hindi | ✅ built on `p6-experience`; pull request next | | D-050 to D-054 |
 | P7 Hardening and documentation | ⬜ | | |
 
 **🛑 Owner gates**
@@ -54,6 +54,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | Fact-check the Help Centre numbers and sentences, and the Community page's places that help | SETUP.md §5, `content/help.json` and `content/community.json` › `review` |
 | Confirm the three font licences (Inter added in D-034) | `docs/ASSET_LICENSES.md` |
 | Vercel deploy (only when a public URL is wanted) | SETUP.md §3 |
+| Have the Hindi checked by a fluent speaker, then publish it from `/reviewer` | SETUP.md §7 |
 
 **Phase 4 tasks** (detail in §9)
 
@@ -338,16 +339,16 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 #### Experience upgrade
 
-- [ ] **Splash v2**: a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
-- [ ] **Sound v2**: layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
-- [ ] **Dialogue voice pass**: a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
-- [ ] **Living world**: ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
-- [ ] Re-check calm mode, gentle tone and Help Centre silence after each item.
+- [x] **Splash v2** (D-050): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across carrying the Saksham banner, tap to continue. About 4 s on the first load, 1 s after that, a static fade in calm mode, always skippable, never over `/help`.
+- [x] **Sound v2** (D-051, all synthesised; see the session note): layered ambience per scene (short compressed loops, CC0 or permissive, committed and listed in `ASSET_LICENSES.md`), a soft music loop with its own toggle, footsteps on different surfaces, per-character typing blips, richer UI sounds. If a licence cannot be confirmed, use synthesised sound only and tell the owner.
+- [x] **Dialogue voice pass** (D-052): a `docs/VOICES.md` voice bible (one paragraph and three sample lines per character; Mitthu is warm, curious, a little funny, never preachy). Short lines (aim for 18 words or fewer), natural spoken Indian English, specific details, consequences that feel real but are never graphic. The legal text does not change.
+- [x] **Living world** (D-053): ambient characters, animals, wind in cloth and foliage, dust when walking, time-of-day light, glowing windows and diyas in the evening. Cap ambient elements, pause when `document.hidden`, keep 60 fps on a mid-range phone.
+- [x] Re-check calm mode, gentle tone and Help Centre silence after each item.
 
 #### Hindi
 
-- [ ] `strings.hi.json` and Hindi overlays for scenes, cards, quizzes and help, laid over the English by a `localize()` function. Only text changes: ids, wiring, answers, `law`, `source` and helpline numbers always come from English. Read-aloud picks a `hi-IN` voice in Hindi. The typewriter types by grapheme (`Intl.Segmenter`).
-- [ ] The Hindi is machine-authored and **unreviewed**. Flag it that way in the session notes and in the app credits until a fluent speaker has reviewed it.
+- [x] (D-054) `strings.hi.json` and Hindi overlays for scenes, cards, quizzes and help, laid over the English by a `localize()` function. Only text changes: ids, wiring, answers, `law`, `source` and helpline numbers always come from English. Read-aloud picks a `hi-IN` voice in Hindi. The typewriter types by grapheme (`Intl.Segmenter`).
+- [x] The Hindi is machine-authored and **unreviewed**. Flag it that way in the session notes and in the app credits until a fluent speaker has reviewed it.
 
 ### Phase 7: Hardening and documentation
 
@@ -502,8 +503,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Next task: P4 › Book (card album), Me (character, badges, settings, switch player), Credits, badges, demo mode.
 
 **Handoff for the next session (updated 2026-10-19)**
-- **State:** P0 to P4 are merged to `main` (PRs #1 to #5). Phase 5 is complete on `p5-backend` (D-043 to D-049) and its pull request, [PR #6](https://github.com/bhavyammisra/saksham/pull/6), is open and **CI is green** on it (lint, unit, build, `e2e`, `e2e-local-only`). It is not merged: Claude's attempt to merge was blocked by the session's safety settings ("merge without review"). 241 unit tests (17 files) and 80 e2e tests (15 files, 16 of them safety): with the Supabase settings 79 pass and 1 skips; without them 64 pass and 16 skip. The RLS test has 45 checks, all passing. See **Checkpoints** at the top.
-- **First thing:** PR #6. If it is still open, the owner merges it (GitHub › PR #6 › "Create a merge commit"), or tells Claude to and approves the merge when asked. Pushing a docs commit to `p5-backend` re-runs CI; merge only once both e2e jobs pass on the PR's own run (`gh pr checks 6`; the push run is listed too, don't confuse them). Then cut `p6-experience` from `main` and record the P5 merge in the docs (as `P5: start Phase 5; record P4 merge in docs` did for P4).
+- **State:** P0 to P5 are merged to `main` (PRs #1 to #6; P5 merged 2026-10-19 as `f4eebac`, after CI went green on both e2e jobs). Phase 6 has its branch, `p6-experience`, cut from `main`. 241 unit tests (17 files) and 80 e2e tests (15 files, 16 of them safety): with the Supabase settings 79 pass and 1 skips; without them 64 pass and 16 skip. The RLS test has 45 checks, all passing. See **Checkpoints** at the top.
+- **First thing:** run the start-of-session checks (CLAUDE.md). Merging works when the owner approves it in chat; check `gh pr checks <n>` on the latest commit first (a docs commit restarts CI).
 - **Exact next task:** P6 › **Splash v2** (BUILD_PLAN §9, Phase 6): a pop-up storybook opens, the town builds itself layer by layer, lanterns light one by one, Mitthu flies across with the Saksham banner, tap to continue; about 4 s on the first load and 1 s after, a static fade in calm mode, always skippable, never over `/help`. Respect the performance rule (D-030) and the calm-mode walk exception. Phase 6 notes to keep in mind: **Sound v2** needs licensed or CC0 sounds listed in `ASSET_LICENSES.md` (if a licence can't be confirmed, synthesise and tell the owner); the Hindi task mentions read-aloud, but the voice was removed at the owner's request (D-038), so skip that part and say so.
 - **How the game is put together (D-036 to D-039):**
   - `/town` and `/play/:id` are outside the top-bar Shell: `Scene.tsx` is a full-screen frame with its own Need help?, menu words (Back, History, Things to do, Map, Book, Settings, Exit) and the area map (`src/components/AreaMap.tsx`, places from `src/play/useMap.ts`, pin positions in `content/buildings.json` › `map`). Card, games (quiz, then sort where a building has one, D-041) and results sit in `GameFrame`. Every new full-screen screen needs its own HelpButton.
@@ -644,3 +645,40 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 **P5: pull request (2026-10-19)**
 - Done: PR #6 (`p5-backend` into `main`) opened; CI green on the PR's own run (both e2e jobs). Claude's merge was blocked by the session's safety settings, so the owner merges it. Handoff rewritten for a fresh session (backend map, test patterns, phone-layout and permission lessons).
 - Next task: merge PR #6, cut `p6-experience`, then P6 › Splash v2.
+
+**P5 merged (2026-10-19)**
+- PR #6 (`p5-backend` into `main`) merged with a merge commit (`f4eebac`) after every check passed on its latest commit, with the owner's approval in chat. Phase 5 is complete; `p6-experience` cut from `main`.
+- Next task: P6 › Splash v2.
+
+**P6: Splash v2 (2026-10-20)**
+- Done: `src/components/Splash.tsx` and `splash.css`: a storybook opens on a dusk sky, the town pops up out of its pages (hills, the four buildings, trees), seven lanterns light one by one, and Mitthu flies in with the SAKSHAM banner. About 4 s on the first load, 1 s after (`saksham-splash` in localStorage), only when the game opens on `/`; tap, click or Escape skips it; its own Need help?; the page behind is `inert`. Calm mode: a still, finished picture for 1.2 s, then a fade. No sound (browsers block it before the first tap). D-050. `HelpButton` takes an optional `testId`.
+- Tests: `tests/e2e/splash.spec.ts` (4: first load ends by itself, skipping and the short version, Need help? and never on `/help` or deep links, calm mode has no CSS animation). Every other test starts as a returning player (`storageState` in `playwright.config.ts`). 241 unit and 84 e2e tests (83 pass, 1 skips). Checked by frame-by-frame screenshots at 1366 and 390 wide, and in calm mode.
+- Next task: P6 › Sound v2.
+
+**P6: Sound v2 (2026-10-20)**
+- Done: every sound is synthesised in the browser (`src/lib/synth.ts` recipes, `src/lib/sound.ts` player): an ambience per place (birds, a far-off school bell, a sizzling tawa and clinking glasses at the Dhaba, a slow fan at Home, crows), a soft Bhupali music loop over a drone (the Music setting now works), footsteps on paving, earth or floor (`surface` in scene JSON), a typing blip per speaker, and new `open`, `flip` and `unlock` sounds. Silent on the Help Centre, half in gentle scenes, paused when the tab is hidden. D-051; `ASSET_LICENSES.md` lists the synthesised sound.
+- Owner: no recorded sound was used, because a licence couldn't be confirmed from here and each download needs your OK. If you want recorded ambience or music, pick CC0 files you have checked, and they can replace a recipe by key.
+- Tests: `src/lib/sound.test.ts` (9: the volume rules for effects and music, every scene has a real ambience and surface, nothing loud or nagging, the tune stays in Bhupali, blip pitches and where blips fall). 246 unit tests. Checked in a real browser that the audio graph starts on the first tap, footsteps fire every 0.42 s while walking, and there are no errors. Not checked: how it sounds (Claude can't listen). Owner: play with sound on once and say if anything is too loud or annoying.
+- Next task: P6 › Dialogue voice pass.
+
+**P6: Dialogue voice pass (2026-10-20)**
+- Done: `docs/VOICES.md` (rules, and 14 voices with a paragraph and three sample lines each). All 35 lines over 18 words rewritten: most split into two lines (`<id>-more` nodes, so links and tests stay the same), the rest tightened; the four good choices shortened but complete. What people say about the law is unchanged in meaning; the cards are untouched. The validator now rejects a spoken line over 18 words or a choice over 22. D-052.
+- Tests: a validator test for the length rule. 247 unit and 84 e2e tests (83 pass, 1 skips).
+- Owner: read the four stories once more for tone. The Home and Panchayat lines about the law are the ones to fact-check alongside their cards (SETUP.md §6).
+- Next task: P6 › Living world.
+
+**P6: Living world (2026-10-20)**
+- Done: `ambient` and `time` in scene JSON; `src/art/ambient.tsx` and `ambient.css` (dog, cat, pigeons, cow, passers-by, washing, tulsi, diyas), each a small picture of its own; the light of the time of day; the town follows the clock (evening from 5 pm: dusk sky, lamps lit, windows glowing, diyas); dust on earth; everything pauses when the tab is hidden and stands still in calm mode. Rules in `src/engine/ambient.ts`; the validator caps ambient at 6 and checks kinds, places and times. D-053.
+- Fixed on the way: the music loop kept scheduling notes (at zero volume) on the Help Centre; it now stops there and starts again on the way out (the safety test that counts sounds caught it; it had passed by luck in the Sound v2 run).
+- Tests: `src/engine/ambient.test.ts` (4), a validator test, and `tests/e2e/living.spec.ts` (4: the town at noon and at 7 pm, Home always evening, moving and paused when hidden, calm mode). 252 unit tests; e2e below. Checked by screenshot in all five places at 1366 wide (the town at noon and 7 pm) and the town at 390; 62 fps in the town and the Dhaba in headless Chromium.
+- Re-checked after each P6 item: calm mode (splash still, no ambient motion, no dust, no blips), gentle tone (half volume for every sound) and the Help Centre (no splash, no sound at all, nothing moving).
+- Next task: P6 › Hindi.
+
+**P6: Hindi (2026-10-20)**
+- Done: Hindi everywhere, chosen in Settings (हिन्दी): `content/strings.hi.json` (398 strings) and `content/hi/` (five scenes, buildings, names, Help Centre, Community: 825 texts in all, none missing), laid over the English by `localize()` (`src/lib/localize.ts`), which can only replace text fields, never ids, links, answers, the law, sources or numbers. Content getters in `scenes.ts`; the app remounts on a language change. Hindi review items are separate and stay unpublished; the Reviewed tick is per language. Credits say the Hindi is unreviewed. D-054.
+- **The Hindi is machine-authored and unreviewed.** It was written by Claude. A fluent speaker must check it before it is used with children (SETUP.md §7). The legal quotes on cards stay in English by design.
+- Skipped, as planned: read-aloud with a `hi-IN` voice (the voice was removed at the owner's request, D-038). The typewriter already types by grapheme.
+- Tests: `localize.test.ts` (5), `hindi.test.ts` (5: every UI string differs from English; every Hindi scene has the same wiring, law and sources; Help Centre numbers and sources unchanged; Hindi names; a Hindi twin for every review item), validator tests for Hindi strings, `tests/e2e/hindi.spec.ts` (2: switching and remembering; the law and helpline numbers in Hindi, and the Credits note); the reviewer test now sends 18 items. 264 unit tests. Checked by screenshot in Hindi (title, School, Book at 1366; Help Centre and town at 390, no sideways scroll); the wordmark lost its wide letter-spacing in Hindi so "सक्षम" joins up.
+- Every Phase 6 box is now done.
+- Next task: open the P6 pull request (with the owner's go-ahead), then Phase 7.
+

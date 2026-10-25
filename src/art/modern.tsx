@@ -344,7 +344,8 @@ export function SignLines({ x, y, w, color = '#ffffff' }: { x: number; y: number
 }
 
 export const modernLayers = {
-  'modern.sky': ({ width }: { width: number }) => <Sky width={width} />,
+  // The day sky turns to the evening one when the scene's light is evening (the town after 5 pm, D-053).
+  'modern.sky': ({ width, flags }: { width: number; flags?: ReadonlySet<string> }) => <Sky width={width} evening={flags?.has('evening')} />,
   'modern.skyEvening': ({ width }: { width: number }) => <Sky width={width} evening />,
   'modern.clouds': Clouds,
   'modern.far': Far,

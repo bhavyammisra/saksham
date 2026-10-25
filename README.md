@@ -59,6 +59,8 @@ Playground and Cyber Adda are locked teasers for later chapters.
 
 Younger players (8 to 11) and teens (12 to 16) see different card text, and teens get extra quiz questions.
 
+The whole game can be played in **English or Hindi** (Settings). The law on each card is always quoted exactly as written.
+
 ## Built for classrooms
 
 - **Teachers** make a class and share a six-letter join code. Children join with only their first name.
@@ -147,7 +149,7 @@ The project is built in eight phases. Each one ends in a reviewed pull request.
 | P3 School end to end | The first complete building | Done |
 | P4 Town and all buildings | The town, Dhaba, Home, Panchayat, the sort game, Community | Done |
 | P5 Backend | Teacher classes, sync, the live dashboard, content review | Done |
-| P6 Experience and Hindi | Animated opening, richer sound, a livelier world, a Hindi version | In progress |
+| P6 Experience and Hindi | Storybook opening, sound, a livelier world, short natural dialogue, Hindi | Done (Hindi awaiting a fluent speaker's check) |
 | P7 Hardening and documentation | Every screen size, accessibility, performance, final docs | Planned |
 
 The legal text on each card is waiting for a final expert fact-check before children use the app.

@@ -97,7 +97,7 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-15 | `p2-character-scene` (PR #3) | ✅ green, merged | |
 | 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |
 | 2026-10-18 | `p4-town` (PR #5) | ✅ green, merged | |
-| 2026-10-19 | `p5-backend` (PR #6) | ✅ green (lint, unit, build, `e2e`, `e2e-local-only`), merge pending | [run 39193846346](https://github.com/bhavyammisra/saksham/actions/runs/39193846346) |
+| 2026-10-19 | `p5-backend` (PR #6) | ✅ green (lint, unit, build, `e2e`, `e2e-local-only`), merged | [run 39193846346](https://github.com/bhavyammisra/saksham/actions/runs/39193846346) |
 
 ### RLS and RPCs (`supabase/tests/rls.test.sql`, 45 checks, P5)
 Two teachers and two children, signed in by setting the JWT claims, inside one transaction that is rolled back. Last run 2026-10-18 on project `iggetuuoghdoyppdlppy`: all passed, and a deliberately false check stops the script (so a failure can't go unnoticed).

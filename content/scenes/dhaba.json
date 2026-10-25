@@ -15,6 +15,14 @@
   "walkable": { "minX": 150, "maxX": 3250 },
   "spawn": { "x": 420 },
   "ambience": "dhaba",
+  "surface": "earth",
+  "time": "morning",
+  "ambient": [
+    {"id":  "dog", "kind":  "dog", "x":  1260, "depth":  0.1, "facing":  "left"},
+    {"id":  "cat", "kind":  "cat", "x":  2060, "depth":  0},
+    {"id":  "pigeons", "kind":  "pigeons", "x":  2480, "depth":  0.06},
+    {"id":  "cow", "kind":  "cow", "x":  3120, "depth":  0, "facing":  "left"}
+  ],
   "hotspots": [
     { "id": "exit", "x": 220, "label": "Go back to the town", "kind": "exit", "art": "school.signpost" },
     { "id": "mohan", "x": 1000, "label": "Talk to Mohan Bhaiya", "kind": "npc", "npc": "mohan-bhaiya", "node": "mohan-hello" },
@@ -36,7 +44,14 @@
       "id": "intro",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "The Dhaba! Fresh rotis and hot chai. Truck drivers stop here all day. Hmm, it's a school morning. Who's that at the back?",
+      "text": "The Dhaba! Hot chai, fresh rotis, and truck drivers stopping all day long.",
+      "next": "intro-more"
+    },
+    "intro-more": {
+      "id": "intro-more",
+      "speaker": "mitthu",
+      "mood": "happy",
+      "text": "Hmm, but it's a school morning. Who's that at the back?",
       "end": "good"
     },
 
@@ -44,7 +59,7 @@
       "id": "mohan-hello",
       "speaker": "mohan-bhaiya",
       "mood": "neutral",
-      "text": "Welcome, welcome! Chai is ready in two minutes. Sorry, it's very busy this morning.",
+      "text": "Welcome, welcome! Chai in two minutes. Sorry, it's very busy this morning.",
       "end": "good"
     },
 
@@ -52,7 +67,7 @@
       "id": "sunita-busy",
       "speaker": "sunita-didi",
       "mood": "happy",
-      "text": "Hello! I'm Sunita, from the anganwadi near the well. Just having my chai before the little ones arrive.",
+      "text": "Hello! I'm Sunita, from the anganwadi by the well. One quick chai before the little ones arrive.",
       "end": "good"
     },
 
@@ -73,7 +88,14 @@
       "id": "raju-2",
       "speaker": "raju",
       "mood": "sad",
-      "text": "I'm twelve. I used to go to school. Then my father got sick, so now I come here every day from early morning to make some money.",
+      "text": "I'm twelve. I used to go to school, till my father fell sick.",
+      "next": "raju-2-more"
+    },
+    "raju-2-more": {
+      "id": "raju-2-more",
+      "speaker": "raju",
+      "mood": "sad",
+      "text": "Now I'm here every day from six in the morning, to earn a little money.",
       "next": "raju-3"
     },
     "raju-3": {
@@ -88,7 +110,7 @@
       "id": "mitthu-raju",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Raju should be in school, not working all day. Let's find a grown-up who knows how to help.",
+      "text": "Raju should be in school, not washing glasses all day. Let's find a grown-up who can help.",
       "end": "good"
     },
     "raju-again": {
@@ -103,7 +125,7 @@
       "id": "notebook",
       "speaker": "mitthu",
       "mood": "surprised",
-      "text": "A Class 6 maths notebook, with Raju's name on it. The last page has sums from two months ago, all marked right.",
+      "text": "Raju's Class 6 maths notebook. The last page is from two months ago, every sum ticked right.",
       "set": ["saw-notebook"],
       "fx": "gasp",
       "end": "good"
@@ -118,7 +140,7 @@
         { "label": "Nothing. Raju is just helping out a little.", "to": "sunita-weak-1", "kind": "weak" },
         { "label": "Raju should work faster, so he can finish early.", "to": "sunita-weak-2", "kind": "weak" },
         {
-          "label": "Raju is twelve. He works here all day instead of going to school, because his father is sick. Can you help him?",
+          "label": "Raju is twelve. He works here all day, not at school, because his father is sick. Can you help?",
           "to": "sunita-good",
           "kind": "good"
         }
@@ -149,7 +171,7 @@
       "id": "mitthu-retry-2",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Sunita Didi needs the whole story: how old Raju is, and why he isn't in school. Let's try that again.",
+      "text": "Sunita Didi needs the whole story: Raju's age, and why he isn't in school. Let's try that again.",
       "end": "retry"
     },
     "sunita-good": {
@@ -164,14 +186,28 @@
       "id": "sunita-good-2",
       "speaker": "sunita-didi",
       "mood": "neutral",
-      "text": "No child under fourteen should be made to work, in a dhaba or anywhere else. Raju's job is to learn and to play.",
+      "text": "No child under fourteen should be made to work, in a dhaba or anywhere else.",
+      "next": "sunita-good-2-more"
+    },
+    "sunita-good-2-more": {
+      "id": "sunita-good-2-more",
+      "speaker": "sunita-didi",
+      "mood": "neutral",
+      "text": "Raju's job is to learn and to play.",
       "next": "sunita-good-3"
     },
     "sunita-good-3": {
       "id": "sunita-good-3",
       "speaker": "sunita-didi",
       "mood": "happy",
-      "text": "I'll visit his family today. There is help for families when a parent is ill, so Raju doesn't have to earn. And I'll talk to Mohan Bhaiya. If we need more help, we can call 1098.",
+      "text": "I'll visit his family today. There's help for families when a parent is ill.",
+      "next": "sunita-good-3-more"
+    },
+    "sunita-good-3-more": {
+      "id": "sunita-good-3-more",
+      "speaker": "sunita-didi",
+      "mood": "happy",
+      "text": "Then Raju won't have to earn. I'll talk to Mohan Bhaiya too, and call 1098 if needed.",
       "next": "player-good"
     },
     "player-good": {
@@ -184,7 +220,7 @@
       "id": "mitthu-good",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "Next week, Raju is back in Class 6, sitting next to Lata. And he still beats everyone at maths!",
+      "text": "Next week Raju is back in Class 6, next to Lata. Still the best at maths, of course!",
       "fx": "cheer",
       "end": "good"
     }

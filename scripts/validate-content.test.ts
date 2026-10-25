@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SceneDef } from '../content/types.ts'
-import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validateHubLinks, validatePeople, validateScene, validateStrings } from './validate-content.ts'
+import { findStringKeys, isOfficialSource, validateBuildings, validateHelp, validateHindiStrings, validateHubLinks, validatePeople, validateScene, validateStrings } from './validate-content.ts'
 import help from '../content/help.json' with { type: 'json' }
 
 // A tiny but complete scene. Each test breaks one thing.
@@ -121,6 +121,33 @@ describe('NFR-07 content validation: scenes', () => {
     )
     expect(errors).toContain('node "note" is a dead end (needs "next", "choices" or "end")')
     expect(errors).toContain('node "good" must have only one of "next", "choices" or "end"')
+  })
+
+  it('rejects a spoken line over 18 words and a choice over 22 (docs/VOICES.md)', () => {
+    const long = (n: number) => Array.from({ length: n }, () => 'word').join(' ')
+    expect(validateScene(broken((s) => (s.nodes.note.text = long(18))))).toEqual([])
+    expect(validateScene(broken((s) => (s.nodes.note.text = long(19))))).toContain(
+      'node "note" has 19 words (at most 18; split it, docs/VOICES.md)',
+    )
+    const errors = validateScene(broken((s) => s.nodes.hello.choices?.forEach((c: { label: string }) => (c.label = long(23)))))
+    expect(errors).toContain('node "hello".choices[0] has 23 words (at most 22)')
+  })
+
+  it('accepts a little ambient life, and rejects too much, unknown kinds, strays and bad times (D-053)', () => {
+    const dog = { id: 'dog', kind: 'dog' as const, x: 300, roam: 200 }
+    expect(validateScene(broken((s) => ((s.ambient = [dog]), (s.time = 'clock'))))).toEqual([])
+    const many = Array.from({ length: 7 }, (_, i) => ({ ...dog, id: `dog-${i}` }))
+    expect(validateScene(broken((s) => (s.ambient = many)))).toContain('"ambient" has 7 pieces (at most 6)')
+    const errors = validateScene(
+      broken((s) => {
+        s.ambient = [{ ...dog, kind: 'dragon' as never }, { ...dog, x: s.width - 50 }]
+        s.time = 'midnight' as never
+      }),
+    )
+    expect(errors).toContain('ambient "dog" has unknown kind "dragon"')
+    expect(errors).toContain('ambient "dog" is duplicated')
+    expect(errors).toContain('ambient "dog" must stay inside the scene')
+    expect(errors).toContain('"time" must be one of morning, day, evening, clock')
   })
 
   it('rejects a node whose id does not match its key', () => {
@@ -362,5 +389,21 @@ describe('hub doors', () => {
 
   it('ignore scenes that are not hubs', () => {
     expect(validateHubLinks({ ...hub, hub: false }, new Set())).toEqual([])
+  })
+})
+
+describe('P6 Hindi strings (D-054)', () => {
+  const en = { 'results.title': 'Well done, {name}!', 'quiz.next': 'Next question' }
+
+  it('accepts Hindi for English keys, with the same placeholders', () => {
+    expect(validateHindiStrings(en, { 'results.title': 'शाबाश, {name}!' })).toEqual([])
+  })
+
+  it('rejects unknown keys, empty words and changed placeholders', () => {
+    expect(validateHindiStrings(en, { 'quiz.typo': 'अगला', 'quiz.next': ' ', 'results.title': 'शाबाश!' })).toEqual([
+      '"quiz.typo" is not an English string',
+      '"quiz.next" is empty',
+      '"results.title" must keep the placeholders name',
+    ])
   })
 })

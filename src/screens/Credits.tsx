@@ -57,6 +57,12 @@ export function Credits() {
           ))}
         </ul>
       </section>
+
+      {/* The Hindi is machine-written and unreviewed (BUILD_PLAN P6, D-054): say so until a fluent speaker has checked it. */}
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold">{t('credits.hindiTitle')}</h2>
+        <p className="mt-1">{t('credits.hindi')}</p>
+      </section>
     </Page>
   )
 }

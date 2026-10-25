@@ -4,7 +4,7 @@ import { GameFrame } from '@/components/GameFrame'
 import { Scene, type SceneResult } from '@/engine/Scene'
 import { t } from '@/lib/i18n'
 import { addScores, badgesFor, isUnlocked, questionsForBand, starsFor, type Attempt, type BuildingResult, type Score } from '@/lib/rules'
-import { buildings, getScene, nextBuilding, townScene } from '@/lib/scenes'
+import { getBuildings, getScene, getTownScene, nextBuilding } from '@/lib/scenes'
 import { selectActiveData, selectActiveProfile, useStore } from '@/lib/store'
 import { CardReveal } from '@/play/CardReveal'
 import { Quiz } from '@/play/Quiz'
@@ -23,7 +23,7 @@ export function Play() {
 
 /**
  * Playing one building, the core loop from BUILD_PLAN §2: the scene (full screen, D-036),
- * then its rights card, its games in order (the quiz, and a sort game in some buildings), and the results, which are saved.
+ * then its rights card, its games in order (the quiz, and a sort game in some getBuildings()), and the results, which are saved.
  * Leaving through the scene's exit before finishing goes back to the town without saving.
  */
 function PlayBuilding({ id }: { id: string }) {
@@ -50,14 +50,14 @@ function PlayBuilding({ id }: { id: string }) {
   const onExit = useCallback(() => navigate('/town', { state: { from: id } }), [navigate, id])
 
   if (!profile) return null
-  const unlocked = isUnlocked(id, buildings, data?.progress ?? {}, demo)
+  const unlocked = isUnlocked(id, getBuildings(), data?.progress ?? {}, demo)
   if (!scene || !card || !unlocked) {
     // Still locked (or not written): say which place to finish first, over the town's picture,
     // with Need help? in the corner like every game screen.
-    const playable = buildings.filter((b) => !b.teaser)
+    const playable = getBuildings().filter((b) => !b.teaser)
     const before = playable[playable.findIndex((b) => b.id === id) - 1]
     return (
-      <GameFrame scene={townScene} focusX={townScene.spawn.x}>
+      <GameFrame scene={getTownScene()} focusX={getTownScene().spawn.x}>
         <div className="mx-auto max-w-xl rounded-2xl bg-plaster p-6 text-ink shadow-2xl">
           <h2 className="text-xl font-semibold">{scene?.title ?? t('play.title')}</h2>
           <p className="mt-2">{!unlocked && before ? t('town.lockedAfter', { name: before.name }) : unlocked ? t('play.notFound') : t('play.locked')}</p>
@@ -85,18 +85,18 @@ function PlayBuilding({ id }: { id: string }) {
     const store = useStore.getState()
     const before = selectActiveData(store)
     const next = nextBuilding(id)
-    const wasOpen = next !== null && isUnlocked(next, buildings, before?.progress ?? {}, store.demo)
+    const wasOpen = next !== null && isUnlocked(next, getBuildings(), before?.progress ?? {}, store.demo)
 
     const result: BuildingResult = { completed: true, retries, score }
     store.recordResult(id, result)
     store.addExtra('cards', card.id)
     const after = selectActiveData(useStore.getState())
-    const newBadges = badgesFor(result, after?.progress ?? {}, buildings).filter((b) => !before?.extras.badges.includes(b))
+    const newBadges = badgesFor(result, after?.progress ?? {}, getBuildings()).filter((b) => !before?.extras.badges.includes(b))
     newBadges.forEach((b) => store.addExtra('badges', b))
 
-    const nowOpen = next !== null && isUnlocked(next, buildings, after?.progress ?? {}, store.demo)
+    const nowOpen = next !== null && isUnlocked(next, getBuildings(), after?.progress ?? {}, store.demo)
     const stars = starsFor(result)
-    const name = (buildingId: string | null) => buildings.find((b) => b.id === buildingId)?.name ?? null
+    const name = (buildingId: string | null) => getBuildings().find((b) => b.id === buildingId)?.name ?? null
     // Only announce a place as open if its story exists, so the door really opens.
     const opened = !wasOpen && nowOpen && next !== null && getScene(next) !== null ? name(next) : null
     setSummary({ stars, score, retries, newBadges, unlocked: opened !== null })

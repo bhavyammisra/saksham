@@ -142,6 +142,7 @@ function Queue({ db, email }: { db: Supabase; email: string }) {
           <select value={lang} onChange={(e) => setLang(e.target.value)} className="min-h-tap rounded-button border-2 border-sand bg-plaster px-3">
             <option value="all">{t('reviewer.all')}</option>
             <option value="en">{t('reviewer.english')}</option>
+            <option value="hi">{t('reviewer.hindi')}</option>
           </select>
         </label>
       </div>

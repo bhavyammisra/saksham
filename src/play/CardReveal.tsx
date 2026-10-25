@@ -30,7 +30,7 @@ export function CardReveal({ card, band, right, onNext }: { card: Card; band: Ba
         aria-pressed={flipped}
         disabled={flipped}
         onClick={() => {
-          sound.play('success')
+          sound.play('flip')
           setFlipped(true)
         }}
         className="rights-card mx-auto mt-3 block aspect-[3/4] w-64 disabled:cursor-default"

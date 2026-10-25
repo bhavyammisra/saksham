@@ -6,6 +6,21 @@
 export type Tone = 'normal' | 'gentle'
 export type Mood = 'neutral' | 'happy' | 'worried' | 'surprised' | 'sad'
 export type Band = 'young' | 'teen'
+export type Surface = 'paving' | 'earth' | 'floor'
+export type TimeOfDay = 'morning' | 'day' | 'evening' | 'clock'
+export type AmbientKind = 'dog' | 'cat' | 'pigeons' | 'cow' | 'passerby' | 'cloth' | 'plant' | 'diya'
+
+/** One piece of ambient life (Living world, D-053). It never talks and can't be used. */
+export interface Ambient {
+  id: string
+  kind: AmbientKind
+  x: number // where it stands (or where its stroll starts), in scene units
+  depth?: number // 0 = against the wall to 1 = nearest the viewer (default 0.2)
+  roam?: number // walks this many units to the right and back again (dogs and passers-by)
+  evening?: boolean // only there in the evening (diyas)
+  facing?: 'left' | 'right'
+  look?: number // passers-by: which of the preset people (0, 1, 2)
+}
 
 export interface SceneDef {
   id: string // "school"
@@ -18,7 +33,10 @@ export interface SceneDef {
   walkable: { minX: number; maxX: number }
   blockers?: { x1: number; x2: number }[]
   spawn: { x: number }
-  ambience?: string // sound bed key
+  ambience?: string // sound bed key (src/lib/synth.ts)
+  surface?: Surface // what footsteps sound like (default paving)
+  time?: TimeOfDay // the light; "clock" follows the device's clock (the town). Default "day"
+  ambient?: Ambient[] // life that comes and goes on its own: animals, passers-by, cloth, plants, diyas (at most 6)
   hotspots: Hotspot[]
   objectives: Objective[]
   startNode: string

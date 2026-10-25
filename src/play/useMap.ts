@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router'
 import type { MapPlace } from '@/components/AreaMap'
 import { t } from '@/lib/i18n'
 import { isUnlocked, recommendedBuilding } from '@/lib/rules'
-import { buildings, getScene } from '@/lib/scenes'
+import { getBuildings, getScene } from '@/lib/scenes'
 import { selectActiveData, useStore } from '@/lib/store'
 
 export const TOWN = 'town'
@@ -21,14 +21,14 @@ export function useMap(here: string) {
 
   const places = useMemo<MapPlace[]>(() => {
     const progress = data?.progress ?? {}
-    const playable = buildings.filter((b) => !b.teaser)
-    const suggested = recommendedBuilding(buildings, progress, demo)
-    const fromBuildings: MapPlace[] = buildings.map((b) => {
-      const open = isUnlocked(b.id, buildings, progress, demo) && getScene(b.id) !== null
+    const playable = getBuildings().filter((b) => !b.teaser)
+    const suggested = recommendedBuilding(getBuildings(), progress, demo)
+    const fromBuildings: MapPlace[] = getBuildings().map((b) => {
+      const open = isUnlocked(b.id, getBuildings(), progress, demo) && getScene(b.id) !== null
       const previous = playable[playable.findIndex((p) => p.id === b.id) - 1]
       const note = b.teaser
         ? t('town.comingSoon')
-        : !isUnlocked(b.id, buildings, progress, demo)
+        : !isUnlocked(b.id, getBuildings(), progress, demo)
           ? t('town.lockedAfter', { name: previous?.name ?? '' })
           : t('town.beingBuilt')
       const stars = progress[b.id]?.completed ? progress[b.id]?.stars : undefined

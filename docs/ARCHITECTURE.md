@@ -7,24 +7,24 @@ Saksham is a static single-page web app. Everything a child does runs in the bro
 - **Local-first.** Every child feature works with no network and no Supabase env vars.
 - **Data-driven.** Scenes, dialogue, cards and quizzes are typed JSON in `content/`. The engine plays any scene from its JSON alone and never refers to a building by id.
 - **Pure rules.** Stars, unlocks, band filtering and merging are pure functions in `src/lib/rules.ts`, unit-tested.
-- **One string table.** Every UI string comes from `content/strings.<lang>.json` through `t()`.
+- **One string table.** Every UI string comes from `content/strings.<lang>.json` through `t()`. Content in Hindi is laid over the English by `localize()` (`content/hi/`, D-054), which only replaces words.
 
 ## Folder map
 
 | Folder | Holds | Status |
 | --- | --- | --- |
 | `content/` | Typed JSON: UI strings, scenes, help copy, people; `types.ts` | `types.ts`, `strings.en.json`, `help.json`, `buildings.json` (P1); `npcs.json`, `scenes/sandbox.json` (P2); `credits.json`, `community.json`, the building scenes (P4) |
-| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, `scenes.ts` (content registry: building id → scene, `cardsInTown()`), `supabase.ts` (the client, or null when offline), `classroom.ts` (joining and leaving a class, one anonymous login per player, D-045) and `database.types.ts` (generated), `sync.ts` (sends progress and answers to the class, D-046), `review.ts` (reviewable items and their hashes, shared with `scripts/content-hashes.ts`) and `published.ts` (the "Reviewed" tick, D-049) | P1, P3, P4, P5 |
+| `src/lib/` | Plain TypeScript modules: `i18n.ts`, `calm.ts`, `rules.ts`, `store.ts`, `sound.ts`, `scenes.ts` (content registry: the content in the language on screen, `cardsInTown()`), `localize.ts` and `overlays.ts` (Hindi over English, D-054), `synth.ts` (synthesised sound, D-051), `supabase.ts` (the client, or null when offline), `classroom.ts` (joining and leaving a class, one anonymous login per player, D-045) and `database.types.ts` (generated), `sync.ts` (sends progress and answers to the class, D-046), `review.ts` (reviewable items and their hashes, shared with `scripts/content-hashes.ts`) and `published.ts` (the "Reviewed" tick, D-049) | P1, P3, P4, P5 |
 | `supabase/` | `migrations/` (the database schema, applied in order; D-043) and `tests/rls.test.sql` (the RLS and RPC checks) | P5 |
 | `src/engine/` | Pure scene logic (`movement.ts`: walking, depth, feet and heights; `story.ts`: hotspots, dialogue with Back; `sceneState.ts`: the reducer, with History) and the full-screen scene player (`Scene.tsx` with `ScenePicture`, `Dialogue.tsx` the strip, `WalkPad.tsx`, `hooks.ts`, `people.ts`) | P2, redone in P4 (D-036) |
 | `src/character/` | SVG character rig (`Character.tsx`, `spec.ts`, `character.css`), game-style `CharacterBuilder`, `Portrait`, `Mitthu` | P2 (redesigned, D-024/D-025) |
 | `src/play/` | The end of a building: `CardReveal`, `Quiz` (with the hint round), `Sort` (the sort game, D-041), `Results`; `RightsCard` (card front, back and details, shared with the Book) and `badgeText` | P3, P4 |
 | `src/art/` | Scene art registry by key (`index.ts`), `style.tsx` (shared drawing rules), `sandbox.tsx`, `modern.tsx` (the shared modern kit, D-036), `school.tsx`, `town.tsx` (the walkable town), `dhaba.tsx`, `home.tsx`, `panchayat.tsx` (the cover screens use plain CSS, `src/components/cover.css`, D-034) | P2 to P4 |
 | `src/screens/` | One component per route: Onboarding, Profiles, Title (the main menu at `/`), Town (the walkable town, full screen), Play (a building, full screen), Book, Me (+ character), Community (D-042), Teacher (`/teacher`, D-044) with TeacherDashboard (each class's live progress, D-047), Reviewer (`/reviewer`, D-049), Credits, HelpCentre, guards; dev pages DevCharacters, DevScene | P1 to P5 |
-| `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync | P1 |
+| `src/components/` | Shell (top bar + nav), HelpButton, SettingsDialog, Button, Page, SoundRouteSync, Splash (the storybook opening, D-050) | P1 |
 | `supabase/` | Migrations, RLS tests, seed | P5 |
 | `tests/e2e/` | Playwright end-to-end and safety-invariant tests | P0, safety in P1 |
-| `scripts/` | `validate-content.ts` (content and strings checks, run in CI) | P1 |
+| `scripts/` | `validate-content.ts` (content, strings and Hindi checks, run in CI), `content-hashes.ts` (review hashes, both languages), `hindi-todo.ts` (English text with no Hindi yet) | P1, P5, P6 |
 | `docs/` | Plan, decisions, setup, licences, test report | P0 |
 
 Path aliases: `@/…` → `src/…`, `@content/…` → `content/…`.

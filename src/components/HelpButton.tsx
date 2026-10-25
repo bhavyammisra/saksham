@@ -6,13 +6,13 @@ import { t } from '@/lib/i18n'
  * Calm teal, never red, so it reads as support rather than alarm.
  * It remembers where the child came from, so Help's "Back" returns there.
  */
-export function HelpButton() {
+export function HelpButton({ testId = 'help-button' }: { testId?: string }) {
   const location = useLocation()
   return (
     <Link
       to="/help"
       state={{ from: location.pathname }}
-      data-testid="help-button"
+      data-testid={testId}
       className="inline-flex min-h-tap shrink-0 items-center whitespace-nowrap rounded-pill bg-help-accent px-4 font-semibold text-white shadow-soft hover:bg-help-ink"
     >
       {t('help.button')}

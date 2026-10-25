@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { buildings, cardsInTown, getScene, nextBuilding } from './scenes'
+import { cardsInTown, getBuildings, getScene, nextBuilding } from './scenes'
 
 describe('FR-05 the content registry', () => {
   it('lists one card slot per playable building, in town order (teasers have none)', () => {
     const slots = cardsInTown()
-    expect(slots.map((s) => s.building.id)).toEqual(buildings.filter((b) => !b.teaser).map((b) => b.id))
+    expect(slots.map((s) => s.building.id)).toEqual(getBuildings().filter((b) => !b.teaser).map((b) => b.id))
   })
 
   it('gives a slot its card once the building\'s story exists, and null until then', () => {

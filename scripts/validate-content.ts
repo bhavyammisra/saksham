@@ -7,19 +7,30 @@
 // Runs directly with Node 24 (which strips TypeScript types), so this file only
 // uses type annotations, nothing that needs compiling.
 
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { SceneDef, SortGame, StoryNode } from '../content/types.ts'
+import { overlayProblems, textPaths, type Overlay } from '../src/lib/localize.ts'
+import { CONTENT_OVERLAYS } from '../src/lib/overlays.ts'
 
 const TONES = ['normal', 'gentle']
 const MOODS = ['neutral', 'happy', 'worried', 'surprised', 'sad']
 const HOTSPOT_KINDS = ['npc', 'object', 'exit']
 const CHOICE_KINDS = ['good', 'weak']
 const ENDS = ['good', 'retry']
+const SURFACES = ['paving', 'earth', 'floor']
+const TIMES = ['morning', 'day', 'evening', 'clock']
+const AMBIENT_KINDS = ['dog', 'cat', 'pigeons', 'cow', 'passerby', 'cloth', 'plant', 'diya']
+const MAX_AMBIENT = 6 // performance (D-030, D-053)
 const CARD_FIELDS = ['id', 'title', 'kid', 'teen', 'ifItHappens', 'law', 'source'] as const
 
 // ---------------------------------------------------------------- helpers
+
+// Dialogue stays short and spoken (BUILD_PLAN P6 voice pass, docs/VOICES.md, D-052).
+const MAX_LINE_WORDS = 18
+const MAX_CHOICE_WORDS = 22
+const wordCount = (text: string) => text.trim().split(/\s+/).length
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -64,6 +75,30 @@ export function validateScene(raw: unknown): string[] {
     })
   }
 
+  // Sound and light (D-051, D-053)
+  if (scene.surface !== undefined && !SURFACES.includes(scene.surface)) fail(`"surface" must be one of ${SURFACES.join(', ')}`)
+  if (scene.time !== undefined && !TIMES.includes(scene.time)) fail(`"time" must be one of ${TIMES.join(', ')}`)
+
+  // Ambient life (D-053): a few small things, each inside the scene
+  if (scene.ambient !== undefined) {
+    if (!Array.isArray(scene.ambient)) fail('"ambient" must be a list')
+    else {
+      if (scene.ambient.length > MAX_AMBIENT) fail(`"ambient" has ${scene.ambient.length} pieces (at most ${MAX_AMBIENT})`)
+      const seen = new Set<string>()
+      scene.ambient.forEach((a, i) => {
+        const where = `ambient[${i}]`
+        if (!isObject(a) || !isText(a.id)) return fail(`${where} needs an "id"`)
+        if (seen.has(a.id)) fail(`ambient "${a.id}" is duplicated`)
+        seen.add(a.id)
+        if (!AMBIENT_KINDS.includes(a.kind)) fail(`ambient "${a.id}" has unknown kind "${String(a.kind)}"`)
+        const end = (a.x ?? 0) + (a.roam ?? 0)
+        if (!isNumber(a.x) || !isNumber(scene.width) || a.x < 0 || end > scene.width) fail(`ambient "${a.id}" must stay inside the scene`)
+        if (a.depth !== undefined && (!isNumber(a.depth) || a.depth < 0 || a.depth > 1)) fail(`ambient "${a.id}".depth must be from 0 to 1`)
+        if (a.roam !== undefined && (!isNumber(a.roam) || a.roam < 0)) fail(`ambient "${a.id}".roam must be 0 or more`)
+      })
+    }
+  }
+
   // Walking area
   const walk = scene.walkable
   const walkOk = isObject(walk) && isNumber(walk.minX) && isNumber(walk.maxX) && walk.minX < walk.maxX
@@ -104,6 +139,7 @@ export function validateScene(raw: unknown): string[] {
     if (node.id !== key) fail(`${where} has id "${String(node.id)}" (must match its key)`)
     if (!isText(node.speaker)) fail(`${where} needs a "speaker"`)
     if (!isText(node.text)) fail(`${where} needs "text"`)
+    else if (wordCount(node.text) > MAX_LINE_WORDS) fail(`${where} has ${wordCount(node.text)} words (at most ${MAX_LINE_WORDS}; split it, docs/VOICES.md)`)
     if (node.mood !== undefined && !MOODS.includes(node.mood)) fail(`${where} has unknown mood "${node.mood}"`)
     if (node.end !== undefined && !ENDS.includes(node.end)) fail(`${where} has unknown end "${node.end}"`)
     if (node.set !== undefined) {
@@ -119,6 +155,7 @@ export function validateScene(raw: unknown): string[] {
       } else {
         node.choices.forEach((choice, i) => {
           if (!isText(choice?.label)) fail(`${where}.choices[${i}] needs a "label"`)
+          else if (wordCount(choice.label) > MAX_CHOICE_WORDS) fail(`${where}.choices[${i}] has ${wordCount(choice.label)} words (at most ${MAX_CHOICE_WORDS})`)
           if (!nodeExists(choice?.to)) fail(`${where}.choices[${i}] points to missing node "${String(choice?.to)}"`)
           if (choice?.kind !== undefined && !CHOICE_KINDS.includes(choice.kind)) {
             fail(`${where}.choices[${i}] has unknown kind "${choice.kind}"`)
@@ -415,6 +452,18 @@ export function validateHelp(raw: unknown): string[] {
 
 // ---------------------------------------------------------------- command line
 
+/** Hindi UI strings (D-054): only keys English has, never empty, with the same {placeholders}. */
+export function validateHindiStrings(english: Record<string, string>, hindi: Record<string, string>): string[] {
+  const holes = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(', ')
+  const errors: string[] = []
+  for (const [key, words] of Object.entries(hindi)) {
+    if (!(key in english)) errors.push(`"${key}" is not an English string`)
+    else if (!words.trim()) errors.push(`"${key}" is empty`)
+    else if (holes(english[key] ?? '') !== holes(words)) errors.push(`"${key}" must keep the placeholders ${holes(english[key] ?? '') || '(none)'}`)
+  }
+  return errors
+}
+
 function listFiles(dir: string, test: (name: string) => boolean): string[] {
   let names: string[]
   try {
@@ -465,11 +514,27 @@ function main(): void {
     problems.push(`content/help.json: ${p}`)
   }
 
+  // Hindi (D-054): every line translates real English text and keeps its placeholders.
+  let missingHindi = 0
+  for (const { english, hindi, also } of CONTENT_OVERLAYS) {
+    const source = readJson(join(root, english))
+    const overlay = (existsSync(join(root, hindi)) ? readJson(join(root, hindi)) : {}) as Overlay
+    for (const p of overlayProblems(source, overlay, also)) problems.push(`${hindi}: ${p}`)
+    missingHindi += [...textPaths(source, also).keys()].filter((path) => !overlay[path]).length
+  }
+  const enStrings = readJson(join(root, 'content', 'strings.en.json')) as Record<string, string>
+  const hiStrings = readJson(join(root, 'content', 'strings.hi.json')) as Record<string, string>
+  for (const p of validateHindiStrings(enStrings, hiStrings)) problems.push(`content/strings.hi.json: ${p}`)
+  missingHindi += Object.keys(enStrings).filter((key) => !hiStrings[key]).length
+
   if (problems.length > 0) {
     console.error(`Content problems (${problems.length}):\n- ${problems.join('\n- ')}`)
     process.exit(1)
   }
   console.log(`Content OK: ${sceneFiles.length} scene(s), ${new Set(usedKeys).size} UI string key(s) checked.`)
+  // Missing Hindi shows the English instead, so it is a warning, not an error. List it: node scripts/hindi-todo.ts
+  if (missingHindi > 0) console.warn(`Hindi: ${missingHindi} English text(s) have no Hindi yet (they show in English).`)
+  else console.log('Hindi: every text has a translation.')
 }
 
 // Run only when called as a script, not when imported by tests.

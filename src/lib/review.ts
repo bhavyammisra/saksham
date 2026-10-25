@@ -6,9 +6,9 @@
 import type { Card, GameDef, HelpContent } from '../../content/types.ts'
 
 export interface ReviewItem {
-  id: string // e.g. "card:right-to-education:en", "quiz:school:en", "help:centre:en"
+  id: string // e.g. "card:right-to-education:en", "quiz:school:hi", "help:centre:en"
   kind: 'card' | 'quiz' | 'help'
-  lang: 'en'
+  lang: 'en' | 'hi' // Hindi items are separate and stay unpublished until a fluent reviewer approves them (D-054)
   title: string // what a reviewer sees in the list
   text: string // exactly what is hashed
 }
@@ -21,20 +21,24 @@ const withoutReview = <T extends { review?: unknown }>(value: T) => {
   return copy
 }
 
-export const cardItemId = (card: Card) => `card:${card.id}:en`
+export const cardItemId = (card: Card, lang: ReviewItem['lang'] = 'en') => `card:${card.id}:${lang}`
 
 export function cardText(card: Card): string {
   return asText(withoutReview(card))
 }
 
-/** Every reviewable item, in a fixed order: each building's card and games, then the Help Centre. */
-export function reviewItems(buildings: { id: string; name: string; card?: Card | null; games?: GameDef[] }[], help: HelpContent): ReviewItem[] {
+/** Every reviewable item in one language, in a fixed order: each building's card and games, then the Help Centre. */
+export function reviewItems(
+  buildings: { id: string; name: string; card?: Card | null; games?: GameDef[] }[],
+  help: HelpContent,
+  lang: ReviewItem['lang'] = 'en',
+): ReviewItem[] {
   const items: ReviewItem[] = []
   for (const b of buildings) {
-    if (b.card) items.push({ id: cardItemId(b.card), kind: 'card', lang: 'en', title: `${b.name}: ${b.card.title}`, text: cardText(b.card) })
-    if (b.games?.length) items.push({ id: `quiz:${b.id}:en`, kind: 'quiz', lang: 'en', title: `${b.name}: games`, text: asText(b.games) })
+    if (b.card) items.push({ id: cardItemId(b.card, lang), kind: 'card', lang, title: `${b.name}: ${b.card.title}`, text: cardText(b.card) })
+    if (b.games?.length) items.push({ id: `quiz:${b.id}:${lang}`, kind: 'quiz', lang, title: `${b.name}: games`, text: asText(b.games) })
   }
-  items.push({ id: 'help:centre:en', kind: 'help', lang: 'en', title: help.title, text: asText(withoutReview(help)) })
+  items.push({ id: `help:centre:${lang}`, kind: 'help', lang, title: help.title, text: asText(withoutReview(help)) })
   return items
 }
 

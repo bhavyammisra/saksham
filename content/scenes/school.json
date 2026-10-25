@@ -15,6 +15,14 @@
   "walkable": { "minX": 150, "maxX": 3450 },
   "spawn": { "x": 420 },
   "ambience": "school",
+  "surface": "paving",
+  "time": "morning",
+  "ambient": [
+    {"id":  "pigeons", "kind":  "pigeons", "x":  1120, "depth":  0.05},
+    {"id":  "plant-1", "kind":  "plant", "x":  2150, "depth":  0},
+    {"id":  "plant-2", "kind":  "plant", "x":  2700, "depth":  0},
+    {"id":  "dog", "kind":  "dog", "x":  2850, "roam":  260, "depth":  0.12}
+  ],
   "hotspots": [
     { "id": "lata", "x": 790, "label": "Talk to the girl at the gate", "kind": "npc", "npc": "lata", "node": "lata-hello", "hideIf": ["met-lata"] },
     { "id": "lata-again", "x": 790, "label": "Talk to Lata", "kind": "npc", "npc": "lata", "node": "lata-again", "showIf": ["met-lata"] },
@@ -37,7 +45,7 @@
       "id": "intro",
       "speaker": "mitthu",
       "mood": "happy",
-      "text": "Here's the town school! The morning bell is about to ring. Ravi is waving at you. Let's go and see him.",
+      "text": "Here's the school! The morning bell will ring any minute. Look, Ravi is waving at you.",
       "end": "good"
     },
 
@@ -66,7 +74,7 @@
       "id": "ravi-3",
       "speaker": "ravi",
       "mood": "happy",
-      "text": "Good idea. She's shy, but she's really nice. She can do sums in her head faster than me!",
+      "text": "Good idea. She's shy, but really nice. And she does sums in her head faster than me!",
       "end": "good"
     },
 
@@ -87,7 +95,14 @@
       "id": "lata-2",
       "speaker": "lata",
       "mood": "sad",
-      "text": "Amma says school costs money we don't have. And a man in our old town said they won't take me without a birth certificate.",
+      "text": "Amma says school costs money. We don't have any extra.",
+      "next": "lata-2-more"
+    },
+    "lata-2-more": {
+      "id": "lata-2-more",
+      "speaker": "lata",
+      "mood": "sad",
+      "text": "And a man in our old town said they won't take me without a birth certificate.",
       "next": "lata-3"
     },
     "lata-3": {
@@ -102,7 +117,7 @@
       "id": "mitthu-lata",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Hmm. Is that really true? Let's look at the notice board, and then ask someone who knows.",
+      "text": "Hmm. Is that really true? Let's read the notice board, then ask someone who knows.",
       "end": "good"
     },
     "lata-again": {
@@ -117,7 +132,7 @@
       "id": "notice",
       "speaker": "mitthu",
       "mood": "surprised",
-      "text": "The notice says: \"Admissions open for children aged 6 to 14. Come to the school office. Meena Didi will help you.\"",
+      "text": "The notice says: \"Admissions open, ages 6 to 14. Come to the office. Meena Didi will help.\"",
       "set": ["read-notice"],
       "fx": "gasp",
       "next": "notice-2"
@@ -133,7 +148,7 @@
       "id": "didi-busy",
       "speaker": "meena-didi",
       "mood": "happy",
-      "text": "Good morning! I'm getting the classroom ready. Have you met everyone yet? Ravi looks like he wants to tell you something.",
+      "text": "Good morning! I'm getting the classroom ready. Ravi looks like he wants to tell you something.",
       "end": "good"
     },
     "didi-hello": {
@@ -145,7 +160,7 @@
         { "label": "Never mind. It's not my business.", "to": "didi-weak-1", "kind": "weak" },
         { "label": "There's a girl at the gate. Maybe she can come next year?", "to": "didi-weak-2", "kind": "weak" },
         {
-          "label": "Lata, at the gate, wants to study here. Her family thinks school costs money and she has no birth certificate. Can you help?",
+          "label": "Lata wants to study here. Her family thinks it costs money, and she has no birth certificate. Can you help?",
           "to": "didi-good",
           "kind": "good"
         }
@@ -176,7 +191,7 @@
       "id": "mitthu-retry-2",
       "speaker": "mitthu",
       "mood": "neutral",
-      "text": "Meena Didi needs to know what the problem is. Tell her what Lata told you. Let's try that again.",
+      "text": "Meena Didi needs to know the problem. Tell her what Lata told you. Let's try that again.",
       "end": "retry"
     },
     "didi-good": {
@@ -191,14 +206,21 @@
       "id": "didi-good-2",
       "speaker": "meena-didi",
       "mood": "neutral",
-      "text": "Every child from 6 to 14 has the right to study, free, in a government school like ours. And no child can be turned away because they have no birth certificate.",
+      "text": "Every child from 6 to 14 has the right to study free, in a government school like ours.",
+      "next": "didi-good-2-more"
+    },
+    "didi-good-2-more": {
+      "id": "didi-good-2-more",
+      "speaker": "meena-didi",
+      "mood": "neutral",
+      "text": "And no child can be turned away for not having a birth certificate.",
       "next": "didi-good-3"
     },
     "didi-good-3": {
       "id": "didi-good-3",
       "speaker": "meena-didi",
       "mood": "happy",
-      "text": "I'll walk over with the admission form and talk to her Amma today. Will you come and introduce me?",
+      "text": "I'll take the admission form to her Amma today. Will you come and introduce me?",
       "next": "player-good"
     },
     "player-good": {

@@ -10,18 +10,21 @@
 
 import { memo, useEffect, useMemo, useReducer, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
-import type { Hotspot, Layer, Mood, SceneDef } from '@content/types'
+import type { Ambient, Hotspot, Layer, Mood, SceneDef } from '@content/types'
 import { layerArt, propArt, SCENE_HEIGHT, type LayerArt } from '@/art'
+import { ambientArt } from '@/art/ambient'
 import { Character, type Pose } from '@/character/Character'
 import { Mitthu } from '@/character/Mitthu'
-import { defaultSpec } from '@/character/spec'
+import { defaultSpec, normalizeSpec } from '@/character/spec'
 import { AreaMap, type MapPlace } from '@/components/AreaMap'
 import { DemoChip, useDemoMode } from '@/components/DemoMode'
 import { HelpButton } from '@/components/HelpButton'
 import { SettingsDialog } from '@/components/SettingsDialog'
 import { t } from '@/lib/i18n'
 import { sound } from '@/lib/sound'
+import { STEP_SECONDS } from '@/lib/synth'
 import { selectActiveProfile, useStore } from '@/lib/store'
+import { AMBIENT_SIZE, ambientShown, lightFor, PASSERBY_LOOKS, roamSeconds } from './ambient'
 import { Dialogue, speakerColour } from './Dialogue'
 import { useCalm, useCoarsePointer, useElementSize } from './hooks'
 import { FEET_FAR, FEET_NEAR, feetY, layerOffset, layerWidth, personHeight } from './movement'
@@ -143,6 +146,23 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
     return () => sound.setTone('normal')
   }, [scene.tone])
 
+  // The place's bed of sound, and footsteps while the player walks (Sound v2, D-051).
+  useEffect(() => {
+    sound.setAmbience(scene.ambience ?? null)
+    return () => sound.setAmbience(null)
+  }, [scene.ambience])
+  useEffect(() => {
+    if (!state.walking) return
+    const surface = scene.surface ?? 'paving'
+    sound.step(surface)
+    const timer = window.setInterval(() => sound.step(surface), STEP_SECONDS * 1000)
+    return () => window.clearInterval(timer)
+  }, [state.walking, scene.surface])
+
+  useEffect(() => {
+    if (panel !== 'none') sound.play('open')
+  }, [panel])
+
   const fxPose = state.fx?.pose ?? null
   useEffect(() => {
     if (fxPose) sound.play(fxPose === 'cheer' ? 'success' : 'soft')
@@ -158,8 +178,20 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
     if (state.completed) onComplete({ retries: state.story.retries })
   }, [state.completed, state.story.retries, onComplete])
 
+  // Living world (D-053): the light of the time of day, worked out once when the scene opens,
+  // and whether the tab is hidden (then nothing ambient moves).
+  const [light] = useState(() => lightFor(scene.time, new Date().getHours()))
+  const [hidden, setHidden] = useState(false)
+  useEffect(() => {
+    const onChange = () => setHidden(document.hidden)
+    document.addEventListener('visibilitychange', onChange)
+    return () => document.removeEventListener('visibilitychange', onChange)
+  }, [])
+
   // ---------------------------------------------------------------- drawing
   const flags = state.story.flags
+  const artFlags = useMemo(() => (light === 'evening' ? new Set([...flags, 'evening']) : flags), [flags, light])
+  const ambient = ambientShown(scene.ambient, light === 'evening')
   const hotspots = visibleHotspots(scene, flags)
   const node = state.dialogue ? scene.nodes[state.dialogue.nodeId] : undefined
   const near = state.dialogue || state.entering ? null : nearbyHotspot(scene, state.x, flags)
@@ -183,12 +215,12 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
     dispatch({ type: 'walkTo', x: state.camera + (event.clientX - rect.left) / scale, depth: y > FEET_FAR - 60 ? depth : undefined })
   }
 
-  const layerProps = { camera: state.camera, scale, viewWidth, sceneWidth: scene.width, calm, flags, top }
+  const layerProps = { camera: state.camera, scale, viewWidth, sceneWidth: scene.width, calm, flags: artFlags, top }
   const shake = state.shake > 0 ? `translateX(${Math.sin(state.shake * 60) * 4}px)` : undefined
   const trail = state.dialogue?.trail ?? []
 
   return (
-    <div className="scene game fixed inset-0 z-30 overflow-hidden bg-black text-white" data-tone={scene.tone}>
+    <div className="scene game fixed inset-0 z-30 overflow-hidden bg-black text-white" data-tone={scene.tone} data-light={light} data-hidden={hidden || undefined}>
       <div
         ref={viewport}
         tabIndex={-1}
@@ -202,6 +234,8 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
 
           {/* The stage: everything standing on the ground moves with the camera. */}
           <div className="absolute left-0" style={{ top, height: px(SCENE_HEIGHT), width: px(scene.width), transform: `translate3d(${-px(state.camera)}px,0,0)` }}>
+            {scale > 0 && ambient.map((a) => <AmbientView key={a.id} ambient={a} px={px} calm={calm} />)}
+
             {scale > 0 &&
               hotspots.map((h) => (
                 <HotspotView
@@ -234,6 +268,17 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
             {scale > 0 && (
               <>
                 <Shadow x={state.x} depth={state.depth} height={playerH} px={px} />
+                {state.walking && !calm && scene.surface === 'earth' && (
+                  <div
+                    aria-hidden="true"
+                    className="game-dust pointer-events-none absolute"
+                    style={{ left: px(state.x - (state.facing === 'right' ? 120 : -10)), top: px(feetY(state.depth) - 40), width: px(110), height: px(40), zIndex: depthZ(state.depth) - 1 }}
+                  >
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                )}
                 <div
                   className="game-person absolute"
                   style={{ left: px(state.x), top: px(feetY(state.depth) - playerH * 0.975), height: px(playerH), width: px(playerH / 3), transform: `translateX(-50%) scale(${1 - goneIn * 0.06})`, transformOrigin: 'bottom', opacity: 1 - goneIn, zIndex: depthZ(state.depth) }}
@@ -276,7 +321,8 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
           </div>
 
           {scale > 0 && scene.layers.filter(isFront).map((l) => <LayerView key={l.id} layer={l} {...layerProps} />)}
-          {/* The colour grade: darker corners and a heavier sky, so the eye goes to the middle. */}
+          {/* The light of the time of day (D-053), then the colour grade: darker corners and a heavier sky, so the eye goes to the middle. */}
+          <div aria-hidden="true" className="game-light pointer-events-none absolute inset-0" data-light={light} />
           <div aria-hidden="true" className="game-grade pointer-events-none absolute inset-0" />
         </div>
 
@@ -453,6 +499,35 @@ function LockIcon() {
 }
 
 /** A person's shadow on the ground, cast to the right by the low sun on the left. */
+/** One piece of ambient life (D-053): a small picture that moves by itself, or a passer-by. */
+function AmbientView({ ambient: a, px, calm }: { ambient: Ambient; px: (u: number) => number; calm: boolean }) {
+  const depth = a.depth ?? 0.2
+  const grow = personHeight(1, depth) // nearer things look bigger, like people
+  const person = a.kind === 'passerby'
+  const size = AMBIENT_SIZE[a.kind]
+  const h = person ? personHeight(ADULT_HEIGHT, depth) : size.h * grow
+  const w = person ? h / 3 : size.w * grow
+  const Art = ambientArt[a.kind]
+  const roaming = (a.roam ?? 0) > 0
+  const style = { '--roam': `${px(a.roam ?? 0)}px`, '--dur': `${roamSeconds(a.roam ?? 0)}s` } as React.CSSProperties
+  return (
+    <div
+      aria-hidden="true"
+      data-kind={a.kind}
+      className={`amb pointer-events-none absolute ${roaming ? 'amb-roam amb-moving' : ''}`}
+      style={{ left: px(a.x - w / 2), top: px(feetY(depth) - h), width: px(w), height: px(h), zIndex: depthZ(depth) - 2, ...style }}
+    >
+      <div className={`size-full ${roaming ? 'amb-turn' : ''}`} style={!roaming && a.facing === 'left' ? { transform: 'scaleX(-1)' } : undefined}>
+        {person ? (
+          <Character spec={normalizeSpec(PASSERBY_LOOKS[(a.look ?? 0) % PASSERBY_LOOKS.length])} pose={roaming && !calm ? 'walk' : 'idle'} mood="neutral" facing="right" className="size-full" />
+        ) : (
+          Art && <Art />
+        )}
+      </div>
+    </div>
+  )
+}
+
 function Shadow({ x, depth, height, px }: { x: number; depth: number; height: number; px: (u: number) => number }) {
   return (
     <div

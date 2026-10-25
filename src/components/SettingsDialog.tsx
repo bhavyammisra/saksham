@@ -11,7 +11,11 @@ const toggles: { key: Toggle; label: StringKey; hint?: StringKey }[] = [
 ]
 
 // Hindi is added in Phase 6.
-const languages: { lang: Lang; label: StringKey }[] = [{ lang: 'en', label: 'lang.en' }]
+// Each language is named in its own script, so a child can find theirs whichever is showing.
+const languages: { lang: Lang; label: StringKey }[] = [
+  { lang: 'en', label: 'lang.en' },
+  { lang: 'hi', label: 'lang.hi' },
+]
 
 /**
  * The settings button and its dialog. Uses the browser's <dialog>, which
