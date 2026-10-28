@@ -91,13 +91,13 @@ test('FR-15 a card shows "Reviewed" only when its exact text was published', asy
   let published = [{ id: SCHOOL_CARD, content_hash: hash, reviewed_at: '2026-10-18T10:00:00Z' }]
   await page.route(/supabase\.co\/rest\/v1\/rpc\/published_content/, (route) => json(route, published))
   await seedPlayer(page, '/book', { school: true })
-  await page.getByRole('button', { name: strings['book.read'].replace('{title}', school.card.title) }).click()
+  await page.getByRole('button', { name: new RegExp(`^${strings['book.read']}.*${school.card.title}`) }).click()
   await expect(page.getByText(strings['card.reviewedOn'].replace('{date}', '18 October 2026'))).toBeVisible()
 
   // A different text (the card changed after it was reviewed): no tick, and the card is still there.
   published = [{ id: SCHOOL_CARD, content_hash: 'f'.repeat(64), reviewed_at: '2026-10-18T10:00:00Z' }]
   await page.reload()
-  await page.getByRole('button', { name: strings['book.read'].replace('{title}', school.card.title) }).click()
+  await page.getByRole('button', { name: new RegExp(`^${strings['book.read']}.*${school.card.title}`) }).click()
   await expect(page.locator('blockquote')).toHaveText(school.card.law)
   await expect(page.getByText(strings['card.reviewed'], { exact: false })).toHaveCount(0)
 })

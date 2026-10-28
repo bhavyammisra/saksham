@@ -6,7 +6,7 @@ import { openMap, seedPlayer, strings } from './helpers.ts'
 test('FR-05 the Book shows collected cards, and each reads exactly as written', async ({ page }) => {
   await seedPlayer(page, '/book', { school: true })
   await expect(page.getByText(strings['book.count'].replace('{n}', '1').replace('{total}', '4'))).toBeVisible()
-  await page.getByRole('button', { name: strings['book.read'].replace('{title}', school.card.title) }).click()
+  await page.getByRole('button', { name: new RegExp(`^${strings['book.read']}.*${school.card.title}`) }).click()
   await expect(page.getByRole('heading', { name: school.card.title })).toBeVisible()
   await expect(page.locator('blockquote')).toHaveText(school.card.law)
   await page.getByRole('button', { name: strings['book.close'] }).click()

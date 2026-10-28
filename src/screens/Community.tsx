@@ -121,7 +121,7 @@ function AskAnExpert() {
     <Section id="community-ask" title={t('community.ask')} hint={t('community.askHint')}>
       <p className="mt-3 rounded-card bg-plaster-deep p-3">
         {t('community.askDanger')}{' '}
-        <Link to="/help" className="inline-flex min-h-tap items-center font-semibold text-peacock underline underline-offset-4">
+        <Link to="/help" className="inline-flex min-h-tap items-center font-semibold text-help-ink underline underline-offset-4">
           {t('community.askDangerLink')}
         </Link>
       </p>

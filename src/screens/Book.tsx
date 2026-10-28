@@ -42,11 +42,14 @@ export function Book() {
               {have ? (
                 <button
                   type="button"
-                  aria-label={t('book.read', { title: card.title })}
                   aria-expanded={open === card.id}
                   onClick={() => setOpen(open === card.id ? null : card.id)}
                   className="relative block aspect-[3/4] w-full max-w-44 rounded-card hover:-translate-y-1"
                 >
+                  {/* The picture is hidden from screen readers, so its name is said here instead (no aria-label, WCAG 2.5.3). */}
+                  <span className="sr-only">
+                    {t('book.read')}: {card.title}
+                  </span>
                   <CardFront right={building.right} title={card.title} small />
                 </button>
               ) : (

@@ -640,7 +640,7 @@ function HotspotView(props: { hotspot: Hotspot; px: (units: number) => number; p
         type="button"
         aria-label={h.label}
         onClick={props.onUse}
-        className={`scene-hotspot absolute ${person ? 'game-person' : ''}`}
+        className={`scene-hotspot absolute ${person ? 'game-person' : 'min-h-tap'}`}
         style={{ left: px(h.x), top: px(feetY(depth) - height * (person ? 0.975 : 1)), width: px(width), height: px(height), transform: 'translateX(-50%)', zIndex: depthZ(depth) }}
       >
         {picture}
