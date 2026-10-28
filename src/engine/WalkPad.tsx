@@ -18,7 +18,7 @@ export function WalkPad({ onDir }: { onDir: (dir: -1 | 0 | 1) => void }) {
   const style =
     'grid size-16 touch-none select-none place-items-center rounded-full bg-plaster/85 text-2xl font-semibold text-ink shadow-lifted active:bg-marigold-soft'
   return (
-    <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex justify-between">
+    <div className="pointer-events-none absolute inset-x-3 bottom-[calc(var(--hud-h)+0.75rem)] z-20 flex justify-between">
       <button type="button" aria-label={t('scene.walkLeft')} className={`pointer-events-auto ${style}`} {...hold(-1)}>
         <span aria-hidden="true">◀</span>
       </button>

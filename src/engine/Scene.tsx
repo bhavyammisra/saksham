@@ -233,7 +233,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
           {scale > 0 && scene.layers.filter((l) => !isFront(l)).map((l) => <LayerView key={l.id} layer={l} {...layerProps} />)}
 
           {/* The stage: everything standing on the ground moves with the camera. */}
-          <div className="absolute left-0" style={{ top, height: px(SCENE_HEIGHT), width: px(scene.width), transform: `translate3d(${-px(state.camera)}px,0,0)` }}>
+          <div data-stage className="absolute left-0" style={{ top, height: px(SCENE_HEIGHT), width: px(scene.width), transform: `translate3d(${-px(state.camera)}px,0,0)` }}>
             {scale > 0 && ambient.map((a) => <AmbientView key={a.id} ambient={a} px={px} calm={calm} />)}
 
             {scale > 0 &&
@@ -336,7 +336,8 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
             <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
           </svg>
         </button>
-        <div className="game-hud pt-1">
+        {/* On a phone the list sits on a soft dark backing, so it reads on a bright sky (P7). */}
+        <div className="game-hud pt-1 max-sm:rounded-xl max-sm:bg-black/45 max-sm:px-2.5 max-sm:py-1.5">
           <h1 className="text-lg font-semibold leading-tight">{scene.title}</h1>
           {scene.objectives.length > 0 && (
             <section aria-labelledby="objectives-title" className="mt-1">
@@ -381,7 +382,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
 
       {/* "Things to do here": every visible hotspot, to go there at once (no walking needed). */}
       {panel === 'things' && (
-        <section id="things-panel" aria-labelledby="things-title" className="game-panel absolute bottom-12 left-1/2 z-30 w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 rounded-2xl p-4">
+        <section id="things-panel" aria-labelledby="things-title" className="game-panel absolute bottom-[calc(var(--hud-h)+0.75rem)] left-1/2 z-30 w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 rounded-2xl p-4">
           <h2 id="things-title" className="font-semibold">
             {t('scene.thingsToDo')}
           </h2>
@@ -410,7 +411,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
       )}
 
       {/* The dialogue strip, just above the menu words. */}
-      <div className="absolute inset-x-0 bottom-9 z-20">
+      <div className="absolute inset-x-0 bottom-[var(--hud-h)] z-20">
         {state.dialogue ? (
           <Dialogue
             scene={scene}
@@ -426,7 +427,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
       </div>
 
       {/* Small menu words along the bottom, like a visual novel. */}
-      <nav aria-label={t('hud.menu')} className="absolute inset-x-0 bottom-0 z-30 flex h-9 items-center justify-start gap-x-1 overflow-x-auto whitespace-nowrap bg-black/85 px-2 text-sm sm:justify-center">
+      <nav aria-label={t('hud.menu')} className="absolute inset-x-0 bottom-0 z-30 flex h-[var(--hud-h)] flex-wrap content-center items-center justify-center gap-x-1 whitespace-nowrap bg-black/85 px-2 text-sm">
         <button type="button" onClick={() => dispatch({ type: 'back' })} disabled={trail.length === 0} className="game-menu">
           {t('hud.back')}
         </button>

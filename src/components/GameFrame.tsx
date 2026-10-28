@@ -18,7 +18,8 @@ export function GameFrame({ scene, focusX, children }: { scene: SceneDef; focusX
     <div className="fixed inset-0 z-30 overflow-hidden bg-black">
       <ScenePicture scene={scene} focusX={focusX} />
       <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
-      <main id="main" tabIndex={-1} className="absolute inset-0 overflow-y-auto px-4 pb-10 pt-20 outline-none">
+      {/* The scroll area starts below the corner buttons, so the card never slides under Need help? (P7). */}
+      <main id="main" tabIndex={-1} className="absolute inset-x-0 bottom-0 top-[4.5rem] overflow-y-auto px-4 pb-10 pt-2 outline-none">
         <h1 className="sr-only">{scene.title}</h1>
         {children}
       </main>
