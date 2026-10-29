@@ -484,3 +484,23 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Why:** Many children in the target age group read Hindi more easily than English. Keeping the English as the single source of wiring and law means the two languages can never disagree on what matters, and a translator can only change words.
 - **Alternatives:** Full copies of each scene in Hindi (two sets of wiring to keep in step, easy to break); an i18n library such as i18next (a dependency for what one small function does); translating the legal quotes (the law must render exactly as authored, in the language it was enacted and published in).
 
+## D-055 Hardening: three screen sizes, axe, focus, layers, and the report documents
+
+- **Context:** BUILD_PLAN P7 asks for the demo path at 1366×768, 1920×1080 and 390×844 with every rough edge fixed, offline and "backend down" checks, an accessibility pass with axe checks in Playwright, a performance check (60 fps on a mid-range phone, first load under 3 s on a school connection) and the documentation sweep (§12).
+- **Choice:**
+  - `tests/e2e/sizes.spec.ts` plays the demo path at the three sizes and fails if anything scrolls sideways or a button sticks out. People and doors on the scene's moving stage (`data-stage`) are skipped, because standing off screen until you walk there is the game. It found four phone problems, all fixed:
+    - The menu words ran off the screen. They now wrap onto two rows of 48 px buttons, with a `--hud-h` variable that the dialogue, the "Things to do" panel and the walk pad sit above.
+    - "Need help?" covered the top of the card and results. The scroll area now starts below the corner buttons.
+    - Results opened scrolled partway down. Each step now starts at the top.
+    - The objectives were hard to read on the sky. They now have a soft dark backing on phones.
+  - A backend-down test (every class-server request fails) joins the existing offline tests.
+  - **New dev dependency `@axe-core/playwright`**: the standard way to run the axe accessibility engine in Playwright, named in the BUILD_PLAN tech stack. It's for tests only and never ships. `tests/e2e/a11y.spec.ts` checks 11 screens against WCAG 2.1 AA, every target's size, and a keyboard-only School. It found and fixed four problems:
+    - The Book card buttons' names didn't match what they show. The name is now said in screen-reader text, with no `aria-label`.
+    - A teal link on a darker panel had too little contrast.
+    - The town's door buttons were 46 px tall, under the 48 px rule.
+    - "Things to do" left focus behind on the menu, so Tab skipped the panel. Focus now moves to its first choice.
+  - Performance: measured on the production build with Chrome DevTools throttling (4× slower CPU, 1.5 Mbps). First load is 2.3 to 3.0 s. Walking in the School was 19 fps, because the people and the small moving pictures repainted the whole wide stage. `will-change: transform` gives each its own small layer, raising it to 43 fps; the town walks at 46 fps.
+  - Documents: `DATA_MODEL.md` (ER diagram and who can see what), `API.md` (each function), `TRACEABILITY.md` (each requirement to a screen and its tests, with test names renamed so every one starts with its ID), the two sequence diagrams in `ARCHITECTURE.md`, the test report, the sprint log and the README.
+- **Why:** These are the checks a real classroom will put the game through (an old laptop, a phone, a child using only a keyboard), and the report is written from these documents.
+- **Alternatives:** Lighthouse instead of axe in Playwright (a separate run, not part of the test suite); hiding the menu words behind the ☰ button on phones (one more tap to reach Book or Settings); lowering the ambient life on phones (the layers fixed the cost instead).
+

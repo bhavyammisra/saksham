@@ -2,15 +2,17 @@
 
 Updated at the end of each phase. Test names start with the requirement IDs from BUILD_PLAN §11, so they map straight into the traceability matrix.
 
-## Counts (Phase 4 done, 2026-10-18, after Community)
+## Counts (Phase 7, 2026-10-29: the finished project)
 
 | Type | Tool | Files | Tests | Where |
 | --- | --- | --- | --- | --- |
-| Unit | Vitest | 17 | 241 | `src/**/*.test.ts`, `scripts/*.test.ts` |
-| End-to-end | Playwright (Chromium) | 14 | 64 | `tests/e2e/shell.spec.ts`, `onboarding.spec.ts`, `scene.spec.ts`, `play.spec.ts`, `demo-path.spec.ts`, `town.spec.ts`, `collection.spec.ts`, `community.spec.ts`, `teacher.spec.ts`, `class.spec.ts`, `sync.spec.ts`, `dashboard.spec.ts`, `offline.spec.ts`, `reviewer.spec.ts`. CI runs them twice: with the Supabase settings (job `e2e`) and without (job `e2e-local-only`, where the 16 backend tests skip themselves) |
+| Unit | Vitest | 20 | 264 | `src/**/*.test.ts`, `scripts/*.test.ts` |
+| End-to-end | Playwright (Chromium) | 19 | 91 | `tests/e2e/*.spec.ts`: shell, onboarding, scene, play, demo-path, town, collection, community, teacher, class, sync, dashboard, offline, reviewer, splash, living, hindi, sizes, a11y. CI runs them twice: with the Supabase settings (job `e2e`) and without (job `e2e-local-only`, where the backend tests skip themselves) |
 | Safety invariants | Playwright (Chromium) | 1 | 16 | `tests/e2e/safety.spec.ts` |
-| Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` |
-| RLS (database) | SQL script on the Supabase project | 1 | 45 checks | `supabase/tests/rls.test.sql` (run by hand or through the Supabase MCP after each migration; not in CI) |
+| Accessibility | axe-core in Playwright | (in `a11y.spec.ts`) | 13 | WCAG 2.1 AA on 11 screens, 48 px targets on every screen, the School by keyboard alone |
+| Content validation | `npm run validate` (CI) | n/a | n/a | `scripts/validate-content.ts` (scene graphs, flags, strings, line length, ambient life, Hindi) |
+| RLS (database) | SQL script on the Supabase project | 1 | 45 checks | `supabase/tests/rls.test.sql` (run through the Supabase MCP after each migration; not in CI) |
+| Performance | Measured on the production build | n/a | n/a | See "Performance" below |
 
 ## What the tests prove
 
@@ -88,6 +90,28 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | Hindi name | A Devanagari first name is accepted |
 | No other child's text | One player's name appears on no screen while another plays (except the player picker) |
 
+### Added in Phases 6 and 7
+- **`splash.spec.ts` (4).** The long splash on the first load ends by itself; tap, click and Escape skip it, and the next load is short; it has its own Need help? and never shows over the Help Centre or a deep link; calm mode is a still picture.
+- **`living.spec.ts` (4).** The town follows the clock (no diyas at noon, diyas and evening light at 7 pm); Home is always evening; ambient life moves and pauses while the tab is hidden; calm mode moves nothing and raises no dust.
+- **`hindi.spec.ts` (2), `hindi.test.ts` (5), `localize.test.ts` (5).** FR-09: switching to Hindi changes everything and is remembered; every UI string is translated; every Hindi scene has exactly the English wiring, answers, law and sources; helpline numbers never change; Hindi review items are separate (FR-16 per language).
+- **`sizes.spec.ts` (3).** NFR-05: the whole demo path at 1366×768, 1920×1080 and 390×844, with no sideways scrolling and no button cut off on any screen.
+- **`a11y.spec.ts` (13).** NFR-05: axe finds no WCAG 2.1 AA problems on 11 screens; every button and link is a 48 px target; the School can be played with the keyboard alone.
+- **`offline.spec.ts`, new case.** NFR-03: with the class server down (every request fails), a child still plays the School to the end, joining a class and a teacher's sign-in give calm messages, and nothing crashes.
+- **`sound.test.ts` (9).** NFR-06: effects and music each follow their own setting; nothing at all plays on the Help Centre; gentle scenes are half as loud; every scene has a real ambience.
+
+### Performance (NFR-04, measured 2026-10-29)
+
+On the production build (`vite preview`) in headless Chromium, using Chrome DevTools throttling: a 4× slower CPU for a mid-range phone, and a "school connection" of 1.5 Mbps down with 150 ms latency. Headless Chromium draws without a GPU, which is harsher than a real phone.
+
+| Measure | Result | Target |
+| --- | --- | --- |
+| First load to a usable title menu (school connection and slow CPU, three runs) | 2.3 s, 2.5 s, 3.0 s | under 3 s |
+| Town, standing / walking (4× slower CPU) | 60 / 46 fps | 60 fps |
+| School, standing / walking (4× slower CPU) | 60 / 43 fps (19 fps before the P7 fix) | 60 fps |
+| JavaScript (one file, gzipped) | 248 KB | n/a |
+
+Walking falls short of 60 fps in this no-GPU emulation. The P7 fix (people and ambient pictures on their own layers) more than doubled it. A check on a real mid-range phone is still to do.
+
 ## Latest CI run
 
 | Date | Branch | Result | Link |
@@ -98,6 +122,8 @@ Updated at the end of each phase. Test names start with the requirement IDs from
 | 2026-10-15 | `p3-school` (PR #4) | ✅ green, merged | [run 38701159641](https://github.com/bhavyammisra/saksham/actions/runs/38701159641) |
 | 2026-10-18 | `p4-town` (PR #5) | ✅ green, merged | |
 | 2026-10-19 | `p5-backend` (PR #6) | ✅ green (lint, unit, build, `e2e`, `e2e-local-only`), merged | [run 39193846346](https://github.com/bhavyammisra/saksham/actions/runs/39193846346) |
+| 2026-10-20 | `docs-readme` (PR #7) | ✅ green, merged | |
+| 2026-10-25 | `p6-experience` (PR #8) | ✅ green (10 checks), merged | |
 
 ### RLS and RPCs (`supabase/tests/rls.test.sql`, 45 checks, P5)
 Two teachers and two children, signed in by setting the JWT claims, inside one transaction that is rolled back. Last run 2026-10-18 on project `iggetuuoghdoyppdlppy`: all passed, and a deliberately false check stops the script (so a failure can't go unnoticed).

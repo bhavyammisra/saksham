@@ -116,9 +116,10 @@ function PlayBuilding({ id }: { id: string }) {
 
   if (stage === 'scene') return <Scene key={run} scene={scene} onComplete={onComplete} onExit={onExit} map={map} />
 
-  // The card, quiz and results sit in front of the scene's picture.
+  // The card, quiz and results sit in front of the scene's picture. A new step starts at the top,
+  // not where the last one was scrolled to (keyed by the step and how many games are done, P7).
   return (
-    <GameFrame scene={scene} focusX={scene.width / 2}>
+    <GameFrame key={`${stage}-${scores.length}`} scene={scene} focusX={scene.width / 2}>
       <div className="mx-auto max-w-3xl rounded-2xl bg-plaster p-5 text-ink shadow-2xl md:p-8">
         {stage === 'card' && <CardReveal card={card} band={profile.band} right={scene.right} onNext={() => setStage('games')} />}
         {stage === 'games' && game?.kind === 'quiz' && <Quiz key={game.id} questions={questionsForBand(game.questions, profile.band)} onDone={gameDone} />}

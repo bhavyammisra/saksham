@@ -21,6 +21,7 @@
 /* People stand in the scene's light: a little darker and less bright than on the menus. */
 .game .game-person {
   filter: brightness(0.9) saturate(0.88) contrast(1.05);
+  will-change: transform; /* its own small layer: a blink doesn't repaint the wide stage (P7, D-030) */
 }
 .game-shadow {
   border-radius: 50%;
@@ -49,8 +50,19 @@
   background: linear-gradient(to top, rgb(0 0 0 / 0.82) 0%, rgb(0 0 0 / 0.64) 60%, transparent 100%);
 }
 
+/* The menu words along the bottom: one row of 48 px buttons, or two rows on a phone so every
+   word fits without a hidden sideways scroll (P7). The dialogue, panels and walk pad sit above it. */
+.scene {
+  --hud-h: 6rem;
+}
+@media (min-width: 640px) {
+  .scene {
+    --hud-h: 3rem;
+  }
+}
+
 .game-menu {
-  min-height: 2.25rem;
+  min-height: 3rem;
   padding: 0 0.6rem;
   color: rgb(255 255 255 / 0.85);
   letter-spacing: 0.04em;

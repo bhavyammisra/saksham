@@ -8,6 +8,12 @@
   animation-play-state: paused !important;
 }
 
+/* Each piece is its own small layer, so its motion never repaints the wide stage it stands on
+   (P7: about 24 -> 34 fps walking in the School on a 4x slower CPU with no GPU). */
+.amb {
+  will-change: transform;
+}
+
 /* A stroll to the right and back, turning round at the far end. */
 .amb-roam {
   animation: amb-roam var(--dur) ease-in-out infinite;

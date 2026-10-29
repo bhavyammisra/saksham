@@ -6,7 +6,7 @@ import school from '../../content/scenes/school.json' with { type: 'json' }
 import hi from '../../content/strings.hi.json' with { type: 'json' }
 import { seedPlayer, strings } from './helpers.ts'
 
-test('P6 switching to Hindi changes the whole game, and is remembered after a reload', async ({ page }) => {
+test('FR-09 / NFR-09 switching to Hindi changes the whole game, and is remembered after a reload', async ({ page }) => {
   await seedPlayer(page, '/')
   await page.getByRole('button', { name: strings['title.settings'] }).click()
   await page.getByRole('button', { name: hi['lang.hi'] }).click()
@@ -23,7 +23,7 @@ test('P6 switching to Hindi changes the whole game, and is remembered after a re
   await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'मिट्ठू' }).first()).toContainText(hiTown['nodes.intro.text'])
 })
 
-test('P6 in Hindi, the law on a card and the helpline numbers stay exactly as written', async ({ page }) => {
+test('FR-09 / NFR-10 in Hindi, the law on a card and the helpline numbers stay exactly as written', async ({ page }) => {
   await seedPlayer(page, '/', { school: true })
   await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem('saksham') ?? '{}')

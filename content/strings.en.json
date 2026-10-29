@@ -317,7 +317,7 @@
   "town.celebrateClose": "Thanks, Mitthu!",
   "book.intro": "Every rights card you collect is kept here. Tap one to read it again.",
   "book.count": "{n} of {total} cards collected",
-  "book.read": "Read the card: {title}",
+  "book.read": "Read the card",
   "book.notYet": "Not collected yet",
   "book.helpAt": "Help at {place} to collect it.",
   "book.writing": "This story is still being written.",

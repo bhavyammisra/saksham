@@ -14,7 +14,7 @@ function wiring(scene: SceneDef) {
   return JSON.stringify(scene, (_key, value: unknown) => (typeof value === 'string' && words.has(value) ? '…' : value))
 }
 
-describe('P6 Hindi (D-054)', () => {
+describe('FR-09 / NFR-09 / NFR-10 Hindi (D-054)', () => {
   it('the UI speaks Hindi, and falls back to English for nothing', () => {
     setLang('hi')
     expect(getLang()).toBe('hi')

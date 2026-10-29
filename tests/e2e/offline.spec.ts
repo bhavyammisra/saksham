@@ -2,7 +2,7 @@
 // without the Supabase settings is the same game with the class features simply absent.
 import { expect, test } from '@playwright/test'
 import school from '../../content/scenes/school.json' with { type: 'json' }
-import { answerQuiz, createPlayer, playStory, strings } from './helpers.ts'
+import { answerQuiz, createPlayer, playStory, seedPlayer, skipWithoutBackend, strings } from './helpers.ts'
 
 test.describe.configure({ timeout: 60_000 })
 test.use({ reducedMotion: 'reduce' })
@@ -39,4 +39,36 @@ test('NFR-03 without the Supabase settings, the class features are simply not th
   await expect(page.getByRole('region', { name: strings['class.title'] })).toHaveCount(0)
   await page.goto('/#/community')
   await expect(page.getByRole('region', { name: strings['community.mission'] })).toContainText(strings['community.sample'])
+})
+
+test('NFR-03 with the class server down, the game still plays and only says so calmly', async ({ page }) => {
+  await skipWithoutBackend(page)
+  const crashes: string[] = []
+  page.on('pageerror', (error) => crashes.push(String(error)))
+  // Every request to the class server fails, as if it were down.
+  await page.route(/supabase\.co/, (route) => route.fulfill({ status: 503, contentType: 'application/json', body: '{"message":"unavailable"}' }))
+
+  await seedPlayer(page, '/play/school')
+  await playStory(page, true)
+  await page.getByRole('button', { name: strings['card.flip'] }).click()
+  await page.getByRole('button', { name: strings['card.toQuiz'] }).click()
+  await answerQuiz(page, [true, true, true, true])
+  await expect(page.getByText(strings['results.cardSaved'])).toBeVisible()
+
+  // Joining a class says something went wrong, in plain words, and the game carries on.
+  await page.goto('/#/me')
+  await page.getByLabel(strings['class.code']).fill('ABCDEF')
+  await page.getByRole('button', { name: strings['class.join'] }).click()
+  await expect(page.getByText(strings['class.problemGeneral'])).toBeVisible()
+  await page.goto('/#/book')
+  await expect(page.getByRole('heading', { name: school.card.title }).or(page.getByText(strings['book.count'].replace('{n}', '1').replace('{total}', '4')))).toBeVisible()
+
+  // A teacher signing in is told to check their connection.
+  await page.goto('/#/teacher')
+  await page.getByLabel(strings['teacher.email']).fill('teacher@example.com')
+  await page.getByLabel(strings['teacher.password']).fill('a-long-password')
+  await page.getByRole('main').getByRole('button', { name: strings['teacher.signIn'] }).last().click()
+  await expect(page.getByText(strings['teacher.errorGeneral'])).toBeVisible()
+
+  expect(crashes).toEqual([])
 })
