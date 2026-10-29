@@ -87,10 +87,10 @@ These rules are built into the code and checked by automated tests.
 | Part | Choice |
 | --- | --- |
 | App | React 19, TypeScript (strict), Vite |
-| Styling and motion | Tailwind CSS v4, Motion |
+| Styling, motion and sound | Tailwind CSS v4, Motion, Web Audio (all sound made in the browser) |
 | Saved progress | Zustand, saved on the device |
 | Backend | Supabase: Postgres, anonymous sign-in for children, Row Level Security |
-| Testing | Vitest (unit), Playwright (end to end and accessibility) |
+| Testing | Vitest (unit), Playwright (end to end), axe-core (accessibility) |
 | Quality checks | ESLint, TypeScript, a content validator, GitHub Actions CI |
 
 ```mermaid
@@ -117,6 +117,8 @@ npm run dev
 
 Then open the address Vite prints. No account or `.env` file is needed: without Supabase settings the game runs fully offline.
 
+To turn on classes, the teacher dashboard and content review, put your Supabase project's public URL and anon key in `.env.local` as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (see [SETUP.md §4](docs/SETUP.md)). Only the public anon key belongs here; the service-role key never does.
+
 Tip: type `demo` anywhere in the game (or press and hold the logo) to open every building at once.
 
 ## Check it
@@ -129,13 +131,23 @@ npm run validate
 npm run build
 ```
 
-End-to-end tests (install the browser once with `npx playwright install chromium`):
+End-to-end tests, including the safety rules, accessibility (axe, WCAG 2.1 AA) and three screen sizes. Install the browser once with `npx playwright install chromium`:
 
 ```bash
 npm run e2e
 ```
 
-CI runs all of these on every pull request, including a build with no backend at all, to prove the game works offline.
+Test names start with the requirement they prove, so one requirement's tests run on their own:
+
+```bash
+npx playwright test -g "FR-07"
+```
+
+CI runs all of these on every pull request, including a build with no backend at all, to prove the game works offline. In all: 264 unit tests, 107 end-to-end tests, and 45 database security checks (`supabase/tests/rls.test.sql`).
+
+## Deploy it
+
+It is a static site: `npm run build` puts everything in `dist/`, which any static host can serve, because the app uses hash routes and needs no server rewrites. CI deploys `main` to Vercel once a Vercel token and project are set up in the GitHub repository ([SETUP.md §3](docs/SETUP.md)). Until then the deploy step is skipped and CI stays green.
 
 ## Project status
 
@@ -150,16 +162,19 @@ The project is built in eight phases. Each one ends in a reviewed pull request.
 | P4 Town and all buildings | The town, Dhaba, Home, Panchayat, the sort game, Community | Done |
 | P5 Backend | Teacher classes, sync, the live dashboard, content review | Done |
 | P6 Experience and Hindi | Storybook opening, sound, a livelier world, short natural dialogue, Hindi | Done (Hindi awaiting a fluent speaker's check) |
-| P7 Hardening and documentation | Every screen size, accessibility, performance, final docs | Planned |
+| P7 Hardening and documentation | Every screen size, accessibility, performance, the report documents | Done |
 
-The legal text on each card is waiting for a final expert fact-check before children use the app.
+Every phase is built. Before children use it, a legal expert must fact-check each card's text, and a fluent speaker must check the Hindi ([SETUP.md](docs/SETUP.md) §5 to §7). Play-testing with children at a school or NGO is the next step after that.
 
 ## Documentation
 
 - [Build plan](docs/BUILD_PLAN.md): every phase, task and approval gate
-- [Decisions](docs/DECISIONS.md): 49 recorded design decisions, each with its reason and the alternatives
-- [Architecture](docs/ARCHITECTURE.md): how the code fits together
-- [Test report](docs/TEST_REPORT.md) and [sprint log](docs/SPRINT_LOG.md)
+- [Decisions](docs/DECISIONS.md): 55 recorded design decisions, each with its reason and the alternatives
+- [Architecture](docs/ARCHITECTURE.md): how the code fits together, with the sync and join-class sequences
+- [Data model](docs/DATA_MODEL.md) and [API](docs/API.md): the database, who can see what, and each server function
+- [Traceability](docs/TRACEABILITY.md): every requirement linked to its screen and its tests
+- [Test report](docs/TEST_REPORT.md) (with performance figures) and [sprint log](docs/SPRINT_LOG.md)
+- [Voices](docs/VOICES.md): how every character talks
 - [Setup](docs/SETUP.md) and [asset licences](docs/ASSET_LICENSES.md)
 
 ## Author

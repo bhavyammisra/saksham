@@ -40,7 +40,7 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
 - **Merged:** PR #4, 2026-10-15.
 - **Next:** P4 Town and all buildings, on branch `p4-town`.
 
-## P4 Town and all buildings (from 2026-10-15), in progress
+## P4 Town and all buildings (2026-10-15 to 2026-10-18)
 
 - **Goal:** A walkable town linking every building, all four buildings playable, plus the Book, Me, Credits, demo mode, the sort game and the community screens.
 - **Done so far:**
@@ -51,3 +51,29 @@ One entry per phase (BUILD_PLAN §12): goal, done, next. This is the process evi
   - The Dhaba: child labour, told gently (D-033).
   - 195 unit and 53 e2e tests green (as of the Dhaba, 2026-10-16).
 - **Next:** the Home scene, then the Panchayat.
+- **Merged:** PR #5, 2026-10-18.
+
+## P5 Backend (2026-10-18 to 2026-10-19)
+
+- **Goal:** A thin class server: teacher accounts and classes, children joining with a code, sync, a live dashboard, and content review, without the game ever depending on it.
+- **Done:** Supabase project and schema with row level security (D-043), the teacher page (D-044), joining a class with one anonymous login per player (D-045), background sync (D-046), the live dashboard and real Class Mission (D-047), proof that the game works offline and without a backend (D-048), content review with hashes and the "Reviewed" tick (D-049).
+- **Merged:** PR #6, 2026-10-19.
+
+## P6 Experience and Hindi (2026-10-20 to 2026-10-25)
+
+- **Goal:** Make the game feel alive, and playable in Hindi.
+- **Done:** the storybook splash (D-050), synthesised sound and music (D-051), the dialogue voice pass and `VOICES.md` (D-052), ambient life and time of day (D-053), and Hindi laid over the English (D-054, machine-written and flagged unreviewed).
+- **Merged:** PR #8, 2026-10-25.
+
+## P7 Hardening and documentation (2026-10-28 to 2026-10-29)
+
+- **Goal:** Make it solid at every screen size, for every child, on modest hardware, and document it for the report.
+- **Done:**
+  - The demo path tested at three sizes, which led to the phone menu, card and results fixes.
+  - The backend-down check.
+  - Accessibility checks with axe, which found and fixed the Book card names, a contrast problem and the door targets.
+  - Keyboard focus moves into "Things to do".
+  - Performance measured, and the School walking frame rate more than doubled.
+  - New docs: `DATA_MODEL.md`, `API.md` and `TRACEABILITY.md`, the architecture sequence diagrams, the test report and the README. D-055.
+- **Next:** none in the plan. The owner's tasks remain (SETUP.md §4 to §7), and play-testing with children.
+

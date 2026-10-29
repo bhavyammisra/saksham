@@ -107,6 +107,51 @@ stage, people (npcs.json), prompts"]
 - Calm mode turns off parallax, camera smoothing, the typewriter and all ambient motion. `gentle` scenes play sound at half volume and never nudge the screen.
 - The engine never names a building. It reads only the SceneDef, the art registry by key, and `npcs.json`.
 
+## Joining a class (D-045)
+
+```mermaid
+sequenceDiagram
+    actor Child
+    participant App as Saksham (browser)
+    participant Auth as Supabase Auth
+    participant DB as Postgres (RLS)
+    Child->>App: Me › My class: types the teacher's code
+    alt no internet
+        App-->>Child: "You're not connected right now. Keep playing." (nothing sent)
+    else online
+        App->>Auth: sign in this player (anonymous; refresh the saved login if there is one)
+        Auth-->>App: session for this player only
+        App->>DB: join_class(code, first name, band, look)
+        alt code unknown or switched off
+            DB-->>App: P0002 (same answer for both)
+            App-->>Child: "That code didn't work. Check it with your teacher."
+        else code is good
+            DB->>DB: insert or update the student row, create their extras row
+            DB-->>App: class id and name
+            App-->>Child: "You're in <class>." Sync starts.
+        end
+    end
+```
+
+## Syncing progress (D-046)
+
+```mermaid
+sequenceDiagram
+    participant Store as Saved game (device)
+    participant Sync as sync.ts
+    participant DB as Postgres (RLS + merge triggers)
+    Note over Store,Sync: runs at start, 1.5 s after any change, and when the network comes back
+    Sync->>Store: read the active player (skip if not in a class)
+    Sync->>DB: upsert progress and extras
+    DB->>DB: keep the best: max stars and score, union of lists
+    Sync->>DB: insert queued quiz and sort answers (the outbox)
+    Sync->>Store: drop only the answers that were sent
+    Sync->>DB: read progress and extras back
+    DB-->>Sync: rows (this child only)
+    Sync->>Store: merge (best of both devices)
+    Note over Sync: any error: stop quietly, keep the outbox, try again next round
+```
+
 ## Build and run
 
 - `index.html` → `src/main.tsx`. That file sets calm mode, wraps the app in `HashRouter`, and renders `App`.

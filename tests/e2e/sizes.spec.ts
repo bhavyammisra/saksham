@@ -34,7 +34,7 @@ async function fits(page: Page, size: string, screen: string) {
 }
 
 for (const size of SIZES) {
-  test(`P7 the demo path fits a ${size.name} (${size.width}x${size.height})`, async ({ page }) => {
+  test(`NFR-05 the demo path fits a ${size.name} (${size.width}x${size.height})`, async ({ page }) => {
     await page.setViewportSize({ width: size.width, height: size.height })
     await page.goto('/')
     await fits(page, size.name, '01-title')

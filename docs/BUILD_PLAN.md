@@ -26,8 +26,8 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P3 School end to end (**MILESTONE A**) | ✅ merged | #4 | D-027 to D-029 |
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
-| P6 Experience and Hindi | ✅ built on `p6-experience`; pull request next | | D-050 to D-054 |
-| P7 Hardening and documentation | ⬜ | | |
+| P6 Experience and Hindi | ✅ merged 2026-10-25 | #8 | D-050 to D-054 |
+| P7 Hardening and documentation | ✅ built on `p7-hardening`; pull request next | | D-055 |
 
 **🛑 Owner gates**
 
@@ -352,10 +352,10 @@ Done when: School plays from start to results, progress survives a reload, and t
 
 ### Phase 7: Hardening and documentation
 
-- [ ] Walk the demo path at 1366×768, 1920×1080 and 390×844; fix every rough edge. Offline check and a "backend down" check.
-- [ ] Accessibility pass: keyboard-only path, 48 px targets, `aria-live`, reduced motion, axe checks in Playwright.
-- [ ] Performance check (town and School at 60 fps on a mid-range phone profile; first load under 3 s on a school connection).
-- [ ] Documentation sweep (§12) and `ASSET_LICENSES.md` complete. Update the README with how to run, test and deploy.
+- [x] (D-055) Walk the demo path at 1366×768, 1920×1080 and 390×844; fix every rough edge. Offline check and a "backend down" check.
+- [x] (D-055) Accessibility pass: keyboard-only path, 48 px targets, `aria-live`, reduced motion, axe checks in Playwright.
+- [x] (D-055) Performance check (town and School at 60 fps on a mid-range phone profile; first load under 3 s on a school connection).
+- [x] (D-055) Documentation sweep (§12) and `ASSET_LICENSES.md` complete. Update the README with how to run, test and deploy.
 
 ## 10. Writing rules for scenes and dialogue
 
@@ -681,4 +681,14 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Tests: `localize.test.ts` (5), `hindi.test.ts` (5: every UI string differs from English; every Hindi scene has the same wiring, law and sources; Help Centre numbers and sources unchanged; Hindi names; a Hindi twin for every review item), validator tests for Hindi strings, `tests/e2e/hindi.spec.ts` (2: switching and remembering; the law and helpline numbers in Hindi, and the Credits note); the reviewer test now sends 18 items. 264 unit tests. Checked by screenshot in Hindi (title, School, Book at 1366; Help Centre and town at 390, no sideways scroll); the wordmark lost its wide letter-spacing in Hindi so "सक्षम" joins up.
 - Every Phase 6 box is now done.
 - Next task: open the P6 pull request (with the owner's go-ahead), then Phase 7.
+
+**P6 merged (2026-10-25)**
+- PR #8 merged with a merge commit after CI went green (10 checks). The repo now has a description and topics on GitHub.
+
+**P7: hardening and documentation (2026-10-28 to 2026-10-29)**
+- Done: every Phase 7 box (D-055). The demo path at three sizes (`sizes.spec.ts`), with phone fixes (two-row menu bar with 48 px buttons, card and results below the corner buttons, each step starting at the top, readable objectives); the backend-down test; axe accessibility checks (`a11y.spec.ts`; new dev dependency `@axe-core/playwright`), fixing the Book card names, a contrast problem, door target size, and focus moving into "Things to do"; performance measured (first load 2.3 to 3.0 s; School walking 19 → 43 fps by giving people and ambient pictures their own layers). Docs: `DATA_MODEL.md`, `API.md`, `TRACEABILITY.md`, sequence diagrams in `ARCHITECTURE.md`, the test report, the sprint log, the README. Tests renamed so each starts with its requirement ID.
+- Tests: 264 unit and 107 e2e tests.
+- Not done, and honest about it: a real mid-range phone check (the emulation has no GPU, and walking reaches 43 to 46 fps there, not 60), and play-testing with children (BUILD_PLAN §11 evaluation targets).
+- Owner: everything in the Checkpoints' "Owner-only tasks" table is still open, and all of it must be done before children use the app.
+- Next task: open the P7 pull request; when it merges, every phase in this plan is done.
 

@@ -86,7 +86,7 @@ test('FR-15 a reviewer sends the content, reads it next to its hash, and publish
   await expect(page.getByText(strings['reviewer.nothingNew'])).toBeVisible()
 })
 
-test('FR-15 a card shows "Reviewed" only when its exact text was published', async ({ page }) => {
+test('FR-16 a card shows "Reviewed" only when its exact text was published', async ({ page }) => {
   const hash = await sha256(cardText(school.card as Card))
   let published = [{ id: SCHOOL_CARD, content_hash: hash, reviewed_at: '2026-10-18T10:00:00Z' }]
   await page.route(/supabase\.co\/rest\/v1\/rpc\/published_content/, (route) => json(route, published))

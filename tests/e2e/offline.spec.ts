@@ -41,7 +41,7 @@ test('NFR-03 without the Supabase settings, the class features are simply not th
   await expect(page.getByRole('region', { name: strings['community.mission'] })).toContainText(strings['community.sample'])
 })
 
-test('P7 with the class server down, the game still plays and only says so calmly', async ({ page }) => {
+test('NFR-03 with the class server down, the game still plays and only says so calmly', async ({ page }) => {
   await skipWithoutBackend(page)
   const crashes: string[] = []
   page.on('pageerror', (error) => crashes.push(String(error)))
