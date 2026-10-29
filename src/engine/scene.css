@@ -21,6 +21,7 @@
 /* People stand in the scene's light: a little darker and less bright than on the menus. */
 .game .game-person {
   filter: brightness(0.9) saturate(0.88) contrast(1.05);
+  will-change: transform; /* its own small layer: a blink doesn't repaint the wide stage (P7, D-030) */
 }
 .game-shadow {
   border-radius: 50%;
