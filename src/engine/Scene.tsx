@@ -83,6 +83,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
   const reducer = useMemo(() => sceneReducer(scene, locked), [scene, locked])
   const [state, dispatch] = useReducer(reducer, scene, (s) => initialSceneState(s, startX, startFlags, skipIntro))
   const [panel, setPanel] = useState<'none' | 'history' | 'map' | 'things'>('none')
+  const thingsList = useRef<HTMLUListElement>(null)
 
   // ---------------------------------------------------------------- input and the frame loop
   const keys = useRef({ left: false, right: false, up: false, down: false, pad: 0 as -1 | 0 | 1 })
@@ -161,6 +162,8 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
 
   useEffect(() => {
     if (panel !== 'none') sound.play('open')
+    // Keyboard users land on the first thing to do: the panel comes before the menu in the page, so Tab alone would skip it (P7).
+    if (panel === 'things') thingsList.current?.querySelector('button')?.focus()
   }, [panel])
 
   const fxPose = state.fx?.pose ?? null
@@ -387,7 +390,7 @@ export function Scene({ scene, onComplete, onExit, locked = NOTHING_LOCKED, star
             {t('scene.thingsToDo')}
           </h2>
           <p className="text-sm text-white/75">{t('scene.thingsToDoHint')}</p>
-          <ul className="mt-3 flex flex-wrap gap-2">
+          <ul ref={thingsList} className="mt-3 flex flex-wrap gap-2">
             {hotspots.map((h) => (
               <li key={h.id}>
                 <button

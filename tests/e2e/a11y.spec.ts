@@ -43,8 +43,7 @@ test('NFR-05 every button and link on the main screens is a 48 px target', async
   expect(small).toEqual([])
 })
 
-// fixme: after Things to do walks the player there, E doesn't open the talk yet in this test; finish in P7.
-test.fixme('NFR-05 the School can be played with the keyboard alone', async ({ page }) => {
+test('NFR-05 the School can be played with the keyboard alone', async ({ page }) => {
   await seedPlayer(page, '/play/school')
   const next = page.getByRole('button', { name: strings['scene.next'] })
   /** Each line's Next button takes focus by itself, so Enter alone keeps a conversation going. */
@@ -63,9 +62,9 @@ test.fixme('NFR-05 the School can be played with the keyboard alone', async ({ p
   await expect(things).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page.getByRole('heading', { name: strings['scene.thingsToDo'] })).toBeVisible()
-  await page.keyboard.press('Tab')
-  await page.keyboard.press('Enter') // walks straight to the first thing to do
-  await page.keyboard.press('e') // and talks
+  // Focus moves into the panel by itself, so Enter goes straight to the first thing to do and talks.
+  await expect(page.locator('#things-panel button').first()).toBeFocused()
+  await page.keyboard.press('Enter')
   await expect(next).toBeVisible()
   await talkWithEnter()
   await expect(page.getByText(strings['hud.controls'])).toBeVisible()
