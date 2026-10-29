@@ -27,7 +27,7 @@ Where the project stands against every phase, owner gate and owner-only task. De
 | P4 Town and all buildings | ✅ merged 2026-10-18 | #5 | D-030 to D-042 |
 | P5 Backend | ✅ merged 2026-10-19 | #6 | D-043 to D-049 |
 | P6 Experience and Hindi | ✅ merged 2026-10-25 | #8 | D-050 to D-054 |
-| P7 Hardening and documentation | ✅ built on `p7-hardening`; pull request next | | D-055 |
+| P7 Hardening and documentation | ✅ merged 2026-10-29 | #9 | D-055 |
 
 **🛑 Owner gates**
 
@@ -691,4 +691,8 @@ Evaluation targets: at least 70% of at least 20 test children score at least 70%
 - Not done, and honest about it: a real mid-range phone check (the emulation has no GPU, and walking reaches 43 to 46 fps there, not 60), and play-testing with children (BUILD_PLAN §11 evaluation targets).
 - Owner: everything in the Checkpoints' "Owner-only tasks" table is still open, and all of it must be done before children use the app.
 - Next task: open the P7 pull request; when it merges, every phase in this plan is done.
+
+**P7 merged: the plan is complete (2026-10-29)**
+- PR #9 (`p7-hardening` into `main`) merged with a merge commit (`2e65bef`) after CI went green (10 checks). Every phase from P0 to P7 is now on `main`.
+- Left for the owner, before any child uses the app: the fact-checks (SETUP.md §5, §6), the Hindi check (§7), becoming a reviewer and publishing (§4), the font licences, and an email provider for teacher sign-ups. After that: a real-phone frame-rate check and play-testing with children (§11 evaluation targets).
 
