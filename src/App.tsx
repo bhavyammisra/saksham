@@ -9,6 +9,7 @@ import { DevCharacters } from '@/screens/DevCharacters'
 import { DevScene } from '@/screens/DevScene'
 import { RequireProfile } from '@/screens/guards'
 import { HelpCentre } from '@/screens/HelpCentre'
+import { Privacy, Terms } from '@/screens/Legal'
 import { Me, MeCharacter } from '@/screens/Me'
 import { Onboarding } from '@/screens/Onboarding'
 import { Community } from '@/screens/Community'
@@ -57,6 +58,8 @@ export default function App() {
           {/* Screens with the top bar and the main navigation. */}
           <Route element={<Shell nav />}>
             <Route path="/credits" element={<Credits />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route element={<RequireProfile />}>
               <Route path="/book" element={<Book />} />
               <Route path="/community" element={<Community />} />
