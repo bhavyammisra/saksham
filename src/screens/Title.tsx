@@ -81,6 +81,14 @@ export function Title() {
           ·{' '}
           <Link to="/teacher" className="underline underline-offset-4 hover:text-espresso">
             {t('title.forTeachers')}
+          </Link>{' '}
+          ·{' '}
+          <Link to="/privacy" className="underline underline-offset-4 hover:text-espresso">
+            {t('title.privacy')}
+          </Link>{' '}
+          ·{' '}
+          <Link to="/terms" className="underline underline-offset-4 hover:text-espresso">
+            {t('title.terms')}
           </Link>
         </p>
       </div>

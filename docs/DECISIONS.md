@@ -504,3 +504,10 @@ One short entry per significant choice: context, choice, why, alternatives. Newe
 - **Why:** These are the checks a real classroom will put the game through (an old laptop, a phone, a child using only a keyboard), and the report is written from these documents.
 - **Alternatives:** Lighthouse instead of axe in Playwright (a separate run, not part of the test suite); hiding the menu words behind the ☰ button on phones (one more tap to reach Book or Settings); lowering the ambient life on phones (the layers fixed the cost instead).
 
+
+## D-056: Privacy and terms pages before going live
+
+- **Context:** The game is going live on a free `.vercel.app` address so it can be submitted. The owner's launch checklist needs a privacy policy and terms before anything goes live.
+- **Choice:** Two plain pages, `/privacy` and `/terms` (`src/screens/Legal.tsx`), linked from the title menu's footer. Each is a list of headings and short paragraphs from the strings files, in English and Hindi. The privacy page says exactly what the code does: a player lives on the device, a class gets the first name, progress and quiz answers, teachers sign in with email, and there is no analytics or tracking. The terms say the cards are for learning and not legal advice, and give 1098 and 112.
+- **Why:** Short, true and in the child's own languages. Both go through `t()` like every other screen, so the validator and the Hindi tests cover them.
+- **Alternatives:** One combined page (the checklist asks for two); a page written by a template generator (generic text that would not match what Saksham actually does).

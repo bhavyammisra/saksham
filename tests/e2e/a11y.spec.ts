@@ -7,7 +7,7 @@ import { seedPlayer, strings } from './helpers.ts'
 test.describe.configure({ timeout: 60_000 })
 test.use({ reducedMotion: 'reduce' })
 
-const SCREENS = ['/', '/onboarding', '/town', '/play/school', '/book', '/me', '/community', '/credits', '/teacher', '/reviewer', '/help']
+const SCREENS = ['/', '/onboarding', '/town', '/play/school', '/book', '/me', '/community', '/credits', '/privacy', '/terms', '/teacher', '/reviewer', '/help']
 
 /** WCAG 2.1 A and AA problems on the screen, as short lines a person can read. */
 async function axeProblems(page: Page) {
